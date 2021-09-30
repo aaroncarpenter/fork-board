@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset = "UTF-8">
+      <title>Wallet Dashboard</title>
+      <link rel = "stylesheet" href = "./bower_components/bootstrap/dist/css/bootstrap.min.css" />
+      <style type = "text/css">
+         #wallet-list {
+            height: 500px;
+            overflow-y: auto;
+         }
+
+         .card-footer {
+            padding-top: 1px;
+            padding-bottom: 1px;
+            margin-bottom:10px;
+         }
+
+         .card-header {
+            padding-top: 2px;
+            padding-bottom: 2px;
+         }
+
+         small {
+            font-variant: small-caps;
+         }
+      </style>
+   </head>
+   
+   <body>
+      <div class = "container">
+         <h1 id="appDisplayHeader">Actual Wallet Balance</h5> 
+            
+         <div id="alertBox" class="alert alert-warning" style="display: none" role="alert">
+         </div>
+         <div id="add-wallet" class="alert alert-info" style="display: none" role="alert">
+            <div class = "form-group">
+               <label for = "Wallet">Enter Wallet Address</label>
+               <input type = "text" name = "Wallet" value = "" id = "Wallet" placeholder = "Wallet" class = "form-control col-xs-4" required>
+               <p />
+               <button class = "btn btn-primary" id = "add-to-list">Add Wallet</button>
+               <button class = "btn btn-primary" id = "cancel-add">Cancel</button>
+            </div>
+         </div>
+         <p />
+         <div id="wallet-cards" class="row" style="vertical-align:bottom"></div>
+      <script src = "./view.js" ></script> 
+      </div>
+   </body>
+</html>

@@ -1,0 +1,99 @@
+[{
+    "coinSymbol": "xdg",
+    "coinApiName": "dogechia",
+    "coinName": "DogeChia",
+    "imgPath": "./img/dogechia.png",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "xch",
+    "coinApiName": "chia",
+    "coinName": "Chia",
+    "imgPath": "./img/chia.png",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "xcd",
+    "coinApiName": "cryptodoge",
+    "coinName": "CryptoDoge",
+    "imgPath": "./img/cryptodoge.svg",
+    "multiplier": "1000000"
+},
+{
+    "coinSymbol": "xfx",
+    "coinApiName": "flax",
+    "coinName": "Flax",
+    "imgPath": "./img/flax.svg",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "xfl",
+    "coinApiName": "flora",
+    "coinName": "Flora",
+    "imgPath": "./img/flora.svg",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "gdog",
+    "coinApiName": "greendoge",
+    "coinName": "GreenDoge",
+    "imgPath": "./img/greendoge.png",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "hdd",
+    "coinApiName": "hddcoin",
+    "coinName": "HDDCoin",
+    "imgPath": "./img/hddcoin.png",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "tsit",
+    "coinApiName": "silicoin",
+    "coinName": "Silicoin",
+    "imgPath": "./img/silicoin.png",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "tad",
+    "coinApiName": "tad",
+    "coinName": "Tad",
+    "imgPath": "./img/tad.svg",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "xmz",
+    "coinApiName": "maize",
+    "coinName": "Maize",
+    "imgPath": "./img/maize.svg",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "xtx",
+    "coinApiName": "taco",
+    "coinName": "Taco",
+    "imgPath": "./img/taco.png",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "sock",
+    "coinApiName": "socks",
+    "coinName": "Socks",
+    "imgPath": "./img/socks.png",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "wheat",
+    "coinApiName": "wheat",
+    "coinName": "Wheat",
+    "imgPath": "./img/wheat.png",
+    "multiplier": "1"
+},
+{
+    "coinSymbol": "scm",
+    "coinApiName": "scam",
+    "coinName": "Scam",
+    "imgPath": "./img/scam.svg",
+    "multiplier": "1"
+}
+]
