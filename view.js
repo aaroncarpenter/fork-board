@@ -1,9 +1,8 @@
-let $ = require('jquery')
-let fs = require('fs')
-//const prompt = require('electron-prompt');
-let walletFile = './config/wallets.json'
+let $ = require('jquery');
+let fs = require('fs');
+let walletFile = './config/wallets.json';
 let cardTemplate = '<div id="{3}-card" class="walletCard col-md-4"><div class="card-header"><img style="height: 30px; width: 30px" src="{2}" class="card-img"> &nbsp;&nbsp;<b>{0}</b></div><div class="card"><div class="card-body"><h2 class="card-text"><div class="spinner-border" role="status"></div></h2></div></div><div class="card-footer"><small class="text-muted">{4}</small></div></div>';
-const {ipcRenderer} = require('electron')
+const {ipcRenderer} = require('electron');
 let walletCache = new Set();
 let coinConfigObj = JSON.parse(fs.readFileSync('./config/coinconfig.json', 'utf8'));
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
@@ -16,7 +15,6 @@ $('#add-to-list').on('click', () => {
    if (!walletCache.has(walletVal))
    {
       walletObj.push({'wallet': walletVal});
-      //fs.appendFile(walletFile, wallet + '\n');
       addEntry(walletVal);
       fs.writeFile(walletFile, JSON.stringify(walletObj, null, '\t'));
    }
@@ -82,11 +80,38 @@ function getCoinConfigForWallet(wallet)
    }
 }
 
+function getCoinConfigForCoin(coin)
+{
+   let coinConfig;
+   let coinConfigFound = false;
+   coinConfigObj.every((cfg) => {
+      if (coin == cfg.coinApiName)
+      {
+         coinConfig = cfg;
+         coinConfigFound = true;
+         return false;
+      }
+      else
+      {
+         return true;
+      }
+   });
+
+   if (coinConfigFound)
+   {
+      return coinConfig;
+   }
+   else
+   {
+      console.log('Unable to locate coin configuration settings for ' + wallet);
+   }
+}
+
 function buildWalletCard(wallet)
 {
       let coinCfg = getCoinConfigForWallet(wallet);
 
-      let updateString = cardTemplate.replace('{0}', coinCfg.coinName).replace('{1}', '...').replace('{2}', coinCfg.imgPath).replace('{3}', coinCfg.coinApiName).replace('{4}', coinCfg.coinSymbol);
+      let updateString = cardTemplate.replace('{0}', coinCfg.coinName).replace('{2}', coinCfg.imgPath).replace('{3}', coinCfg.coinApiName).replace('{4}', coinCfg.coinSymbol);
 
       if ($('#'+coinCfg.coinApiName+'-card').length == 0)
          $('#wallet-cards').append(updateString);
@@ -140,7 +165,8 @@ ipcRenderer.on('async-get-pending-recovery-balance-reply', (event, arg) => {
             //Remove loading spinner if present
             $('#'+coin+'-card .spinner-border').remove();
 
-            $('#'+coin+'-card .card-text').text(balance.toLocaleString());
+            if ($('#'+coin+'-card .card-text').text() != 'N/A')
+               $('#'+coin+'-card .card-text').text(balance.toLocaleString());
          }
 
          return true;
@@ -176,8 +202,14 @@ ipcRenderer.on('async-show-recoverable-wallet-balance', (event, arg) => {
    loadAndDisplayWallets(false);
 
    // No Pending Balance to be displayed for Chia
-   $('#chia-card .spinner-border').remove();
-   $('#chia-card .card-text').text('-');
+   coinConfigObj.every((cfg) => {
+      if (!cfg.isRecoverable)
+      {
+         $('#'+cfg.coinApiName+'-card .spinner-border').remove();
+         $('#'+cfg.coinApiName+'-card .card-text').text('N/A');
+      }
+      return true;
+   });
 
    ipcRenderer.send('async-get-pending-recovery-balance', ['e72d87fddafb0ca93f88773069f5794e55915a4067efaa382673c08b3f2e64ec']);   
 })
