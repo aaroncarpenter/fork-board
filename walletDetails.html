@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset = "UTF-8">
+      <title>Wallet Details</title>
+      <link rel = "stylesheet" href = "./bower_components/bootstrap/dist/css/bootstrap.min.css" />
+      <style type = "text/css">
+         #wallet-list {
+            overflow-y: auto;
+         }
+
+         .card-footer {
+            padding-top: 1px;
+            padding-bottom: 0.1rem;
+            margin-bottom: 0.5rem;
+         }
+
+         .card-header {
+            padding-top: 0.1rem;
+            padding-bottom: 0.1rem;
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+         }
+
+         .walletCard {
+            min-width: 550px;
+         }
+
+         small {
+            font-variant: small-caps;
+         }
+      </style>
+
+      <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+   </head>
+   
+   <body>
+      <div class = "container">
+         <h2 id="coinName"></h2>
+         <p></p>
+         <div id="wallet-cards" class="row" style="vertical-align:bottom"></div>
+      <script src = "./walletDetails.js" ></script>
+      </div>
+   </body>
+</html>

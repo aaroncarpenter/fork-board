@@ -1,11 +1,11 @@
 {
-  "name": "delicate-expansion-wrap-949py",
-  "productName": "delicate-expansion-wrap-949py",
-  "description": "My Electron application description",
+  "name": "chia-forks-dashboard",
+  "productName": "chia-forks-dashboard",
+  "description": "A small dashboard application to show balances of wallets from Chia and Forks.",
   "keywords": [],
   "main": "./main.js",
   "version": "1.0.0",
-  "author": "amcar",
+  "author": "Aaron Carpenter",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -16,14 +16,15 @@
   "dependencies": {
     "axios": "^0.21.4",
     "electron-prompt": "^1.7.0",
+    "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.6.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.59",
-    "@electron-forge/maker-deb": "^6.0.0-beta.59",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.59",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.59",
-    "@electron-forge/maker-zip": "^6.0.0-beta.59",
+    "@electron-forge/cli": "^6.0.0-beta.61",
+    "@electron-forge/maker-deb": "^6.0.0-beta.61",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.61",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
+    "@electron-forge/maker-zip": "^6.0.0-beta.61",
     "electron": "13.1.7"
   },
   "config": {
@@ -31,12 +32,15 @@
       "packagerConfig": {},
       "makers": [
         {
-          "name": "@electron-forge/maker-squirrel"
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "chia-forks-dashboard"
+          }
         },
         {
           "name": "@electron-forge/maker-zip",
           "platforms": [
-            "darwin"
+            "darwin", "linux"
           ]
         },
         {

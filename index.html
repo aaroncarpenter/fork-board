@@ -12,39 +12,52 @@
 
          .card-footer {
             padding-top: 1px;
-            padding-bottom: 1px;
-            margin-bottom:10px;
+            padding-bottom: 0.1rem;
+            margin-bottom: 0.5rem;
+            max-height: 35px;
          }
 
          .card-header {
-            padding-top: 2px;
-            padding-bottom: 2px;
+            padding-top: 0.1rem;
+            padding-bottom: 0.1rem;
+            padding-left: 0.25rem;
          }
 
          small {
             font-variant: small-caps;
          }
       </style>
+
+      <script src="./bower_components/jquery/dist/jquery.min.js"></script>
    </head>
    
    <body>
       <div class = "container">
-         <h1 id="appDisplayHeader">Actual Wallet Balance</h5> 
-            
+         <p></p>
+         <div class="row">
+            <div class="col-md-6"></div>
+            <div class="btn-group btn-group-sm col-md-6" role="group" aria-label="Basic example">
+               <button type="button" id="show-actual-balance" class="btn btn-primary btn-small">Show Actual Balance</button>
+               <button type="button" id="show-recoverable-balance" class="btn btn-secondary btn-small">Show Recoverable Balance</button>
+            </div>
+         </div>
          <div id="alertBox" class="alert alert-warning" style="display: none" role="alert">
          </div>
          <div id="add-wallet" class="alert alert-info" style="display: none" role="alert">
-            <div class = "form-group">
+            <div class="d-flex flex-row justify-content-between">
                <label for = "Wallet">Enter Wallet Address</label>
-               <input type = "text" name = "Wallet" value = "" id = "Wallet" placeholder = "Wallet" class = "form-control col-xs-4" required>
+               <input type = "text" name = "Wallet" value = "" id = "Wallet" placeholder = "You can enter multiple wallets separated by commas." class = "form-control col-xs-4" required>
                <p />
                <button class = "btn btn-primary" id = "add-to-list">Add Wallet</button>
                <button class = "btn btn-primary" id = "cancel-add">Cancel</button>
             </div>
          </div>
+         <div id="nft-recovery" class="alert alert-info" style="display: none" role="alert">
+            <button class = "btn btn-primary" id = "open-nft-recovery">Open NFT Recovery Site</button>
+         </div>
          <p />
          <div id="wallet-cards" class="row" style="vertical-align:bottom"></div>
-      <script src = "./view.js" ></script> 
+      <script src = "./view.js" ></script>
       </div>
    </body>
 </html>

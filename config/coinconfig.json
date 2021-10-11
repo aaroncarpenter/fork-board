@@ -109,5 +109,29 @@
     "imgPath": "./img/scam.svg",
     "multiplier": "1",
     "isRecoverable": true
+},
+{
+    "coinSymbol": "cgn",
+    "coinApiName": "chaingreen",
+    "coinName": "ChainGreen",
+    "imgPath": "./img/chaingreen.svg",
+    "multiplier": "1",
+    "isRecoverable": false
+},
+{
+    "coinSymbol": "trz",
+    "coinApiName": "tranzact",
+    "coinName": "Tranzact",
+    "imgPath": "./img/tranzact.png",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xkm",
+    "coinApiName": "mint",
+    "coinName": "Mint",
+    "imgPath": "./img/mint.png",
+    "multiplier": "1",
+    "isRecoverable": true
 }
 ]
