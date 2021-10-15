@@ -1,10 +1,16 @@
+const {ipcRenderer} = require('electron');
+
 let $ = require('jquery');
 let fs = require('fs');
-let walletFile = './config/wallets.json';
-let cardTemplate = '<div id="{0}-card" class="walletCard"><div class="card-header"><div class="d-flex flex-row justify-content-between"><div><small>{1}&nbsp;&nbsp;&nbsp;&nbsp;</small></div><div><button type="button" onclick="handleWalletDelete(\'{2}\')" class="btn-close" aria-label="Close"></button></div></div></div><div class="card"><div class="card-body"><h2 class="card-text"><div class="spinner-border" role="status"></div></h2></div></div><div class="card-footer"><small class="text-muted">{3}</small></div></div>';
-const {ipcRenderer} = require('electron');
-let coinConfigObj = JSON.parse(fs.readFileSync('./config/coinconfig.json', 'utf8'));
+let path = require('path');
+
+let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
+let templateFile = path.resolve(__dirname, '../resources/templates/card-template-wallet-detail.html');
+let coinConfigFile = path.resolve(__dirname, '../resources/config/coinconfig.json');
+let cardTemplate = fs.readFileSync(templateFile, 'utf8');
+let coinConfigObj = JSON.parse(fs.readFileSync(coinConfigFile, 'utf8'));
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
+
 let coinName = "";
 
 addEventListener('keyup', handleKeyPress, true);

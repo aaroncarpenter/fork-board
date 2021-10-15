@@ -1,13 +1,21 @@
 let $ = require('jquery');
 let fs = require('fs');
-let walletFile = './config/wallets.json';
-let cardTemplate = '<div id="{3}-card" class="walletCard col-md-4" onclick="loadWalletDetails(\'{1}\')"><div class="card-header"><img style="height: 30px; width: 30px" src="{2}" class="card-img"> &nbsp;&nbsp;<b>{0}</b></div><div class="card"><div class="card-body"><h2 class="card-text"><div class="spinner-border" role="status"></div></h2></div></div><div class="card-footer"><div class="d-flex flex-row justify-content-between"><div><small class="text-muted">{4}</small></div><div><small class="text-muted"><span id="walletCount"></span><span id="walletCountLabel"></span></small></div></div></div>';
+let path = require('path');
 const {ipcRenderer, clipboard} = require('electron');
-let walletCache = new Set();
-let coinConfigObj = JSON.parse(fs.readFileSync('./config/coinconfig.json', 'utf8'));
-let clientConfigObj = JSON.parse(fs.readFileSync('./config/clientconfig.json', 'utf8'));
+
+let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
+let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
+let coinConfigFile = path.resolve(__dirname, '../resources/config/coinconfig.json');
+let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig.json');
+let cardTemplate = fs.readFileSync(templateFile, 'utf8');
+let coinConfigObj = JSON.parse(fs.readFileSync(coinConfigFile, 'utf8'));
+let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
+
+let coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
+
 let actualBalanceDisplayed = true;
+let walletCache = new Set();
 
 loadAndDisplayWallets(true);
 
@@ -37,7 +45,7 @@ $('#show-actual-balance').on('click', () => {
    if (!actualBalanceDisplayed)
    {
       $('#show-recoverable-balance').addClass('btn-secondary');
-      $('#show-recoverable-balance').removeClass('btn-primary')
+      $('#show-recoverable-balance').removeClass('btn-primary');
       $('#show-actual-balance').addClass('btn-primary');
       $('#show-actual-balance').removeClass('btn-secondary');
       getWalletBalances();
@@ -49,7 +57,7 @@ $('#show-recoverable-balance').on('click', () => {
    if (actualBalanceDisplayed)
    {
       $('#show-actual-balance').addClass('btn-secondary');
-      $('#show-actual-balance').removeClass('btn-primary')
+      $('#show-actual-balance').removeClass('btn-primary');
       $('#show-recoverable-balance').addClass('btn-primary');
       $('#show-recoverable-balance').removeClass('btn-secondary');
       getWalletRecoverableBalances();
@@ -182,10 +190,12 @@ function getCoinConfigForCoin(coin)
 
 function buildWalletCard(wallet, coinCfg)
 {
-      let updateString = cardTemplate.replace('{0}', coinCfg.coinName).replace('{1}', coinCfg.coinApiName).replace('{2}', coinCfg.imgPath).replace('{3}', coinCfg.coinApiName).replace('{4}', coinCfg.coinSymbol);
+   let imgPath = coinImgPath.replace('{0}', coinCfg.coinApiName);
+   
+   let updateString = cardTemplate.replace('{0}', coinCfg.coinName).replace('{1}', coinCfg.coinApiName).replace('{2}', imgPath).replace('{3}', coinCfg.coinApiName).replace('{4}', coinCfg.coinSymbol);
 
-      if ($('#'+coinCfg.coinApiName+'-card').length == 0)
-         $('#wallet-cards').append(updateString);
+   if ($('#'+coinCfg.coinApiName+'-card').length == 0)
+      $('#wallet-cards').append(updateString);
 }
 
 function getWalletBalances()
@@ -241,24 +251,50 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
          //Remove loading spinner if present
          $('#'+coin+'-card .spinner-border').remove();
 
-         currentVal = $('#'+coin+'-card .card-text').text();
+         currentBalance = $('#'+coin+'-card .card-text .balance').text();
+         currentBalanceChange = $('#'+coin+'-card .balanceChange').text();
          currentWalletCount = Number($('#'+coin+'-card #walletCount').text()) + 1;
+
          $('#'+coin+'-card #walletCount').text(Number(currentWalletCount));
          $('#'+coin+'-card #walletCountLabel').text(" wallet" + ((currentWalletCount > 1) ? "s" : ""));
 
-
-         if (isNaN(currentVal) && !isNaN(balance))
+         if (currentBalance == "" && !isNaN(balance))
          {
-            $('#'+coin+'-card .card-text').text(balance.toLocaleString());
+            $('#'+coin+'-card .card-body .balance').text(balance.toLocaleString());
          }
-         else if (!isNaN(balance) && !isNaN(currentVal))
+         else if (!isNaN(balance) && !isNaN(currentBalance))
          {
-            $('#'+coin+'-card .card-text').text((Number(balance) + Number(currentVal)).toLocaleString());
+            $('#'+coin+'-card .card-body .balance').text((Number(balance) + Number(currentBalance)).toLocaleString());
          }
          else
          {
             console.log('Numbers in incorrect formats');
          }
+
+         let pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
+         let neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
+         let balanceChange = 0;
+
+         if (currentBalanceChange == "" && !isNaN(change))
+            balanceChange = Number(change);
+         else if (!isNaN(change) && !isNaN(currentBalanceChange))
+            balanceChange = Number(currentBalanceChange) + Number(change)
+         else
+            console.log('Numbers in incorrect formats');
+
+         $('#'+coin+'-card .balanceChangeSymbol span').remove();
+         if (balanceChange > 0)
+         {
+            $('#'+coin+'-card .balanceChange').text(balanceChange.toLocaleString());
+            $('#'+coin+'-card .balanceChangeSymbol').append(pos_chg_icon);
+         }
+         else if (balanceChange < 0)
+         {
+            $('#'+coin+'-card .balanceChange').text(balanceChange.toLocaleString());
+            $('#'+coin+'-card .balanceChangeSymbol').append(neg_chg_icon); 
+         }
+         else
+         $('#'+coin+'-card .balanceChange').text(balanceChange.toLocaleString());
       }
    }
    else
@@ -300,6 +336,17 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
 })
 
 ipcRenderer.on('async-refresh-wallets', (event, arg) => {
+   /*$.ajax({
+      url: "https://chiaforkscalculator.com",
+      dataType: 'text',
+      success: function(data) {
+           var elements = $("<div>").html(data)[0].getElementsByTagName("ul")[0].getElementsByTagName("li");
+           for(var i = 0; i < elements.length; i++) {
+                var theText = elements[i].firstChild.nodeValue;
+                // Do something here
+           }
+      }
+ });*/
    if (actualBalanceDisplayed)
       getWalletBalances();
    else

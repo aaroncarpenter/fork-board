@@ -10,7 +10,14 @@ let win
 let walletDetails
 
 function createWindow() { 
-   win = new BrowserWindow({width: 1000, height: 900}) 
+   win = new BrowserWindow({
+      width: 1100, 
+      height: 1100,
+      webPreferences: {
+         nodeIntegration: true,
+         contextIsolation: false,
+         enableRemoteModule: true
+       }}) 
    win.loadURL(url.format ({ 
       pathname: path.join(__dirname, 'index.html'), 
       protocol: 'file:', 
@@ -31,7 +38,7 @@ function createWalletDetailsWindow(coin) {
      webPreferences: {
        nodeIntegration: true,
        contextIsolation: false,
-       enableRemoteModule: true,
+       enableRemoteModule: true
      },
    });
    
@@ -56,7 +63,7 @@ function createWalletDetailsWindow(coin) {
 function createNFTRecoveryWindow() {
    walletDetails = new BrowserWindow({
      width: 1000,
-     height: 800,
+     height: 900,
      modal: true,
      show: false,
      parent: win, // Make sure to add parent window here
@@ -79,6 +86,7 @@ function createNFTRecoveryWindow() {
 }
 
 ipcMain.on("close-wallet-details", (event, arg) => {
+   //TODO: Refresh main dashboard
    console.log('Hiding wallet details');
    walletDetails.hide();
 });

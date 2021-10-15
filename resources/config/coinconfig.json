@@ -2,7 +2,6 @@
     "coinSymbol": "xdg",
     "coinApiName": "dogechia",
     "coinName": "DogeChia",
-    "imgPath": "./img/dogechia.png",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -10,7 +9,6 @@
     "coinSymbol": "xch",
     "coinApiName": "chia",
     "coinName": "Chia",
-    "imgPath": "./img/chia.png",
     "multiplier": "1",
     "isRecoverable": false
 },
@@ -18,7 +16,6 @@
     "coinSymbol": "xcd",
     "coinApiName": "cryptodoge",
     "coinName": "CryptoDoge",
-    "imgPath": "./img/cryptodoge.svg",
     "multiplier": "1000000",
     "isRecoverable": false
 },
@@ -26,7 +23,6 @@
     "coinSymbol": "xfx",
     "coinApiName": "flax",
     "coinName": "Flax",
-    "imgPath": "./img/flax.svg",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -34,7 +30,6 @@
     "coinSymbol": "xfl",
     "coinApiName": "flora",
     "coinName": "Flora",
-    "imgPath": "./img/flora.svg",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -42,7 +37,6 @@
     "coinSymbol": "gdog",
     "coinApiName": "greendoge",
     "coinName": "GreenDoge",
-    "imgPath": "./img/greendoge.png",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -50,7 +44,6 @@
     "coinSymbol": "hdd",
     "coinApiName": "hddcoin",
     "coinName": "HDDCoin",
-    "imgPath": "./img/hddcoin.png",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -58,7 +51,6 @@
     "coinSymbol": "tsit",
     "coinApiName": "silicoin",
     "coinName": "Silicoin",
-    "imgPath": "./img/silicoin.png",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -66,7 +58,6 @@
     "coinSymbol": "tad",
     "coinApiName": "tad",
     "coinName": "Tad",
-    "imgPath": "./img/tad.svg",
     "multiplier": "1",
     "isRecoverable": false
 },
@@ -74,7 +65,6 @@
     "coinSymbol": "xmz",
     "coinApiName": "maize",
     "coinName": "Maize",
-    "imgPath": "./img/maize.svg",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -82,7 +72,6 @@
     "coinSymbol": "xtx",
     "coinApiName": "taco",
     "coinName": "Taco",
-    "imgPath": "./img/taco.png",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -90,7 +79,6 @@
     "coinSymbol": "sock",
     "coinApiName": "socks",
     "coinName": "Socks",
-    "imgPath": "./img/socks.png",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -98,7 +86,6 @@
     "coinSymbol": "wheat",
     "coinApiName": "wheat",
     "coinName": "Wheat",
-    "imgPath": "./img/wheat.png",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -106,7 +93,6 @@
     "coinSymbol": "scm",
     "coinApiName": "scam",
     "coinName": "Scam",
-    "imgPath": "./img/scam.svg",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -114,7 +100,6 @@
     "coinSymbol": "cgn",
     "coinApiName": "chaingreen",
     "coinName": "ChainGreen",
-    "imgPath": "./img/chaingreen.svg",
     "multiplier": "1",
     "isRecoverable": false
 },
@@ -122,7 +107,6 @@
     "coinSymbol": "trz",
     "coinApiName": "tranzact",
     "coinName": "Tranzact",
-    "imgPath": "./img/tranzact.png",
     "multiplier": "1",
     "isRecoverable": true
 },
@@ -130,8 +114,28 @@
     "coinSymbol": "xkm",
     "coinApiName": "mint",
     "coinName": "Mint",
-    "imgPath": "./img/mint.png",
     "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "stai",
+    "coinApiName": "stai",
+    "coinName": "STAI",
+    "multiplier": "1000",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "apple",
+    "coinApiName": "apple",
+    "coinName": "Apple",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "melon",
+    "coinApiName": "melon",
+    "coinName": "mELON",
+    "multiplier": "1000",
     "isRecoverable": true
 }
 ]

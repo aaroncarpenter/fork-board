@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset = "UTF-8">
+      <title>Wallet Dashboard</title>
+      <link rel = "stylesheet" href = "../bower_components/bootstrap/dist/css/bootstrap.min.css" />
+      <style type = "text/css">
+         #wallet-list {
+            height: 500px;
+            overflow-y: auto;
+         }
+
+         .card-footer {
+            padding-top: 1px;
+            padding-bottom: 0.1rem;
+            margin-bottom: 0.5rem;
+            max-height: 35px;
+         }
+
+         .card-header {
+            padding-top: 0.1rem;
+            padding-bottom: 0.1rem;
+            padding-left: 0.25rem;
+         }
+
+         small {
+            font-variant: small-caps;
+         }
+      </style>
+      <script src="https://kit.fontawesome.com/80792d13b7.js" crossorigin="anonymous"></script>
+      <!--<script src="./bower_components/jquery/dist/jquery.min.js"></script>-->
+   </head>
+   
+   <body>
+      <div class = "container">
+         <p></p>
+         <div class="row">
+            <div class="btn-group btn-group-sm col-md-6" role="group" aria-label="Basic example">
+               <button type="button" id="show-actual-balance" class="btn btn-primary btn-small">Show Actual Balance</button>
+               <button type="button" id="show-recoverable-balance" class="btn btn-secondary btn-small">Show Recoverable Balance</button>
+            </div>
+            <div class="col-md-2"></div>
+            <div class="form-check form-switch col-sm-4" style="display: none">
+               <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+               <label class="form-check-label" for="flexSwitchCheckDefault">Auto-Refresh (5 mins)</label>
+             </div>
+         </div>
+         <div id="alertBox" class="alert alert-warning" style="display: none" role="alert">
+         </div>
+         <div id="add-wallet" class="alert alert-info" style="display: none" role="alert">
+            <form>
+               <div class="form-group row d-flex align-items-center">
+                  <div class="col-sm-11">
+                     <input type = "text" name = "Wallet" value = "" id = "Wallet" placeholder = "You can enter multiple wallets separated by commas.  Click the checkmark or just press Enter to Save." class = "form-control" required>
+                  </div>
+
+                  <div class="col-sm-1">
+                     <nobr>
+                        <i class = "fas fa-check" id = "add-to-list"></i>&nbsp;
+                        <i class = "fas fa-times" id = "cancel-add"></i>
+                     </nobr>
+                  </div>
+               </div>
+            </form>
+         </div>
+         
+         <div id="nft-recovery" class="alert alert-info" style="display: none" role="alert">
+            <button class = "btn btn-primary" id = "open-nft-recovery">Open NFT Recovery Site</button> <small class="text-muted">Your launcherid will be added to the clipboard to paste into the recovery site.</small>
+         </div>
+         <p />
+         <div id="wallet-cards" class="row" style="vertical-align:bottom"></div>
+      <!--<script src="./bower_components/jquery/dist/jquery.min.js"></script>-->
+      <script src = "./view.js" ></script>
+      </div>
+   </body>
+</html>

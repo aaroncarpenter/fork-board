@@ -1,0 +1,41 @@
+<div id="{3}-card" class="walletCard col-md-4" onclick="loadWalletDetails('{1}')">
+    <div class="card-header">
+        <div class="d-flex flex-row justify-content-between">
+            <div>
+                <img style="height: 30px; width: 30px" src="{2}" class="card-img">
+                &nbsp;&nbsp;<b>{0}</b>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex flex-row justify-content-between align-items-center">
+                <div class="col-md-7 text-center">
+                    <h1 class="card-text">
+                        <span class="balance"></span>
+                        <div class="spinner-border" role="status"></div>
+                    </h1>
+                </div>
+                <div>
+                    <small class="text-muted">Chg:&nbsp; 
+                        <span class="balanceChange"></span>
+                        <span class="balanceChangeSymbol"></span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="d-flex flex-row justify-content-between">
+            <div>
+                <small class="text-muted">{4}</small>
+            </div>
+            <div>
+                <small class="text-muted">
+                    <span id="walletCount"></span>
+                    <span id="walletCountLabel"></span>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

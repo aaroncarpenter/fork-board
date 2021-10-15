@@ -3,8 +3,8 @@
   "productName": "chia-forks-dashboard",
   "description": "A small dashboard application to show balances of wallets from Chia and Forks.",
   "keywords": [],
-  "main": "./main.js",
-  "version": "1.0.0",
+  "main": "./src/main.js",
+  "version": "0.1.0",
   "author": "Aaron Carpenter",
   "scripts": {
     "start": "electron-forge start",
@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "axios": "^0.21.4",
+    "electron-installer-windows": "^3.0.0",
+    "electron-packager": "^15.4.0",
     "electron-prompt": "^1.7.0",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.6.0"
@@ -40,7 +42,8 @@
         {
           "name": "@electron-forge/maker-zip",
           "platforms": [
-            "darwin", "linux"
+            "darwin",
+            "linux"
           ]
         },
         {

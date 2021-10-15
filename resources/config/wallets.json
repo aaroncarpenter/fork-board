@@ -66,12 +66,16 @@
 		"wallet": "tsit1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwkskdyrha"
 	},
 	{
-		"wallet": "xch19cj5lrxf9srnut2jzkp3rdef90wl27sgqdf5ul5xfzlqj7xecehqwct0pe"
-	},
-	{
 		"wallet": "trz1wv2sez76p6w4us0s3n7qrkscd87705pzrkg8qecxa00n5v653kvs2p8j5g"
 	},
 	{
 		"wallet": "xkm1wv2sez76p6w4us0s3n7qrkscd87705pzrkg8qecxa00n5v653kvsvevwx7"
-	}
+	},
+	{
+		"wallet": "stai1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwksrfdghq"
+	},
+	{
+		"wallet": "apple1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwkscngyrt"
+	},
+	{"wallet":"melon1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwkshxvm0y"}
 ]
