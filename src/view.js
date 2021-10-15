@@ -84,7 +84,11 @@ function addNewWallet()
       {
          walletObj.push({'wallet': walletStr});
          addEntry(walletStr, actualBalanceDisplayed);
-         fs.writeFile(walletFile, JSON.stringify(walletObj, null, '\t'));
+         fs.writeFile(walletFile, JSON.stringify(walletObj, null, '\t'), (err) => { 
+            if (err) { 
+              console.log(err); 
+            } 
+          });
       }
       else
       {
