@@ -1,15 +1,3 @@
 node_modules
-chia-forks-dashboard-darwin-arm64
-chia-forks-dashboard-darwin-x64
-chia-forks-dashboard-linux-arm64
-chia-forks-dashboard-linux-armv7l
-chia-forks-dashboard-linux-ia32
-chia-forks-dashboard-linux-X64
-chia-forks-dashboard-mas-arm64
-chia-forks-dashboard-mas-x64
-chia-forks-dashboard-win32-arm64
-chia-forks-dashboard-win32-ia32
-chia-forks-dashboard-win32-x64
-
 out
 dist

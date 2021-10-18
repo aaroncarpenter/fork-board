@@ -188,7 +188,7 @@ function getCoinConfigForCoin(coin)
    }
    else
    {
-      console.log('Unable to locate coin configuration settings for ' + wallet);
+      console.log('Unable to locate coin configuration settings for ' + coin);
    }
 }
 
@@ -316,18 +316,16 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
 
          if ($('#'+coin+'-card .card-text').length != 0)
          {
+            let coinCfg = getCoinConfigForCoin(coin);
             //Remove loading spinner if present
             $('#'+coin+'-card .spinner-border').remove();
 
             if ($('#'+coin+'-card .card-text').text() != 'N/A')
             {
-               $('#'+coin+'-card .card-text').text(balance.toLocaleString());
+               $('#'+coin+'-card .card-text').text((Number(balance)*coinCfg.multiplier).toLocaleString());
             }
 
-            //if (Number(balance) != 0)
-            //{
-               $('#nft-recovery').show();
-            //}
+            $('#nft-recovery').show();
          }
 
          return true;

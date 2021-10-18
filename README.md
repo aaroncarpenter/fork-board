@@ -180,7 +180,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- CONTACT -->
 ## Contact
 
-Aaron Carpenter - [@discord_handle](https://discordapp.com/users/872708817899646978) - aaron@redwolftek.com
+Aaron Carpenter - [@discord](https://discordapp.com/users/872708817899646978) - aaron@redwolftek.com
 
 Project Link: [https://github.com/aaroncarpenter/chia-forks-dashboard](https://github.com/aaroncarpenter/chia-forks-dashboard)
 
