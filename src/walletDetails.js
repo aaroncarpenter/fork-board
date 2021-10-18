@@ -1,4 +1,6 @@
 const {ipcRenderer} = require('electron');
+const logger = require('electron-log');
+logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/walletDetails.log');
 
 let $ = require('jquery');
 let fs = require('fs');
@@ -13,12 +15,13 @@ let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 let coinName = "";
 
+// #region Page Event Handlers
 addEventListener('keyup', handleKeyPress, true);
 
 function handleKeyPress(event) {
    if (event.key == "Escape")
    {
-      console.log('Sending close-wallet-details event');
+      logger.info('Sending close-wallet-details event');
       ipcRenderer.send('close-wallet-details', []);
    }
 }
@@ -44,12 +47,14 @@ function handleWalletDelete(wallet)
    //remove the card from the display
    $('#'+wallet+'-card').remove();
 }
+// #endregion
 
+// #region Wallet Functions
 function loadAndDisplayWallets() {  
    // clearing any existing wallets
    $('.walletCard').remove();
 
-   console.log('Loading Wallet Details for ' + coinName);
+   logger.info('Loading Wallet Details for ' + coinName);
    //Check if file exists
    let coinCfg = getCoinConfigForCoin(coinName);
 
@@ -60,7 +65,7 @@ function loadAndDisplayWallets() {
    walletObj.every((w) => {
       if (w.wallet.startsWith(coinCfg.coinSymbol))
       {
-         console.log('Loading Wallet Details for wallet: ' + w.wallet);
+         logger.info('Loading Wallet Details for wallet: ' + w.wallet);
          buildWalletCard(w.wallet, coinCfg)
 
          ipcRenderer.send('async-get-wallet-balance', [w.wallet, coinCfg.coinApiName, coinCfg.multiplier]);
@@ -70,6 +75,15 @@ function loadAndDisplayWallets() {
    });
 }
 
+function buildWalletCard(wallet, coinCfg)
+{
+      let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', wallet).replace('{2}', wallet).replace('{3}', coinCfg.coinSymbol);
+      
+      $('#wallet-cards').append(updateString);
+}
+// #endregion
+
+// #region Coin Configuration
 function getCoinConfigForCoin(coin)
 {
    let coinConfig;
@@ -96,47 +110,26 @@ function getCoinConfigForCoin(coin)
       console.log('Unable to locate coin configuration settings for ' + coin);
    }
 }
+// #endregion
 
-function buildWalletCard(wallet, coinCfg)
-{
-      let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', wallet).replace('{2}', wallet).replace('{3}', coinCfg.coinSymbol);
-      
-      $('#wallet-cards').append(updateString);
-}
-
-function showErrorMessage(message, timeout)
-{
-   $('#alertBox').text(message);
-   $('#alertBox').show();
-   setTimeout(
-      function() {
-         $('#alertBox').hide();
-      }, timeout
-   );
-}
-
-function convertFromMojo(mojoValue)
-{
-      return mojoValue/1000000000000;
-}
-
+// #region Electron Event Handlers
 ipcRenderer.on('load-wallet-details', (event, arg) => {
-   console.log('Received load-wallet-details event');
+   logger.info('Received load-wallet-details event');
    if (arg.length == 1)
    {
       coinName = arg[0];
-      console.log('Loading details for ' + coinName);
+      logger.info('Loading details for ' + coinName);
       loadAndDisplayWallets();
    }
    else
    {
-      console.log('Reply args incorrect');
+      logger.error('Reply args incorrect');
    }
 })
 
 // Async message handler
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
-   console.log('Received async-get-wallet-balance-reply event');
+   logger.info('Received async-get-wallet-balance-reply event');
    if (arg.length == 4)
    {
       let coin = arg[0];
@@ -156,13 +149,33 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
          }
          else
          {
-            console.log('Numbers in incorrect formats');
+            logger.error('Numbers in incorrect formats');
          }
       }
    }
    else
    {
-      console.log('Reply args incorrect');
+      logger.error('Reply args incorrect');
    }
 })
+// #endregion
 
+// #region Helper Functions
+function showErrorMessage(message, timeout)
+{
+   logger.error(message);
+   
+   $('#alertBox').text(message);
+   $('#alertBox').show();
+   setTimeout(
+      function() {
+         $('#alertBox').hide();
+      }, timeout
+   );
+}
+
+function convertFromMojo(mojoValue)
+{
+      return mojoValue/1000000000000;
+}
+// #endregion

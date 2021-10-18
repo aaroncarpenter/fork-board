@@ -1,6 +1,9 @@
 let $ = require('jquery');
 let fs = require('fs');
 let path = require('path');
+const logger = require('electron-log');
+logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/view.log');
+
 const {ipcRenderer, clipboard} = require('electron');
 
 let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
@@ -10,6 +13,10 @@ let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig
 let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 let coinConfigObj = JSON.parse(fs.readFileSync(coinConfigFile, 'utf8'));
 let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
+
+// write empty file if wallets file is missing.
+if (!fs.existsSync(walletFile))
+   fs.writeFileSync(walletFile, '[]');
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 let coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
@@ -19,6 +26,7 @@ let walletCache = new Set();
 
 loadAndDisplayWallets(true);
 
+// #region Page Event Handlers
 addEventListener('keyup', handleKeyPress, true);
 
 function handleKeyPress(event) {
@@ -70,29 +78,36 @@ $('#open-nft-recovery').on('click', () => {
    openNFTRecoverySite();
 })
 
+// #endregion
+
 function addNewWallet()
 {
-   let walletVal = $('#Wallet').val();
-
    $('#add-wallet').hide();
-
+   
+   let walletVal = $('#Wallet').val();
    let walletArr = walletVal.split(',');
 
    walletArr.every((walletStr) => {
       walletStr = walletStr.trim();
-      if (!walletCache.has(walletStr))
+
+      let coinCfg = getCoinConfigForWallet(walletStr);
+
+      if (coinCfg != null)
       {
-         walletObj.push({'wallet': walletStr});
-         addEntry(walletStr, actualBalanceDisplayed);
-         fs.writeFile(walletFile, JSON.stringify(walletObj, null, '\t'), (err) => { 
-            if (err) { 
-              console.log(err); 
-            } 
-          });
+         if (!walletCache.has(walletStr))
+         {
+            walletObj.push({'wallet': walletStr});
+            addEntry(walletStr, actualBalanceDisplayed);
+            fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
+         }
+         else
+         {
+            showErrorMessage("The wallet (" + walletStr + ") already exists.", 5000);
+         }
       }
       else
       {
-         showErrorMessage("The wallet already exists.", 1000);
+         showErrorMessage("The wallet is currently unsupported.  You entered (" + walletStr + ").", 5000);
       }
 
       return true;
@@ -103,24 +118,40 @@ function addNewWallet()
 
 function loadWalletDetails(coin)
 {
+   logger.info('Sending open-wallet-details event');
    ipcRenderer.send('open-wallet-details', [coin]);
 }
 
 function openNFTRecoverySite()
 {
-   clipboard.writeText(clientConfigObj.launcherid)
+   clipboard.writeText(clientConfigObj.launcherid);
+
+   logger.info('Sending open-nft-recovery-site event');
    ipcRenderer.send('open-nft-recovery-site', [clientConfigObj.launcherid]);
 }
 
 function addEntry(wallet, loadBalance) {
+   let coinCfg = getCoinConfigForWallet(wallet);
+   
    if (wallet) {
-      walletCache.add(wallet);
       let coinCfg = getCoinConfigForWallet(wallet);
-      buildWalletCard(wallet, coinCfg)
-      if (loadBalance)
+
+      if (coinCfg != null)
       {
-         ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinApiName, coinCfg.multiplier]);
+         walletCache.add(wallet);
+         let coinCfg = getCoinConfigForWallet(wallet);
+         buildWalletCard(wallet, coinCfg)
+         if (loadBalance)
+         {
+            logger.info('Sending async-get-wallet-balance event');
+            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinApiName, coinCfg.multiplier]);
+         }
       }
+      else
+      {
+         logger.error("Unable to Add Entry for unsupported wallet (" + walletStr + ").");
+      }
+
    }
 }
 
@@ -137,6 +168,8 @@ function loadAndDisplayWallets(loadBalance) {
       });
    }
 }
+
+// #region Coin Config
 
 function getCoinConfigForWallet(wallet)
 {
@@ -161,7 +194,7 @@ function getCoinConfigForWallet(wallet)
    }
    else
    {
-      console.log('Unable to locate coin configuration settings for ' + wallet);
+      logger.error('Unable to locate coin configuration settings for ' + wallet);
    }
 }
 
@@ -188,10 +221,13 @@ function getCoinConfigForCoin(coin)
    }
    else
    {
-      console.log('Unable to locate coin configuration settings for ' + wallet);
+      logger.error('Unable to locate coin configuration settings for ' + wallet);
    }
 }
 
+// #endregion
+
+// #region Wallet Functions
 function buildWalletCard(wallet, coinCfg)
 {
    let imgPath = coinImgPath.replace('{0}', coinCfg.coinApiName);
@@ -233,6 +269,7 @@ function getWalletRecoverableBalances()
          return true;
       });
 
+      logger.info('Sending async-get-recoverable-wallet-balance event')
       ipcRenderer.send('async-get-recoverable-wallet-balance', [clientConfigObj.launcherid]);
    }
    else
@@ -240,9 +277,12 @@ function getWalletRecoverableBalances()
       showErrorMessage("Unable to get recoverable balances.  Enter your chia launcherid into ./config/clientconfig.json", 1000);
    }
 }
+// #endregion
 
+// #region Async Event Handlers
 // Async message handler
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
+   logger.info('Received async-get-wallet-balance-reply event')
    if (arg.length == 4)
    {
       let coin = arg[0];
@@ -272,7 +312,7 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
          }
          else
          {
-            console.log('Numbers in incorrect formats');
+            logger.error('Numbers in incorrect formats');
          }
 
          let pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
@@ -303,11 +343,12 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    }
    else
    {
-      console.log('Reply args incorrect');
+      logger.error('Reply args incorrect');
    }
 })
 
 ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
+   logger.info('Received async-get-recoverable-wallet-balance-reply event')
    if (arg.length > 1)
    {
       arg.every((recovBal) => {
@@ -335,11 +376,12 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    }
    else
    {
-      console.log('Reply args incorrect');
+      logger.error('Reply args incorrect');
    }
 })
 
 ipcRenderer.on('async-refresh-wallets', (event, arg) => {
+   logger.info('Received async-refresh-wallets event');
    /*$.ajax({
       url: "https://chiaforkscalculator.com",
       dataType: 'text',
@@ -358,11 +400,15 @@ ipcRenderer.on('async-refresh-wallets', (event, arg) => {
 })
 
 ipcRenderer.on('async-add-wallet', (event, arg) => {
+   logger.info('Received async-add-wallet event');
    $('#add-wallet').show();
 })
+// #endregion
 
+// #region Utility Functions
 function showErrorMessage(message, timeout)
 {
+   logger.error(message)
    $('#alertBox').text(message);
    $('#alertBox').show();
    setTimeout(
@@ -376,4 +422,4 @@ function convertFromMojo(mojoValue)
 {
       return mojoValue/1000000000000;
 }
-
+// #endregion

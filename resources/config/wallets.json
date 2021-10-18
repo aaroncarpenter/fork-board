@@ -77,5 +77,10 @@
 	{
 		"wallet": "apple1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwkscngyrt"
 	},
-	{"wallet":"melon1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwkshxvm0y"}
+	{
+		"wallet": "melon1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwkshxvm0y"
+	},
+	{
+		"wallet": "ozt1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwks559v5n"
+	}
 ]

@@ -3,11 +3,13 @@ const url = require('url')
 const path = require('path')  
 const axios = require('axios')
 const https = require('https');
+const logger = require('electron-log');
 const agent = new https.Agent({rejectUnauthorized: false});
 let baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
 
-let win
-let walletDetails
+let win, walletDetails, nftRecovery
+
+logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/main.log');
 
 function createWindow() { 
    win = new BrowserWindow({
@@ -49,55 +51,53 @@ function createWalletDetailsWindow(coin) {
    })) 
 
    walletDetails.once("show", function() {
-      console.log('Sending load-wallet-details event: ' + coin);
+      logger.info('Sending load-wallet-details event: ' + coin);
       walletDetails.webContents.send("load-wallet-details", [coin]);
     });
 
    walletDetails.once("ready-to-show", () => {
-      
-      console.log('Ready to show');
+      logger.info('Ready to show - Wallet Details');
       walletDetails.show();
    });
 }
 
 function createNFTRecoveryWindow() {
-   walletDetails = new BrowserWindow({
-     width: 1000,
-     height: 900,
+   nftRecovery = new BrowserWindow({
+     width: 900,
+     height: 1100,
      modal: true,
      show: false,
      parent: win, // Make sure to add parent window here
      autoHideMenuBar: true,
    });
    
-   walletDetails.loadURL(url.format ({ 
+   nftRecovery.loadURL(url.format ({ 
       pathname: '/nft-recovery', 
       protocol: 'https', 
       hostname: 'alltheblocks.net'
    })) 
 
-   walletDetails.once("ready-to-show", () => {
-      
-      console.log('Ready to show');
-      walletDetails.show();
+   nftRecovery.once("ready-to-show", () => {
+      logger.info('Ready to show - NFT Recovery');
+      nftRecovery.show();
    });
-
-
 }
 
 ipcMain.on("close-wallet-details", (event, arg) => {
-   //TODO: Refresh main dashboard
-   console.log('Hiding wallet details');
+   logger.info('Received close-wallet-details Event');
    walletDetails.hide();
+
+   logger.info('Sending async-refresh-wallets Event');
+   win.webContents.send('async-refresh-wallets', []);
 });
 
 ipcMain.on("open-wallet-details", (event, arg) => {
-
+   logger.info('Received open-wallet-details Event');
    if (arg.length == 1)
    {  
       let coin = arg[0];
 
-      console.log("Create wallet details window for :" + coin)
+      logger.info("Create wallet details window for :" + coin);
       
       createWalletDetailsWindow(coin);
    }
@@ -109,7 +109,7 @@ ipcMain.on("open-nft-recovery-site", (event, arg) => {
 
 // Event handler for asynchronous incoming messages
 ipcMain.on('async-get-wallet-balance', (event, arg) => {
-   console.log('Received async-get-wallet-balance event');
+   logger.info('Received async-get-wallet-balance event');
    if (arg.length == 3)
    {
       let wallet = arg[0];
@@ -117,15 +117,15 @@ ipcMain.on('async-get-wallet-balance', (event, arg) => {
       let multiplier = arg[2];
       let url = baseAllTheBlocksApiUrl + "/" + coin + "/address/" + wallet;
 
-      console.log('Wallet: ' + wallet + ', Coin: ' + coin + ', Multiplier: ' + multiplier); 
+      logger.info('Wallet: ' + wallet + ', Coin: ' + coin + ', Multiplier: ' + multiplier); 
 
       axios.get(url, { httpsAgent: agent })
       .then((result) => {
-         console.log('Sending async-get-wallet-balance-reply event');
+         logger.info('Sending async-get-wallet-balance-reply event');
          event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance*multiplier, result.data.balanceBefore*multiplier]);
       })
       .catch((error) => {
-         console.log(error);
+         logger.error(error);
       });
    }
 });
@@ -133,20 +133,19 @@ ipcMain.on('async-get-wallet-balance', (event, arg) => {
 
 
 ipcMain.on('async-get-recoverable-wallet-balance', (event, arg) => {
-   console.log('Received async-get-recoverable-wallet-balance event');
+   logger.info('Received async-get-recoverable-wallet-balance event');
    if (arg.length == 1)
    {
-      //https://api.alltheblocks.net/atb/nft/{0}/eligible
       let launcherid = arg[0];
       let url = baseAllTheBlocksApiUrl + "/atb/nft/" + launcherid + "/eligible";
 
       axios.get(url, { httpsAgent: agent })
       .then((result) => {
-         console.log('Sending async-get-recoverable-wallet-balance-reply event');
+         logger.info('Sending async-get-recoverable-wallet-balance-reply event');
          event.sender.send('async-get-recoverable-wallet-balance-reply', result.data);
       })
       .catch((error) => {
-         console.log(error);
+         logger.error(error);
       });
    }
 });
