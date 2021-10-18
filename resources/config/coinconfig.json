@@ -137,5 +137,257 @@
     "coinName": "mELON",
     "multiplier": "1000",
     "isRecoverable": true
+},
+{
+    "coinSymbol": "xach",
+    "coinApiName": "achi",
+    "coinName": "Achi",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "avo",
+    "coinApiName": "avocado",
+    "coinName": "avocado",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xbr",
+    "coinApiName": "beer",
+    "coinName": "Beer",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xbt",
+    "coinApiName": "beet",
+    "coinName": "Beet",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xbtc",
+    "coinApiName": "btcgreen",
+    "coinName": "BTCGreen",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "vag",
+    "coinApiName": "c_nt",
+    "coinName": "C*ntCoin",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "cac",
+    "coinApiName": "cactus",
+    "coinName": "Cactus",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "cans",
+    "coinApiName": "cannabis",
+    "coinName": "Cannabis",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xcc",
+    "coinApiName": "chives",
+    "coinName": "Chives",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "cov",
+    "coinApiName": "covid",
+    "coinName": "Covid",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xeq",
+    "coinApiName": "equality",
+    "coinName": "Equality",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "ffk",
+    "coinApiName": "fishery",
+    "coinName": "Fishery",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xfk",
+    "coinApiName": "fork",
+    "coinName": "Fork",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xgj",
+    "coinApiName": "goji",
+    "coinName": "Goji",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "ozt",
+    "coinApiName": "goldcoin",
+    "coinName": "Goldcoin",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xka",
+    "coinApiName": "kale",
+    "coinName": "Kale",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xkw",
+    "coinApiName": "kiwi",
+    "coinName": "Kiwi",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xkj",
+    "coinApiName": "kujenga",
+    "coinName": "Kujenga",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "llc",
+    "coinApiName": "littlelambocoin",
+    "coinName": "LittleLamboCoin",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "lch",
+    "coinApiName": "lotus",
+    "coinName": "Lotus",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "six",
+    "coinApiName": "lucky",
+    "coinName": "Lucky",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xmx",
+    "coinApiName": "melati",
+    "coinName": "Melati",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "mga",
+    "coinApiName": "mogua",
+    "coinName": "Mogua",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "nch",
+    "coinApiName": "nchain",
+    "coinName": "N-Chain",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xol",
+    "coinApiName": "olive",
+    "coinName": "Olive",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "pea",
+    "coinApiName": "peas",
+    "coinName": "Peas",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "pips",
+    "coinApiName": "pipscoin",
+    "coinName": "Pipscoin",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xcr",
+    "coinApiName": "rose",
+    "coinName": "ChiaRose",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xslv",
+    "coinApiName": "salvia",
+    "coinName": "Salvia",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xsc",
+    "coinApiName": "sector",
+    "coinName": "Sector",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xse",
+    "coinApiName": "seno",
+    "coinName": "Seno",
+    "multiplier": "1",
+    "isRecoverable": false
+},
+{
+    "coinSymbol": "srn",
+    "coinApiName": "shamrock",
+    "coinName": "Shamrock",
+    "multiplier": "1",
+    "isRecoverable": false
+},
+{
+    "coinSymbol": "spare",
+    "coinApiName": "spare",
+    "coinName": "Spare",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "stor",
+    "coinApiName": "stor",
+    "coinName": "Stor",
+    "multiplier": "1",
+    "isRecoverable": true
+},
+{
+    "coinSymbol": "xth",
+    "coinApiName": "thyme",
+    "coinName": "Thyme",
+    "multiplier": "1",
+    "isRecoverable": false
+},
+{
+    "coinSymbol": "xcha",
+    "coinApiName": "xcha",
+    "coinName": "Xcha",
+    "multiplier": "1",
+    "isRecoverable": true
 }
 ]
