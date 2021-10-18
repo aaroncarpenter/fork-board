@@ -89,10 +89,6 @@ function addNewWallet()
 
    walletArr.every((walletStr) => {
       walletStr = walletStr.trim();
-<<<<<<< HEAD
-
-=======
->>>>>>> 56d61fb2138de0952cb11a185fd67ffad7c3833e
       let coinCfg = getCoinConfigForWallet(walletStr);
 
       if (coinCfg != null)
@@ -101,32 +97,16 @@ function addNewWallet()
          {
             walletObj.push({'wallet': walletStr});
             addEntry(walletStr, actualBalanceDisplayed);
-<<<<<<< HEAD
             fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
          }
          else
          {
             showErrorMessage("The wallet (" + walletStr + ") already exists.", 5000);
-=======
-            fs.writeFile(walletFile, JSON.stringify(walletObj, null, '\t'), (err) => { 
-               if (err) { 
-               console.log(err); 
-               } 
-            });
-         }
-         else
-         {
-            showErrorMessage("The wallet already exists.", 2000);
->>>>>>> 56d61fb2138de0952cb11a185fd67ffad7c3833e
          }
       }
       else
       {
-<<<<<<< HEAD
          showErrorMessage("The wallet is currently unsupported.  You entered (" + walletStr + ").", 5000);
-=======
-         showErrorMessage("The wallet entered " + walletStr + " is not currently supported by this tool.", 2000);
->>>>>>> 56d61fb2138de0952cb11a185fd67ffad7c3833e
       }
 
       return true;
@@ -154,7 +134,6 @@ function addEntry(wallet, loadBalance) {
    
    if (wallet) {
       let coinCfg = getCoinConfigForWallet(wallet);
-<<<<<<< HEAD
 
       if (coinCfg != null)
       {
@@ -170,17 +149,6 @@ function addEntry(wallet, loadBalance) {
       else
       {
          logger.error("Unable to Add Entry for unsupported wallet (" + walletStr + ").");
-=======
-      if (coinCfg != null)
-      {
-         walletCache.add(wallet);
-      
-         buildWalletCard(wallet, coinCfg)
-         if (loadBalance)
-         {
-            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinApiName, coinCfg.multiplier]);
-         }
->>>>>>> 56d61fb2138de0952cb11a185fd67ffad7c3833e
       }
 
    }
@@ -252,11 +220,7 @@ function getCoinConfigForCoin(coin)
    }
    else
    {
-<<<<<<< HEAD
       logger.error('Unable to locate coin configuration settings for ' + wallet);
-=======
-      console.log('Unable to locate coin configuration settings for ' + coin);
->>>>>>> 56d61fb2138de0952cb11a185fd67ffad7c3833e
    }
 }
 
