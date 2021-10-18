@@ -80,19 +80,28 @@ function addNewWallet()
 
    walletArr.every((walletStr) => {
       walletStr = walletStr.trim();
-      if (!walletCache.has(walletStr))
+      let coinCfg = getCoinConfigForWallet(walletStr);
+
+      if (coinCfg != null)
       {
-         walletObj.push({'wallet': walletStr});
-         addEntry(walletStr, actualBalanceDisplayed);
-         fs.writeFile(walletFile, JSON.stringify(walletObj, null, '\t'), (err) => { 
-            if (err) { 
-              console.log(err); 
-            } 
-          });
+         if (!walletCache.has(walletStr))
+         {
+            walletObj.push({'wallet': walletStr});
+            addEntry(walletStr, actualBalanceDisplayed);
+            fs.writeFile(walletFile, JSON.stringify(walletObj, null, '\t'), (err) => { 
+               if (err) { 
+               console.log(err); 
+               } 
+            });
+         }
+         else
+         {
+            showErrorMessage("The wallet already exists.", 2000);
+         }
       }
       else
       {
-         showErrorMessage("The wallet already exists.", 1000);
+         showErrorMessage("The wallet entered " + walletStr + " is not currently supported by this tool.", 2000);
       }
 
       return true;
@@ -114,12 +123,16 @@ function openNFTRecoverySite()
 
 function addEntry(wallet, loadBalance) {
    if (wallet) {
-      walletCache.add(wallet);
       let coinCfg = getCoinConfigForWallet(wallet);
-      buildWalletCard(wallet, coinCfg)
-      if (loadBalance)
+      if (coinCfg != null)
       {
-         ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinApiName, coinCfg.multiplier]);
+         walletCache.add(wallet);
+      
+         buildWalletCard(wallet, coinCfg)
+         if (loadBalance)
+         {
+            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinApiName, coinCfg.multiplier]);
+         }
       }
    }
 }
@@ -205,6 +218,7 @@ function buildWalletCard(wallet, coinCfg)
 function getWalletBalances()
 {
    $('#nft-recovery').hide();
+  // $('.div-balanceChange').show();
 
    walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
@@ -216,6 +230,7 @@ function getWalletBalances()
 function getWalletRecoverableBalances()
 {
    $('#nft-recovery').hide();
+   //$('.div-balanceChange').hide();
 
    if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0)
    {
@@ -313,7 +328,7 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
       arg.every((recovBal) => {
          let coin = recovBal.pathName;
          let balance = convertFromMojo(recovBal.availableAmount);
-
+         
          if ($('#'+coin+'-card .card-text').length != 0)
          {
             let coinCfg = getCoinConfigForCoin(coin);
