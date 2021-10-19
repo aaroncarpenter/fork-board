@@ -5,6 +5,7 @@ const logger = require('electron-log');
 logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/view.log');
 
 const {ipcRenderer, clipboard} = require('electron');
+const Utils = require('./utils');
 
 let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
 let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
@@ -19,16 +20,27 @@ if (!fs.existsSync(walletFile))
    fs.writeFileSync(walletFile, '[]');
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
-let coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
+const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
 
 let actualBalanceDisplayed = true;
 let walletCache = new Set();
+let utils = new Utils();
+let coinData = [];
 
+
+initializeCoinDataSet();
 loadAndDisplayWallets(true);
 
 // #region Page Event Handlers
+
 addEventListener('keyup', handleKeyPress, true);
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function handleKeyPress(event) {
    if (event.key == "Enter")
    {
@@ -77,9 +89,14 @@ $('#open-nft-recovery').on('click', () => {
    $('#nft-recovery').hide();
    openNFTRecoverySite();
 })
-
 // #endregion
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function addNewWallet()
 {
    $('#add-wallet').hide();
@@ -101,12 +118,12 @@ function addNewWallet()
          }
          else
          {
-            showErrorMessage("The wallet (" + walletStr + ") already exists.", 5000);
+            utils.showErrorMessage(logger, "The wallet (" + walletStr + ") already exists.", 5000);
          }
       }
       else
       {
-         showErrorMessage("The wallet is currently unsupported.  You entered (" + walletStr + ").", 5000);
+         utils.showErrorMessage(logger, "The wallet is currently unsupported.  You entered (" + walletStr + ").", 5000);
       }
 
       return true;
@@ -115,12 +132,24 @@ function addNewWallet()
    $('#Wallet').val(null);
 }
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function loadWalletDetails(coin)
 {
    logger.info('Sending open-wallet-details event');
    ipcRenderer.send('open-wallet-details', [coin]);
 }
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function openNFTRecoverySite()
 {
    clipboard.writeText(clientConfigObj.launcherid);
@@ -129,6 +158,12 @@ function openNFTRecoverySite()
    ipcRenderer.send('open-nft-recovery-site', [clientConfigObj.launcherid]);
 }
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function addEntry(wallet, loadBalance) {
    let coinCfg = getCoinConfigForWallet(wallet);
    
@@ -154,6 +189,12 @@ function addEntry(wallet, loadBalance) {
    }
 }
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function loadAndDisplayWallets(loadBalance) {  
    //clear the wallet cache
    walletCache.clear();
@@ -168,8 +209,96 @@ function loadAndDisplayWallets(loadBalance) {
    }
 }
 
-// #region Coin Config
 
+// #region Coin Dataset Operations
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
+function initializeCoinDataSet()
+{
+   coinData = [];
+
+   coinConfigObj.every((cfg) => {
+      coinData.push({
+         coinSymbol: cfg.coinSymbol,
+         coinApiName: cfg.coinApiName,
+         coinName: cfg.coinName,
+         multiplier: cfg.multiplier,
+         isRecoverable: cfg.isRecoverable,
+         coinBalance: 0,
+         coinChange: 0,
+         coinRecovBalance: 0,
+         coinWalletCount: 0
+      })
+
+      return true;
+   });
+}
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
+function updateCoinDataSetBalance(coin, balance, change)
+{
+   let coinDataObj = {};
+   if (!isNaN(balance) && !isNaN(change))
+   {
+      coinData.every((c) => {
+         if (c.coinApiName === coin)
+         {
+            c.coinBalance = c.coinBalance + balance;
+            c.coinChange = c.coinChange + change;
+            c.coinWalletCount++;
+            
+            coinDataObj = c;
+
+            return false;
+         }
+
+         return true;
+      });
+   }
+
+   return coinDataObj;
+}
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
+function updateCoinDataSetRecoverableBalance(coin, balance)
+{
+   let coinDataObj = {};
+   if (!isNaN(balance))
+   {
+      coinData.every((c) => {
+         if (c.coinApiName === coin)
+         {
+            c.coinRecovBalance = balance;
+
+            coinDataObj = c;
+
+            return false;
+         }
+
+         return true;
+      });
+   }
+
+   return coinDataObj;
+}
+// #endregion
+
+// #region Coin Config
 function getCoinConfigForWallet(wallet)
 {
    let coinConfig;
@@ -227,20 +356,33 @@ function getCoinConfigForCoin(coin)
 // #endregion
 
 // #region Wallet Functions
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function buildWalletCard(wallet, coinCfg)
 {
    let imgPath = coinImgPath.replace('{0}', coinCfg.coinApiName);
    
-   let updateString = cardTemplate.replace('{0}', coinCfg.coinName).replace('{1}', coinCfg.coinApiName).replace('{2}', imgPath).replace('{3}', coinCfg.coinApiName).replace('{4}', coinCfg.coinSymbol);
+   let updateString = cardTemplate.replace('{0}', coinCfg.coinName).replace('{1}', coinCfg.coinApiName).replace('{2}', imgPath).replace('{3}', coinCfg.coinApiName).replace('{4}', coinCfg.coinSymbol).replace('{5}', coinCfg.coinApiName);
 
    if ($('#'+coinCfg.coinApiName+'-card').length == 0)
       $('#wallet-cards').append(updateString);
 }
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function getWalletBalances()
 {
    $('#nft-recovery').hide();
-  // $('.div-balanceChange').show();
+   initializeCoinDataSet();
 
    walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
@@ -249,10 +391,17 @@ function getWalletBalances()
    loadAndDisplayWallets(true);
 }
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function getWalletRecoverableBalances()
 {
    $('#nft-recovery').hide();
-   //$('.div-balanceChange').hide();
+
+   initializeCoinDataSet();
 
    if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0)
    {
@@ -275,72 +424,100 @@ function getWalletRecoverableBalances()
    }
    else
    {
-      showErrorMessage("Unable to get recoverable balances.  Enter your chia launcherid into ./config/clientconfig.json", 1000);
+      utils.showErrorMessage(logger, "Unable to get recoverable balances.  Enter your chia launcherid into ./config/clientconfig.json", 1000);
    }
 }
 // #endregion
 
+// #region Card Operations
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
+function refreshCardData(cardDataObj)
+{
+   let coin = cardDataObj.coinApiName;
+   let balance = cardDataObj.coinBalance;
+   let change = cardDataObj.coinChange;
+   let walletCount = cardDataObj.coinWalletCount;
+
+   if ($('#'+coin+'-card .card-text').length != 0)
+   {
+      //Remove loading spinner if present
+      $('#'+coin+'-card .spinner-border').remove();
+      $('#'+coin+'-card #walletCount').text(Number(walletCount));
+      $('#'+coin+'-card #walletCountLabel').text(" wallet" + ((walletCount > 1) ? "s" : ""));
+      $('#'+coin+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
+
+      let pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
+      let neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
+
+      $('#'+coin+'-card .balanceChangeSymbol span').remove();
+      if (change > 0)
+      {
+         $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
+         $('#'+coin+'-card .balanceChangeSymbol').append(pos_chg_icon);
+      }
+      else if (change < 0)
+      {
+         $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
+         $('#'+coin+'-card .balanceChangeSymbol').append(neg_chg_icon); 
+      }
+      else
+      $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
+   }
+}
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
+function refreshRecoverableCardData(cardDataObj)
+{
+   let coin = cardDataObj.coinApiName;
+   let balance = cardDataObj.coinRecovBalance;
+   let multiplier = cardDataObj.multiplier;
+
+   if ($('#'+coin+'-card .card-text').length != 0)
+   {
+      //Remove loading spinner if present
+      $('#'+coin+'-card .spinner-border').remove();
+
+      if ($('#'+coin+'-card .card-text').text() != 'N/A')
+      {
+         $('#'+coin+'-card .card-text').text(utils.getAdjustedBalanceLabel(balance*multiplier));
+      }
+
+      $('#nft-recovery').show();
+   }
+}
+//#endregion
+
 // #region Async Event Handlers
-// Async message handler
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-wallet-balance-reply event')
    if (arg.length == 4)
    {
       let coin = arg[0];
-      let balance = convertFromMojo(arg[2]);
-      let balanceBefore = convertFromMojo(arg[3]);
+      let balance = utils.convertFromMojo(arg[2]);
+      let balanceBefore = utils.convertFromMojo(arg[3]);
       let change = balance - balanceBefore;
-    
-      if ($('#'+coin+'-card .card-text').length != 0)
-      {
-         //Remove loading spinner if present
-         $('#'+coin+'-card .spinner-border').remove();
 
-         currentBalance = $('#'+coin+'-card .card-text .balance').text();
-         currentBalanceChange = $('#'+coin+'-card .balanceChange').text();
-         currentWalletCount = Number($('#'+coin+'-card #walletCount').text()) + 1;
+      let cardDataObj = updateCoinDataSetBalance(coin, balance, change);
 
-         $('#'+coin+'-card #walletCount').text(Number(currentWalletCount));
-         $('#'+coin+'-card #walletCountLabel').text(" wallet" + ((currentWalletCount > 1) ? "s" : ""));
-
-         if (currentBalance == "" && !isNaN(balance))
-         {
-            $('#'+coin+'-card .card-body .balance').text(balance.toLocaleString());
-         }
-         else if (!isNaN(balance) && !isNaN(currentBalance))
-         {
-            $('#'+coin+'-card .card-body .balance').text((Number(balance) + Number(currentBalance)).toLocaleString());
-         }
-         else
-         {
-            logger.error('Numbers in incorrect formats');
-         }
-
-         let pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
-         let neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
-         let balanceChange = 0;
-
-         if (currentBalanceChange == "" && !isNaN(change))
-            balanceChange = Number(change);
-         else if (!isNaN(change) && !isNaN(currentBalanceChange))
-            balanceChange = Number(currentBalanceChange) + Number(change)
-         else
-            console.log('Numbers in incorrect formats');
-
-         $('#'+coin+'-card .balanceChangeSymbol span').remove();
-         if (balanceChange > 0)
-         {
-            $('#'+coin+'-card .balanceChange').text(balanceChange.toLocaleString());
-            $('#'+coin+'-card .balanceChangeSymbol').append(pos_chg_icon);
-         }
-         else if (balanceChange < 0)
-         {
-            $('#'+coin+'-card .balanceChange').text(balanceChange.toLocaleString());
-            $('#'+coin+'-card .balanceChangeSymbol').append(neg_chg_icon); 
-         }
-         else
-         $('#'+coin+'-card .balanceChange').text(balanceChange.toLocaleString());
-      }
+      refreshCardData(cardDataObj);    
    }
    else
    {
@@ -348,27 +525,24 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    }
 })
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-recoverable-wallet-balance-reply event')
    if (arg.length > 1)
    {
       arg.every((recovBal) => {
          let coin = recovBal.pathName;
-         let balance = convertFromMojo(recovBal.availableAmount);
+         let balance = utils.convertFromMojo(recovBal.availableAmount);
+
+         let cardDataObj = updateCoinDataSetRecoverableBalance(coin, balance);
          
-         if ($('#'+coin+'-card .card-text').length != 0)
-         {
-            let coinCfg = getCoinConfigForCoin(coin);
-            //Remove loading spinner if present
-            $('#'+coin+'-card .spinner-border').remove();
-
-            if ($('#'+coin+'-card .card-text').text() != 'N/A')
-            {
-               $('#'+coin+'-card .card-text').text((Number(balance)*coinCfg.multiplier).toLocaleString());
-            }
-
-            $('#nft-recovery').show();
-         }
+         // Update the displayed card values
+         refreshRecoverableCardData(cardDataObj);
 
          return true;
       });
@@ -379,46 +553,30 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    }
 })
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 ipcRenderer.on('async-refresh-wallets', (event, arg) => {
    logger.info('Received async-refresh-wallets event');
-   /*$.ajax({
-      url: "https://chiaforkscalculator.com",
-      dataType: 'text',
-      success: function(data) {
-           var elements = $("<div>").html(data)[0].getElementsByTagName("ul")[0].getElementsByTagName("li");
-           for(var i = 0; i < elements.length; i++) {
-                var theText = elements[i].firstChild.nodeValue;
-                // Do something here
-           }
-      }
- });*/
+
    if (actualBalanceDisplayed)
       getWalletBalances();
    else
       getWalletRecoverableBalances();
 })
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 ipcRenderer.on('async-add-wallet', (event, arg) => {
    logger.info('Received async-add-wallet event');
    $('#add-wallet').show();
 })
 // #endregion
 
-// #region Utility Functions
-function showErrorMessage(message, timeout)
-{
-   logger.error(message)
-   $('#alertBox').text(message);
-   $('#alertBox').show();
-   setTimeout(
-      function() {
-         $('#alertBox').hide();
-      }, timeout
-   );
-}
-
-function convertFromMojo(mojoValue)
-{
-      return mojoValue/1000000000000;
-}
-// #endregion

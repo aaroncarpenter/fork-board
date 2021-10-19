@@ -4,13 +4,12 @@ const path = require('path')
 const axios = require('axios')
 const https = require('https');
 const logger = require('electron-log');
+logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/main.log');
 const agent = new https.Agent({rejectUnauthorized: false});
 let baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
 
-let win, walletDetails, nftRecovery
-
-logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/main.log');
-
+// #region Main Window
+let win
 function createWindow() { 
    win = new BrowserWindow({
       width: 1100, 
@@ -26,7 +25,10 @@ function createWindow() {
       slashes: true 
    })) 
 }
+// #endregion
 
+// #region Wallet Details Window
+let walletDetails
 function createWalletDetailsWindow(coin) {
    walletDetails = new BrowserWindow({
      width: 600,
@@ -60,7 +62,10 @@ function createWalletDetailsWindow(coin) {
       walletDetails.show();
    });
 }
+// #endregion
 
+// #region NFT Recovery Window
+let nftRecovery
 function createNFTRecoveryWindow() {
    nftRecovery = new BrowserWindow({
      width: 900,
@@ -82,7 +87,9 @@ function createNFTRecoveryWindow() {
       nftRecovery.show();
    });
 }
+// #endregion
 
+// #region Electron Event Handlers
 ipcMain.on("close-wallet-details", (event, arg) => {
    logger.info('Received close-wallet-details Event');
    walletDetails.hide();
@@ -107,7 +114,6 @@ ipcMain.on("open-nft-recovery-site", (event, arg) => {
    createNFTRecoveryWindow();
 });
 
-// Event handler for asynchronous incoming messages
 ipcMain.on('async-get-wallet-balance', (event, arg) => {
    logger.info('Received async-get-wallet-balance event');
    if (arg.length == 3)
@@ -130,8 +136,6 @@ ipcMain.on('async-get-wallet-balance', (event, arg) => {
    }
 });
 
-
-
 ipcMain.on('async-get-recoverable-wallet-balance', (event, arg) => {
    logger.info('Received async-get-recoverable-wallet-balance event');
    if (arg.length == 1)
@@ -149,9 +153,11 @@ ipcMain.on('async-get-recoverable-wallet-balance', (event, arg) => {
       });
    }
 });
-
 //https://xchscan.com/api/chia-price
 
+// #endregion
+
+//#region Menu Setup
 const template = [
    {
       label: 'File',
@@ -217,6 +223,7 @@ const template = [
 
 const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu);
+// #endregion
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

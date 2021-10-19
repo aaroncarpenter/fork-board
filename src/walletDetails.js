@@ -2,6 +2,9 @@ const {ipcRenderer} = require('electron');
 const logger = require('electron-log');
 logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/walletDetails.log');
 
+const Utils = require('./utils');
+let utils = new Utils();
+
 let $ = require('jquery');
 let fs = require('fs');
 let path = require('path');
@@ -18,6 +21,12 @@ let coinName = "";
 // #region Page Event Handlers
 addEventListener('keyup', handleKeyPress, true);
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function handleKeyPress(event) {
    if (event.key == "Escape")
    {
@@ -26,6 +35,12 @@ function handleKeyPress(event) {
    }
 }
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function handleWalletDelete(wallet)
 {
    let newWalletObj = [];
@@ -50,6 +65,13 @@ function handleWalletDelete(wallet)
 // #endregion
 
 // #region Wallet Functions
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function loadAndDisplayWallets() {  
    // clearing any existing wallets
    $('.walletCard').remove();
@@ -75,6 +97,12 @@ function loadAndDisplayWallets() {
    });
 }
 
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function buildWalletCard(wallet, coinCfg)
 {
       let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', wallet).replace('{2}', wallet).replace('{3}', coinCfg.coinSymbol);
@@ -84,6 +112,13 @@ function buildWalletCard(wallet, coinCfg)
 // #endregion
 
 // #region Coin Configuration
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 function getCoinConfigForCoin(coin)
 {
    let coinConfig;
@@ -113,6 +148,13 @@ function getCoinConfigForCoin(coin)
 // #endregion
 
 // #region Electron Event Handlers
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 ipcRenderer.on('load-wallet-details', (event, arg) => {
    logger.info('Received load-wallet-details event');
    if (arg.length == 1)
@@ -127,15 +169,20 @@ ipcRenderer.on('load-wallet-details', (event, arg) => {
    }
 })
 
-// Async message handler
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-wallet-balance-reply event');
    if (arg.length == 4)
    {
       let coin = arg[0];
       let wallet = arg[1];
-      let balance = convertFromMojo(arg[2]);
-      let balanceBefore = convertFromMojo(arg[3]);
+      let balance = utils.convertFromMojo(arg[2]);
+      let balanceBefore = utils.convertFromMojo(arg[3]);
       let change = balance - balanceBefore;
     
       if ($('#'+wallet+'-card .card-text').length != 0)
@@ -158,24 +205,4 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
       logger.error('Reply args incorrect');
    }
 })
-// #endregion
-
-// #region Helper Functions
-function showErrorMessage(message, timeout)
-{
-   logger.error(message);
-   
-   $('#alertBox').text(message);
-   $('#alertBox').show();
-   setTimeout(
-      function() {
-         $('#alertBox').hide();
-      }, timeout
-   );
-}
-
-function convertFromMojo(mojoValue)
-{
-      return mojoValue/1000000000000;
-}
 // #endregion

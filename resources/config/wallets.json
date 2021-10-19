@@ -6,9 +6,6 @@
 		"wallet": "xch1l50tvv3ad87psw078ydjklf2g2kx7j0t9qav5smwmtzpma7kz2wse7gdw5"
 	},
 	{
-		"wallet": "xfl1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwksdw7hf5"
-	},
-	{
 		"wallet": "xfl1wv2sez76p6w4us0s3n7qrkscd87705pzrkg8qecxa00n5v653kvs7n86fy"
 	},
 	{
@@ -82,5 +79,11 @@
 	},
 	{
 		"wallet": "ozt1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwks559v5n"
+	},
+	{
+		"wallet": "xfl1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwksdw7hf5"
+	},
+	{
+		"wallet": "stai1wv2sez76p6w4us0s3n7qrkscd87705pzrkg8qecxa00n5v653kvss559hs"
 	}
 ]
