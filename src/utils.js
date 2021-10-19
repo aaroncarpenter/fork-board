@@ -23,17 +23,6 @@ class Utils {
             $('#alertBox').hide();
          }, timeout
       );
-   }
-
-   // ***********************
-   // Name: 	
-   // Purpose: 
-   //    Args: 
-   //  Return: 
-   // *************************
-   convertFromMojo(mojoValue)
-   {
-      return mojoValue/1000000000000;
    } 
 
    // ***********************

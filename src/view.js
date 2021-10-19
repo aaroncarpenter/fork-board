@@ -12,7 +12,7 @@ let templateFile = path.resolve(__dirname, '../resources/templates/card-template
 let coinConfigFile = path.resolve(__dirname, '../resources/config/coinconfig.json');
 let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig.json');
 let cardTemplate = fs.readFileSync(templateFile, 'utf8');
-let coinConfigObj = JSON.parse(fs.readFileSync(coinConfigFile, 'utf8'));
+//let coinConfigObj = JSON.parse(fs.readFileSync(coinConfigFile, 'utf8'));
 
 // write empty file if wallets file is missing.
 if (!fs.existsSync(walletFile))
@@ -29,11 +29,11 @@ const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
 let actualBalanceDisplayed = true;
 let walletCache = new Set();
 let utils = new Utils();
+
+let coinConfigObj = [];
 let coinData = [];
 
-
-initializeCoinDataSet();
-loadAndDisplayWallets(true);
+getBlockchainSettingsConfiguration();
 
 // #region Page Event Handlers
 
@@ -181,8 +181,10 @@ function addNewWallet()
 // *************************
 function loadWalletDetails(coin)
 {
+   let coinCfg = getCoinConfigForCoin(coin);
+   
    logger.info('Sending open-wallet-details event');
-   ipcRenderer.send('open-wallet-details', [coin]);
+   ipcRenderer.send('open-wallet-details', [coinCfg]);
 }
 
 // ***********************
@@ -219,7 +221,7 @@ function addEntry(wallet, loadBalance) {
          if (loadBalance)
          {
             logger.info('Sending async-get-wallet-balance event');
-            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinApiName, coinCfg.multiplier]);
+            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinPathName]);
          }
       }
       else
@@ -265,11 +267,10 @@ function initializeCoinDataSet()
 
    coinConfigObj.every((cfg) => {
       coinData.push({
-         coinSymbol: cfg.coinSymbol,
-         coinApiName: cfg.coinApiName,
-         coinName: cfg.coinName,
-         multiplier: cfg.multiplier,
-         isRecoverable: cfg.isRecoverable,
+         coinPrefix: cfg.coinPrefix,
+         coinPathName: cfg.coinPathName,
+         coinDisplayName: cfg.coinDisplayName,
+         mojoPerCoin: cfg.mojoPerCoin,
          coinBalance: 0,
          coinChange: 0,
          coinRecovBalance: 0,
@@ -292,10 +293,10 @@ function updateCoinDataSetBalance(coin, balance, change)
    if (!isNaN(balance) && !isNaN(change))
    {
       coinData.every((c) => {
-         if (c.coinApiName === coin)
+         if (c.coinPathName === coin)
          {
-            c.coinBalance = c.coinBalance + balance;
-            c.coinChange = c.coinChange + change;
+            c.coinBalance = c.coinBalance + (balance / c.mojoPerCoin);
+            c.coinChange = c.coinChange + (change / c.mojoPerCoin);
             c.coinWalletCount++;
             
             coinDataObj = c;
@@ -322,9 +323,9 @@ function updateCoinDataSetRecoverableBalance(coin, balance)
    if (!isNaN(balance))
    {
       coinData.every((c) => {
-         if (c.coinApiName === coin)
+         if (c.coinPathName === coin)
          {
-            c.coinRecovBalance = balance;
+            c.coinRecovBalance = (balance / c.mojoPerCoin);
 
             coinDataObj = c;
 
@@ -339,16 +340,24 @@ function updateCoinDataSetRecoverableBalance(coin, balance)
 }
 // #endregion
 
-// #region Coin Config
+// #region Condfiguration
+
+function getBlockchainSettingsConfiguration()
+{
+   //TODO Show Initializing Message
+
+   ipcRenderer.send('async-get-blockchain-settings', []);
+}
+
 function getCoinConfigForWallet(wallet)
 {
-   let coinConfig;
-   let coinConfigFound = false;
+   let coinCfg;
+   let coinCfgFound = false;
    coinConfigObj.every((cfg) => {
-      if (wallet.startsWith(cfg.coinSymbol))
+      if (wallet.startsWith(cfg.coinPrefix))
       {
-         coinConfig = cfg;
-         coinConfigFound = true;
+         coinCfg = cfg;
+         coinCfgFound = true;
          return false;
       }
       else
@@ -357,9 +366,9 @@ function getCoinConfigForWallet(wallet)
       }
    });
 
-   if (coinConfigFound)
+   if (coinCfgFound)
    {
-      return coinConfig;
+      return coinCfg;
    }
    else
    {
@@ -369,13 +378,13 @@ function getCoinConfigForWallet(wallet)
 
 function getCoinConfigForCoin(coin)
 {
-   let coinConfig;
-   let coinConfigFound = false;
+   let coinCfg;
+   let coinCfgFound = false;
    coinConfigObj.every((cfg) => {
-      if (coin == cfg.coinApiName)
+      if (coin == cfg.coinPathName)
       {
-         coinConfig = cfg;
-         coinConfigFound = true;
+         coinCfg = cfg;
+         coinCfgFound = true;
          return false;
       }
       else
@@ -384,9 +393,9 @@ function getCoinConfigForCoin(coin)
       }
    });
 
-   if (coinConfigFound)
+   if (coinCfgFound)
    {
-      return coinConfig;
+      return coinCfg;
    }
    else
    {
@@ -406,11 +415,11 @@ function getCoinConfigForCoin(coin)
 // *************************
 function buildWalletCard(wallet, coinCfg)
 {
-   let imgPath = coinImgPath.replace('{0}', coinCfg.coinApiName);
+   let imgPath = coinImgPath.replace('{0}', coinCfg.coinPathName);
    
-   let updateString = cardTemplate.replace('{0}', coinCfg.coinName).replace('{1}', coinCfg.coinApiName).replace('{2}', imgPath).replace('{3}', coinCfg.coinApiName).replace('{4}', coinCfg.coinSymbol).replace('{5}', coinCfg.coinApiName);
+   let updateString = cardTemplate.replace('{0}', coinCfg.coinDisplayName).replace('{1}', coinCfg.coinPathName).replace('{2}', imgPath).replace('{3}', coinCfg.coinPathName).replace('{4}', coinCfg.coinPrefix).replace('{5}', coinCfg.coinPathName);
 
-   if ($('#'+coinCfg.coinApiName+'-card').length == 0)
+   if ($('#'+coinCfg.coinPathName+'-card').length == 0)
       $('#wallet-cards').append(updateString);
 }
 
@@ -452,10 +461,10 @@ function getWalletRecoverableBalances()
 
       // No Pending Balance to be displayed for Chia
       coinConfigObj.every((cfg) => {
-         if (!cfg.isRecoverable)
+         if (cfg.coinPathName == 'chia' || cfg.coinPathName == 'cryptodoge' || cfg.coinPathName == 'tad')
          {
-            $('#'+cfg.coinApiName+'-card .spinner-border').remove();
-            $('#'+cfg.coinApiName+'-card .card-text').text('N/A');
+            $('#'+cfg.coinPathName+'-card .spinner-border').remove();
+            $('#'+cfg.coinPathName+'-card .card-text').text('N/A');
          }
          return true;
       });
@@ -480,7 +489,7 @@ function getWalletRecoverableBalances()
 // *************************
 function refreshCardData(cardDataObj)
 {
-   let coin = cardDataObj.coinApiName;
+   let coin = cardDataObj.coinPathName;
    let balance = cardDataObj.coinBalance;
    let change = cardDataObj.coinChange;
    let walletCount = cardDataObj.coinWalletCount;
@@ -520,9 +529,9 @@ function refreshCardData(cardDataObj)
 // *************************
 function refreshRecoverableCardData(cardDataObj)
 {
-   let coin = cardDataObj.coinApiName;
+   let coin = cardDataObj.coinPathName;
    let balance = cardDataObj.coinRecovBalance;
-   let multiplier = cardDataObj.multiplier;
+   let mojoPerCoin = cardDataObj.mojoPerCoin;
 
    if ($('#'+coin+'-card .card-text').length != 0)
    {
@@ -531,7 +540,7 @@ function refreshRecoverableCardData(cardDataObj)
 
       if ($('#'+coin+'-card .card-text').text() != 'N/A')
       {
-         $('#'+coin+'-card .card-text').text(utils.getAdjustedBalanceLabel(balance*multiplier));
+         $('#'+coin+'-card .card-text').text(utils.getAdjustedBalanceLabel(balance/mojoPerCoin));
       }
 
       $('#nft-recovery').show();
@@ -547,13 +556,60 @@ function refreshRecoverableCardData(cardDataObj)
 //    Args: 
 //  Return: 
 // *************************
+ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
+   logger.info('Received async-get-blockchain-settings-reply event')
+   if (arg.length > 1)
+   {
+      arg.every((blockSettings) => {
+         coinConfigObj.push({
+            coinPrefix: blockSettings.coinPrefix,
+            coinPathName: blockSettings.pathName,
+            coinDisplayName: blockSettings.displayName,
+            mojoPerCoin: blockSettings.mojoPerCoin
+         });
+
+         return true;
+      });
+
+      initializeCoinDataSet();
+      loadAndDisplayWallets(true);
+   }
+   else
+   {
+      logger.error('Reply args incorrect');
+   }
+})
+/*
+"displayName": "Chia",
+    "pathName": "chia",
+    "coinPrefix": "xch",
+    "programName": "chia",
+    "mojoPerCoin": 1000000000000,
+    "numberZeroBitsPlotFilter": 9,
+    "difficultyConstantFactorExponent": 67,
+    "approximateAmountOfBlocksPerDay": 4608,
+    "donationAddress": "xch1k20j8nphw6unnfevkue0u2zleft0erzgewm0muzg65w30d63tgtsy9cet3",
+    "hidden": false,
+    "nftEnabled": true,
+    "git": "https://github.com/Chia-Network/chia-blockchain",
+    "xchforks": "https://xchforks.com/chia/",
+    "chiaforkscalculator": null,
+    "discord": "https://discord.gg/Mz4SG4KrYN",
+    "website": "https://www.chia.net/"
+*/
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-wallet-balance-reply event')
    if (arg.length == 4)
    {
       let coin = arg[0];
-      let balance = utils.convertFromMojo(arg[2]);
-      let balanceBefore = utils.convertFromMojo(arg[3]);
+      let balance = arg[2];
+      let balanceBefore = arg[3];
       let change = balance - balanceBefore;
 
       let cardDataObj = updateCoinDataSetBalance(coin, balance, change);
@@ -578,7 +634,7 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    {
       arg.every((recovBal) => {
          let coin = recovBal.pathName;
-         let balance = utils.convertFromMojo(recovBal.availableAmount);
+         let balance = recovBal.availableAmount;
 
          let cardDataObj = updateCoinDataSetRecoverableBalance(coin, balance);
          
@@ -602,6 +658,9 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
 // *************************
 ipcRenderer.on('async-refresh-wallets', (event, arg) => {
    logger.info('Received async-refresh-wallets event');
+
+   getBlockchainSettingsConfiguration();
+
 
    if (actualBalanceDisplayed)
       getWalletBalances();

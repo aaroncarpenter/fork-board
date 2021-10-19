@@ -29,7 +29,7 @@ function createWindow() {
 
 // #region Wallet Details Window
 let walletDetails
-function createWalletDetailsWindow(coin) {
+function createWalletDetailsWindow(coinCfg) {
    walletDetails = new BrowserWindow({
      width: 600,
      height: 600,
@@ -53,8 +53,8 @@ function createWalletDetailsWindow(coin) {
    })) 
 
    walletDetails.once("show", function() {
-      logger.info('Sending load-wallet-details event: ' + coin);
-      walletDetails.webContents.send("load-wallet-details", [coin]);
+      logger.info('Sending load-wallet-details event: ' + coinCfg.coinDisplayName);
+      walletDetails.webContents.send("load-wallet-details", [coinCfg]);
     });
 
    walletDetails.once("ready-to-show", () => {
@@ -102,11 +102,11 @@ ipcMain.on("open-wallet-details", (event, arg) => {
    logger.info('Received open-wallet-details Event');
    if (arg.length == 1)
    {  
-      let coin = arg[0];
+      let coinCfg = arg[0];
 
-      logger.info("Create wallet details window for :" + coin);
+      logger.info("Create wallet details window for :" + coinCfg.coinDisplayName);
       
-      createWalletDetailsWindow(coin);
+      createWalletDetailsWindow(coinCfg);
    }
 });
 
@@ -116,19 +116,18 @@ ipcMain.on("open-nft-recovery-site", (event, arg) => {
 
 ipcMain.on('async-get-wallet-balance', (event, arg) => {
    logger.info('Received async-get-wallet-balance event');
-   if (arg.length == 3)
+   if (arg.length == 2)
    {
       let wallet = arg[0];
       let coin = arg[1];
-      let multiplier = arg[2];
       let url = baseAllTheBlocksApiUrl + "/" + coin + "/address/" + wallet;
 
-      logger.info('Wallet: ' + wallet + ', Coin: ' + coin + ', Multiplier: ' + multiplier); 
+      logger.info('Wallet: ' + wallet + ', Coin: ' + coin); 
 
       axios.get(url, { httpsAgent: agent })
       .then((result) => {
          logger.info('Sending async-get-wallet-balance-reply event');
-         event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance*multiplier, result.data.balanceBefore*multiplier]);
+         event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
       })
       .catch((error) => {
          logger.error(error);
@@ -153,6 +152,22 @@ ipcMain.on('async-get-recoverable-wallet-balance', (event, arg) => {
       });
    }
 });
+
+ipcMain.on('async-get-blockchain-settings', (event, arg) => {
+   logger.info('Received async-get-blockchain-settings event');
+      
+   let url = baseAllTheBlocksApiUrl + "/atb/blockchain/settings";
+
+   axios.get(url, { httpsAgent: agent })
+   .then((result) => {
+      logger.info('Sending async-get-blockchain-settings-reply event');
+      event.sender.send('async-get-blockchain-settings-reply', result.data);
+   })
+   .catch((error) => {
+      logger.error(error);
+   });
+});
+
 //https://xchscan.com/api/chia-price
 
 // #endregion

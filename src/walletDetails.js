@@ -11,12 +11,10 @@ let path = require('path');
 
 let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
 let templateFile = path.resolve(__dirname, '../resources/templates/card-template-wallet-detail.html');
-let coinConfigFile = path.resolve(__dirname, '../resources/config/coinconfig.json');
 let cardTemplate = fs.readFileSync(templateFile, 'utf8');
-let coinConfigObj = JSON.parse(fs.readFileSync(coinConfigFile, 'utf8'));
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
-let coinName = "";
+let coinCfg = {};
 
 // #region Page Event Handlers
 addEventListener('keyup', handleKeyPress, true);
@@ -76,21 +74,19 @@ function loadAndDisplayWallets() {
    // clearing any existing wallets
    $('.walletCard').remove();
 
-   logger.info('Loading Wallet Details for ' + coinName);
+   logger.info('Loading Wallet Details for ' + coinCfg.coinDisplayName);
    //Check if file exists
-   let coinCfg = getCoinConfigForCoin(coinName);
+   //let coinCfg = getCoinConfigForCoin(coinDisplayName);
 
-   $(document).attr("title", coinCfg.coinName + " Wallet Details");
-
-   //$('#coinName').text(coinCfg.coinName)
+   $(document).attr("title", coinCfg.coinDisplayName + " Wallet Details");
 
    walletObj.every((w) => {
-      if (w.wallet.startsWith(coinCfg.coinSymbol))
+      if (w.wallet.startsWith(coinCfg.coinPrefix))
       {
          logger.info('Loading Wallet Details for wallet: ' + w.wallet);
          buildWalletCard(w.wallet, coinCfg)
 
-         ipcRenderer.send('async-get-wallet-balance', [w.wallet, coinCfg.coinApiName, coinCfg.multiplier]);
+         ipcRenderer.send('async-get-wallet-balance', [w.wallet, coinCfg.coinPathName]);
       }
 
       return true;
@@ -105,45 +101,9 @@ function loadAndDisplayWallets() {
 // *************************
 function buildWalletCard(wallet, coinCfg)
 {
-      let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', wallet).replace('{2}', wallet).replace('{3}', coinCfg.coinSymbol);
+      let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', wallet).replace('{2}', wallet).replace('{3}', coinCfg.coinPrefix);
       
       $('#wallet-cards').append(updateString);
-}
-// #endregion
-
-// #region Coin Configuration
-
-// ***********************
-// Name: 	
-// Purpose: 
-//    Args: 
-//  Return: 
-// *************************
-function getCoinConfigForCoin(coin)
-{
-   let coinConfig;
-   let coinConfigFound = false;
-   coinConfigObj.every((cfg) => {
-      if (coin == cfg.coinApiName)
-      {
-         coinConfig = cfg;
-         coinConfigFound = true;
-         return false;
-      }
-      else
-      {
-         return true;
-      }
-   });
-
-   if (coinConfigFound)
-   {
-      return coinConfig;
-   }
-   else
-   {
-      console.log('Unable to locate coin configuration settings for ' + coin);
-   }
 }
 // #endregion
 
@@ -159,8 +119,9 @@ ipcRenderer.on('load-wallet-details', (event, arg) => {
    logger.info('Received load-wallet-details event');
    if (arg.length == 1)
    {
-      coinName = arg[0];
-      logger.info('Loading details for ' + coinName);
+      coinCfg = arg[0];
+
+      logger.info('Loading details for ' + coinCfg.coinDisplayName);
       loadAndDisplayWallets();
    }
    else
@@ -179,11 +140,8 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-wallet-balance-reply event');
    if (arg.length == 4)
    {
-      let coin = arg[0];
       let wallet = arg[1];
-      let balance = utils.convertFromMojo(arg[2]);
-      let balanceBefore = utils.convertFromMojo(arg[3]);
-      let change = balance - balanceBefore;
+      let balance = arg[2];
     
       if ($('#'+wallet+'-card .card-text').length != 0)
       {
@@ -192,7 +150,7 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
 
          if (!isNaN(balance))
          {
-            $('#'+wallet+'-card .card-text').text(balance.toLocaleString());
+            $('#'+wallet+'-card .card-text').text((balance / coinCfg.mojoPerCoin).toLocaleString());
          }
          else
          {
