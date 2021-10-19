@@ -13,12 +13,16 @@ let coinConfigFile = path.resolve(__dirname, '../resources/config/coinconfig.jso
 let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig.json');
 let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 let coinConfigObj = JSON.parse(fs.readFileSync(coinConfigFile, 'utf8'));
-let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
 // write empty file if wallets file is missing.
 if (!fs.existsSync(walletFile))
    fs.writeFileSync(walletFile, '[]');
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
+
+// write empty file if wallets file is missing.
+if (!fs.existsSync(clientConfigFile))
+   fs.writeFileSync(clientConfigFile, '{}');
+let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
 const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
 
@@ -53,12 +57,20 @@ function handleKeyPress(event) {
    }
 }
 
-$('#add-to-list').on('click', () => {
+$('#add-wallet').on('click', () => {
    addNewWallet();
 })
 
-$('#cancel-add').on('click', () => {
+$('#cancel-add-wallet').on('click', () => {
    $('#add-wallet').hide();
+})
+
+$('#add-launcher').on('click', () => {
+   saveLauncherId();
+})
+
+$('#cancel-add-launcher').on('click', () => {
+   $('#set-launcher').hide();
 })
 
 $('#show-actual-balance').on('click', () => {
@@ -76,12 +88,19 @@ $('#show-actual-balance').on('click', () => {
 $('#show-recoverable-balance').on('click', () => {
    if (actualBalanceDisplayed)
    {
-      $('#show-actual-balance').addClass('btn-secondary');
-      $('#show-actual-balance').removeClass('btn-primary');
-      $('#show-recoverable-balance').addClass('btn-primary');
-      $('#show-recoverable-balance').removeClass('btn-secondary');
-      getWalletRecoverableBalances();
-      actualBalanceDisplayed = false;
+      if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0)
+      {
+         $('#show-actual-balance').addClass('btn-secondary');
+         $('#show-actual-balance').removeClass('btn-primary');
+         $('#show-recoverable-balance').addClass('btn-primary');
+         $('#show-recoverable-balance').removeClass('btn-secondary');
+         getWalletRecoverableBalances();
+         actualBalanceDisplayed = false;
+      }
+      else
+      {
+         $('#set-launcher').show();
+      }
    }
 })
 
@@ -90,6 +109,28 @@ $('#open-nft-recovery').on('click', () => {
    openNFTRecoverySite();
 })
 // #endregion
+
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
+function saveLauncherId()
+{
+   $('#set-launcher').hide();
+   
+   let launcherVal = $('#Launcher').val();
+
+   clientConfigObj.launcherid = launcherVal;
+   
+   fs.writeFileSync(clientConfigFile, JSON.stringify(clientConfigObj, null, '\t'));
+
+   // Render the Recoverable balances if they are being shown
+   if (!actualBalanceDisplayed)
+      getWalletRecoverableBalances();
+}
 
 // ***********************
 // Name: 	
@@ -577,6 +618,23 @@ ipcRenderer.on('async-refresh-wallets', (event, arg) => {
 ipcRenderer.on('async-add-wallet', (event, arg) => {
    logger.info('Received async-add-wallet event');
    $('#add-wallet').show();
+})
+
+// ***********************
+// Name: 	
+// Purpose: 
+//    Args: 
+//  Return: 
+// *************************
+ipcRenderer.on('async-set-launcher', (event, arg) => {
+   logger.info('Received async-set-launcher event');
+
+   if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0)
+   {
+      $('#Launcher').val(clientConfigObj.launcherid);
+   }
+
+   $('#set-launcher').show();
 })
 // #endregion
 

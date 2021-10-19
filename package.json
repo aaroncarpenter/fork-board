@@ -1,10 +1,10 @@
 {
-  "name": "chia-forks-dashboard",
-  "productName": "chia-forks-dashboard",
+  "name": "fork-board",
+  "productName": "Forkboard",
   "description": "A small dashboard application to show balances of wallets from Chia and Forks.",
   "keywords": [],
   "main": "./src/main.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Aaron Carpenter",
   "scripts": {
     "start": "electron-forge start",

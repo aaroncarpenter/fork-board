@@ -163,6 +163,12 @@ const template = [
       label: 'File',
       submenu: [
          {
+            label: 'Set Launcher Id',
+            click() {
+               win.webContents.send('async-set-launcher', []);
+            }
+         },
+         {
             label: 'Add Wallet',
             click() {
                win.webContents.send('async-add-wallet', []);
