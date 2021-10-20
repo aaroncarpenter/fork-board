@@ -1,0 +1,43 @@
+body.dark-mode {
+   background: #333;
+   color: white;
+}
+
+body.light-mode {
+   background: #ddd;
+   color: black;
+}
+
+#wallet-list {
+   height: 500px;
+   overflow-y: auto;
+}
+
+.card-footer {
+   padding-top: 1px;
+   padding-bottom: 0.1rem;
+   margin-bottom: 0.5rem;
+   max-height: 35px;
+}
+
+.card-header {
+   padding-top: 0.1rem;
+   padding-bottom: 0.1rem;
+   padding-left: 0.25rem;
+}
+
+.walletCard {
+   cursor: pointer;
+}
+
+.card-body {
+   padding: 0.5rem;
+}
+
+small {
+   font-variant: small-caps;
+}
+
+h1 {
+   font-size: 3.0vw
+}

@@ -4,45 +4,30 @@
       <meta charset = "UTF-8">
       <title>ForkBoard</title>
       <link rel = "stylesheet" href = "../bower_components/bootstrap/dist/css/bootstrap.min.css" />
-      <style type = "text/css">
-         #wallet-list {
-            height: 500px;
-            overflow-y: auto;
-         }
+      <link rel = "stylesheet" href = "./css/forkboard.css" />
 
-         .card-footer {
-            padding-top: 1px;
-            padding-bottom: 0.1rem;
-            margin-bottom: 0.5rem;
-            max-height: 35px;
-         }
-
-         .card-header {
-            padding-top: 0.1rem;
-            padding-bottom: 0.1rem;
-            padding-left: 0.25rem;
-         }
-
-         small {
-            font-variant: small-caps;
-         }
-      </style>
       <script src="https://kit.fontawesome.com/80792d13b7.js" crossorigin="anonymous"></script>
    </head>
    
    <body>
       <div class = "container">
          <p></p>
-         <div class="row">
-            <div class="btn-group btn-group-sm col-md-6" role="group" aria-label="Basic example">
-               <button type="button" id="show-actual-balance" class="btn btn-primary btn-small">Show Actual Balance</button>
-               <button type="button" id="show-recoverable-balance" class="btn btn-secondary btn-small">Show Recoverable Balance</button>
+         <div class="d-flex row align-items-center">
+            <div class="btn-group btn-group-sm col-md-6" role="group">
+               <button type="button" id="show-actual-balance" class="btn btn-primary btn-small"><small>Show Actual Balance</small></button>
+               <button type="button" id="show-recoverable-balance" class="btn btn-secondary btn-small"><small>Show Recoverable Balance</small></button>
             </div>
             <div class="col-md-2"></div>
-            <div class="form-check form-switch col-sm-4" style="display: none">
-               <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-               <label class="form-check-label" for="flexSwitchCheckDefault">Auto-Refresh (5 mins)</label>
-             </div>
+            <div class="d-flex col-sm-4 justify-content-end">
+               <!--<div>
+                  <i id="show-dark-mode" class="fas fa-sun" data-toggle="tooltip" title="Dark Mode"></i>
+                  <i id="show-light-mode" class="fas fa-moon" data-toggle="tooltip" title="Light Mode"></i>
+               </div>-->
+               <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="autoRefreshCheck" onclick="autoRefreshHandler();" title="Every 5 mins" />
+                  <label class="form-check-label" for="flexSwitchCheckDefault" title="Every 5 mins"><small class="text-muted">Auto-Refresh</small></label>
+               </div>
+            </div>
          </div>
          <div id="alertBox" class="alert alert-warning" style="display: none" role="alert">
          </div>
@@ -84,6 +69,13 @@
          </div>
          <p />
          <div id="wallet-cards" class="row" style="vertical-align:bottom"></div>
+         <div id="pageLoadingSpinner" class="d-flex column justify-content-center align-items-end" style="height: 450px; vertical-align:bottom;">
+            <div class="spinner-border" role="status" style="width: 4rem; height: 4rem;"> </div>
+         </div>
+         <div id="lastRefreshDate" class="d-flex justify-content-end" style="display: none;">
+            <small class="text-muted font-italic font-weight-light"></small>
+         </div>
+         
       <script src = "./view.js" ></script>
       </div>
    </body>

@@ -1,18 +1,21 @@
+// #region Const Definitions
+const {ipcRenderer, clipboard} = require('electron');
+const Utils = require('./utils');
+const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
+const logger = require('electron-log');
+logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/view.log');
+// #endregion
+
+// #region Variable Definitions
 let $ = require('jquery');
 let fs = require('fs');
 let path = require('path');
-const logger = require('electron-log');
-logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/view.log');
-
-const {ipcRenderer, clipboard} = require('electron');
-const Utils = require('./utils');
 
 let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
 let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
-let coinConfigFile = path.resolve(__dirname, '../resources/config/coinconfig.json');
+let coinPriceFile = path.resolve(__dirname, '../resources/config/coinprices.json');
 let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig.json');
 let cardTemplate = fs.readFileSync(templateFile, 'utf8');
-//let coinConfigObj = JSON.parse(fs.readFileSync(coinConfigFile, 'utf8'));
 
 // write empty file if wallets file is missing.
 if (!fs.existsSync(walletFile))
@@ -21,30 +24,35 @@ let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 // write empty file if wallets file is missing.
 if (!fs.existsSync(clientConfigFile))
-   fs.writeFileSync(clientConfigFile, '{}');
+   fs.writeFileSync(clientConfigFile, '{}'); 
 let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
-const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
+let coinPriceObj = JSON.parse(fs.readFileSync(coinPriceFile, 'utf8'));
 
 let actualBalanceDisplayed = true;
 let walletCache = new Set();
 let utils = new Utils();
 
 let coinConfigObj = [];
-let coinData = [];
+let coinData = [];   
+let lastRefreshed = new Date();
+let refreshTimerLength = 5*60*60; // 5 minutes
+let refreshTimerId;
+// #endregion
 
-getBlockchainSettingsConfiguration();
+
+$(function () {
+   getBlockchainSettingsConfiguration();
+   addEventListener('keyup', handleKeyPress, true);
+});
 
 // #region Page Event Handlers
-
-addEventListener('keyup', handleKeyPress, true);
-
 // ***********************
-// Name: 	
+// Name: 	handleKeyPress
 // Purpose: 
 //    Args: 
-//  Return: 
-// *************************
+//  Return: N/A
+// ************************
 function handleKeyPress(event) {
    if (event.key == "Enter")
    {
@@ -56,6 +64,33 @@ function handleKeyPress(event) {
       }
    }
 }
+
+// ***********************
+// Name: 	autoRefreshHandler
+// Purpose: 
+//    Args: N/A
+//  Return: N/A
+// ************************
+function autoRefreshHandler(){
+   if ($('#autoRefreshCheck')[0].checked) 
+   {
+      refreshTimerId = setInterval(refreshDashboard, refreshTimerLength);
+   }
+   else
+   {
+      clearInterval(refreshTimerId);
+      // release our intervalID from the variable
+      refreshTimerId = null; 
+   }
+}
+
+$('#show-dark-mode').on('click', () => {
+   ipcRenderer.send('dark-mode-toggle', []);
+})
+
+$('#show-light-mode').on('click', () => {
+   ipcRenderer.send('dark-mode-toggle', []);
+})
 
 $('#add-wallet').on('click', () => {
    addNewWallet();
@@ -76,12 +111,12 @@ $('#cancel-add-launcher').on('click', () => {
 $('#show-actual-balance').on('click', () => {
    if (!actualBalanceDisplayed)
    {
+      actualBalanceDisplayed = true;
       $('#show-recoverable-balance').addClass('btn-secondary');
       $('#show-recoverable-balance').removeClass('btn-primary');
       $('#show-actual-balance').addClass('btn-primary');
       $('#show-actual-balance').removeClass('btn-secondary');
       getWalletBalances();
-      actualBalanceDisplayed = true;
    }
 })
 
@@ -90,12 +125,12 @@ $('#show-recoverable-balance').on('click', () => {
    {
       if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0)
       {
+         actualBalanceDisplayed = false;
          $('#show-actual-balance').addClass('btn-secondary');
          $('#show-actual-balance').removeClass('btn-primary');
          $('#show-recoverable-balance').addClass('btn-primary');
          $('#show-recoverable-balance').removeClass('btn-secondary');
          getWalletRecoverableBalances();
-         actualBalanceDisplayed = false;
       }
       else
       {
@@ -110,13 +145,12 @@ $('#open-nft-recovery').on('click', () => {
 })
 // #endregion
 
-
 // ***********************
-// Name: 	
+// Name: 	saveLauncherId
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+//    Args: N/A
+//  Return: N/A
+// ************************
 function saveLauncherId()
 {
    $('#set-launcher').hide();
@@ -133,11 +167,11 @@ function saveLauncherId()
 }
 
 // ***********************
-// Name: 	
+// Name: 	addNewWallet
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+//    Args: N/A
+//  Return: N/A
+// ************************
 function addNewWallet()
 {
    $('#add-wallet').hide();
@@ -145,68 +179,77 @@ function addNewWallet()
    let walletVal = $('#Wallet').val();
    let walletArr = walletVal.split(',');
 
-   walletArr.every((walletStr) => {
-      walletStr = walletStr.trim();
-      let coinCfg = getCoinConfigForWallet(walletStr);
+   if (walletVal.length > 0)
+   {
+      walletArr.every((walletStr) => {
+         walletStr = walletStr.trim();
+         let coinCfg = getCoinConfigForWallet(walletStr);
 
-      if (coinCfg != null)
-      {
-         if (!walletCache.has(walletStr))
+         if (coinCfg != null)
          {
-            walletObj.push({'wallet': walletStr});
-            addEntry(walletStr, actualBalanceDisplayed);
-            fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
+            if (!walletCache.has(walletStr))
+            {
+               walletObj.push({'wallet': walletStr});
+               addEntry(walletStr, actualBalanceDisplayed);
+               fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
+            }
+            else
+            {
+               utils.showErrorMessage(logger, "The wallet (" + walletStr + ") already exists.", 5000);
+            }
          }
          else
          {
-            utils.showErrorMessage(logger, "The wallet (" + walletStr + ") already exists.", 5000);
+            utils.showErrorMessage(logger, "The wallet is currently unsupported.  You entered (" + walletStr + ").", 5000);
          }
-      }
-      else
-      {
-         utils.showErrorMessage(logger, "The wallet is currently unsupported.  You entered (" + walletStr + ").", 5000);
-      }
 
-      return true;
-   });
+         return true;
+      });
+   }
 
+   // Clear the value for the next entry
    $('#Wallet').val(null);
 }
 
 // ***********************
-// Name: 	
-// Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// Name: 	loadWalletDetails
+// Purpose: This event runs when a user clicks on a card.  It sends an event to ipcMain to display and render the wallet details page.
+//    Args: coin - the pathname of the coin to load
+//  Return: N/A
+// ************************
 function loadWalletDetails(coin)
 {
+   // Get configuration for the specified coin
    let coinCfg = getCoinConfigForCoin(coin);
-   
+
+
+   // Send the event to ipcMain to open the details page.
    logger.info('Sending open-wallet-details event');
    ipcRenderer.send('open-wallet-details', [coinCfg]);
 }
 
 // ***********************
-// Name: 	
-// Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// Name: 	openNFTRecoverySite
+// Purpose: This function copies the LauncherId into the Clipboard and then sends an event to ipcMain to display the NFT Recovery page.
+//    Args: N/A
+//  Return: N/A
+// ************************
 function openNFTRecoverySite()
 {
+   // Copy the LauncherId from configuration to the Clipboard
    clipboard.writeText(clientConfigObj.launcherid);
 
+   // Send the event to ipcMain to open the nft recovery page.
    logger.info('Sending open-nft-recovery-site event');
    ipcRenderer.send('open-nft-recovery-site', [clientConfigObj.launcherid]);
 }
 
 // ***********************
-// Name: 	
+// Name: 	addEntry
 // Purpose: 
 //    Args: 
-//  Return: 
-// *************************
+//  Return: N/A
+// ************************
 function addEntry(wallet, loadBalance) {
    let coinCfg = getCoinConfigForWallet(wallet);
    
@@ -228,16 +271,31 @@ function addEntry(wallet, loadBalance) {
       {
          logger.error("Unable to Add Entry for unsupported wallet (" + walletStr + ").");
       }
-
    }
 }
 
 // ***********************
-// Name: 	
+// Name: 	refreshDashboard
+// Purpose: 
+//    Args: N/A
+//  Return: N/A
+// ************************
+function refreshDashboard()
+{
+   getBlockchainSettingsConfiguration();
+
+   if (actualBalanceDisplayed)
+      getWalletBalances();
+   else
+      getWalletRecoverableBalances();
+}
+
+// ***********************
+// Name: 	loadAndDisplayWallets
 // Purpose: 
 //    Args: 
-//  Return: 
-// *************************
+//  Return: N/A
+// ************************
 function loadAndDisplayWallets(loadBalance) {  
    //clear the wallet cache
    walletCache.clear();
@@ -250,17 +308,22 @@ function loadAndDisplayWallets(loadBalance) {
          return true;
       });
    }
+
+   lastRefreshed = new Date();
+
+   $('#lastRefreshDate small').show();
+   $('#lastRefreshDate small').text('Refreshed On: ' + lastRefreshed.toLocaleString());
 }
 
 
 // #region Coin Dataset Operations
 
 // ***********************
-// Name: 	
+// Name: 	initializeCoinDataSet
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+//    Args: N/A
+//  Return: N/A
+// ************************
 function initializeCoinDataSet()
 {
    coinData = [];
@@ -271,9 +334,12 @@ function initializeCoinDataSet()
          coinPathName: cfg.coinPathName,
          coinDisplayName: cfg.coinDisplayName,
          mojoPerCoin: cfg.mojoPerCoin,
+         coinPrice: cfg.coinPrice,
          coinBalance: 0,
+         coinBalanceUSD: 0,
          coinChange: 0,
          coinRecovBalance: 0,
+         coinRecovBalanceUSD: 0,
          coinWalletCount: 0
       })
 
@@ -282,11 +348,11 @@ function initializeCoinDataSet()
 }
 
 // ***********************
-// Name: 	
+// Name: 	updateCoinDataSetBalance
 // Purpose: 
 //    Args: 
 //  Return: 
-// *************************
+// ************************
 function updateCoinDataSetBalance(coin, balance, change)
 {
    let coinDataObj = {};
@@ -297,6 +363,7 @@ function updateCoinDataSetBalance(coin, balance, change)
          {
             c.coinBalance = c.coinBalance + (balance / c.mojoPerCoin);
             c.coinChange = c.coinChange + (change / c.mojoPerCoin);
+            c.coinBalanceUSD = (c.coinPrice != null) ? c.coinBalance * c.coinPrice : null;
             c.coinWalletCount++;
             
             coinDataObj = c;
@@ -312,11 +379,11 @@ function updateCoinDataSetBalance(coin, balance, change)
 }
 
 // ***********************
-// Name: 	
+// Name: 	updateCoinDataSetRecoverableBalance
 // Purpose: 
 //    Args: 
 //  Return: 
-// *************************
+// ************************
 function updateCoinDataSetRecoverableBalance(coin, balance)
 {
    let coinDataObj = {};
@@ -326,6 +393,7 @@ function updateCoinDataSetRecoverableBalance(coin, balance)
          if (c.coinPathName === coin)
          {
             c.coinRecovBalance = (balance / c.mojoPerCoin);
+            c.coinRecovBalanceUSD = (c.coinPrice != null) ? c.coinRecovBalance * c.coinPrice : null;
 
             coinDataObj = c;
 
@@ -340,15 +408,25 @@ function updateCoinDataSetRecoverableBalance(coin, balance)
 }
 // #endregion
 
-// #region Condfiguration
+// #region Configuration
 
+// ***********************
+// Name: 	getBlockchainSettingsConfiguration
+// Purpose: 
+//    Args:  N/A
+//  Return:  N/A
+// ************************
 function getBlockchainSettingsConfiguration()
 {
-   //TODO Show Initializing Message
-
    ipcRenderer.send('async-get-blockchain-settings', []);
 }
 
+// ***********************
+// Name: 	getCoinConfigForWallet
+// Purpose: 
+//    Args: 
+//  Return:  N/A
+// ************************
 function getCoinConfigForWallet(wallet)
 {
    let coinCfg;
@@ -376,6 +454,12 @@ function getCoinConfigForWallet(wallet)
    }
 }
 
+// ***********************
+// Name: 	getCoinConfigForCoin
+// Purpose: 
+//    Args: 
+//  Return: N/A
+// ************************
 function getCoinConfigForCoin(coin)
 {
    let coinCfg;
@@ -403,16 +487,39 @@ function getCoinConfigForCoin(coin)
    }
 }
 
+// ***********************
+// Name: 	getPriceForCoinPrefix
+// Purpose: 
+//    Args: 
+//  Return: N/A
+// ************************
+function getPriceForCoinPrefix(coinPrefix)
+{
+   let price;
+   coinPriceObj.every((cp) => {
+      if (coinPrefix == cp.coinPrefix.toLowerCase())
+      {
+         price = cp.usd;
+         return false;
+      }
+      else
+      {
+         return true;
+      }
+   });
+
+   return price;
+}
 // #endregion
 
 // #region Wallet Functions
 
 // ***********************
-// Name: 	
+// Name: 	buildWalletCard
 // Purpose: 
 //    Args: 
-//  Return: 
-// *************************
+//  Return: N/A
+// ************************
 function buildWalletCard(wallet, coinCfg)
 {
    let imgPath = coinImgPath.replace('{0}', coinCfg.coinPathName);
@@ -424,11 +531,11 @@ function buildWalletCard(wallet, coinCfg)
 }
 
 // ***********************
-// Name: 	
+// Name: 	getWalletBalances
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+//    Args: N/A 
+//  Return: N/A
+// ************************
 function getWalletBalances()
 {
    $('#nft-recovery').hide();
@@ -442,11 +549,11 @@ function getWalletBalances()
 }
 
 // ***********************
-// Name: 	
+// Name: 	getWalletRecoverableBalances
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+//    Args: N/A
+//  Return: N/A
+// ************************
 function getWalletRecoverableBalances()
 {
    $('#nft-recovery').hide();
@@ -482,15 +589,16 @@ function getWalletRecoverableBalances()
 // #region Card Operations
 
 // ***********************
-// Name: 	
+// Name: 	refreshCardData
 // Purpose: 
 //    Args: 
-//  Return: 
-// *************************
+//  Return: N/A
+// ************************
 function refreshCardData(cardDataObj)
 {
    let coin = cardDataObj.coinPathName;
-   let balance = cardDataObj.coinBalance;
+   let balance = (actualBalanceDisplayed) ? cardDataObj.coinBalance : cardDataObj.coinRecovBalance;
+   let balanceUSD = (actualBalanceDisplayed) ? cardDataObj.coinBalanceUSD : cardDataObj.coinRecovBalanceUSD;
    let change = cardDataObj.coinChange;
    let walletCount = cardDataObj.coinWalletCount;
 
@@ -498,66 +606,60 @@ function refreshCardData(cardDataObj)
    {
       //Remove loading spinner if present
       $('#'+coin+'-card .spinner-border').remove();
-      $('#'+coin+'-card #walletCount').text(Number(walletCount));
-      $('#'+coin+'-card #walletCountLabel').text(" wallet" + ((walletCount > 1) ? "s" : ""));
-      $('#'+coin+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
+      $('#'+coin+'-card .card-balances').show();
 
-      let pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
-      let neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
-
-      $('#'+coin+'-card .balanceChangeSymbol span').remove();
-      if (change > 0)
+      if (balance != null)
       {
-         $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
-         $('#'+coin+'-card .balanceChangeSymbol').append(pos_chg_icon);
+         $('#'+coin+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
       }
-      else if (change < 0)
+      
+      if (balanceUSD != null && balance > 0)
       {
-         $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
-         $('#'+coin+'-card .balanceChangeSymbol').append(neg_chg_icon); 
+         $('#'+coin+'-card .card-body .balance-usd').text(utils.getAdjustedUSDBalanceLabel(balanceUSD));
       }
       else
-      $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
-   }
-}
-
-// ***********************
-// Name: 	
-// Purpose: 
-//    Args: 
-//  Return: 
-// *************************
-function refreshRecoverableCardData(cardDataObj)
-{
-   let coin = cardDataObj.coinPathName;
-   let balance = cardDataObj.coinRecovBalance;
-   let mojoPerCoin = cardDataObj.mojoPerCoin;
-
-   if ($('#'+coin+'-card .card-text').length != 0)
-   {
-      //Remove loading spinner if present
-      $('#'+coin+'-card .spinner-border').remove();
-
-      if ($('#'+coin+'-card .card-text').text() != 'N/A')
       {
-         $('#'+coin+'-card .card-text').text(utils.getAdjustedBalanceLabel(balance/mojoPerCoin));
+         $('#'+coin+'-card .card-body .balance-usd').text('-');
       }
 
-      $('#nft-recovery').show();
+      if (actualBalanceDisplayed)
+      {
+         $('#'+coin+'-card #walletCount').text(Number(walletCount));
+         $('#'+coin+'-card #walletCountLabel').text(" wallet" + ((walletCount > 1) ? "s" : ""));
+
+         let pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
+         let neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
+
+         $('#'+coin+'-card .balanceChangeSymbol span').remove();
+         if (change > 0)
+         {
+            $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
+            $('#'+coin+'-card .balanceChangeSymbol').append(pos_chg_icon);
+         }
+         else if (change < 0)
+         {
+            $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
+            $('#'+coin+'-card .balanceChangeSymbol').append(neg_chg_icon); 
+         }
+         else
+         $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
+      }
+      else
+      {
+         $('#nft-recovery').show();
+      }
    }
 }
 //#endregion
 
 // #region Async Event Handlers
 
-// ***********************
-// Name: 	
+// ************************
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
    logger.info('Received async-get-blockchain-settings-reply event')
+   
    if (arg.length > 1)
    {
       arg.every((blockSettings) => {
@@ -565,11 +667,14 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
             coinPrefix: blockSettings.coinPrefix,
             coinPathName: blockSettings.pathName,
             coinDisplayName: blockSettings.displayName,
-            mojoPerCoin: blockSettings.mojoPerCoin
+            mojoPerCoin: blockSettings.mojoPerCoin,
+            coinPrice: getPriceForCoinPrefix(blockSettings.coinPrefix)
          });
 
          return true;
       });
+
+      $('#pageLoadingSpinner').remove();
 
       initializeCoinDataSet();
       loadAndDisplayWallets(true);
@@ -597,12 +702,10 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
     "discord": "https://discord.gg/Mz4SG4KrYN",
     "website": "https://www.chia.net/"
 */
-// ***********************
-// Name: 	
+
+// ************************
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-wallet-balance-reply event')
    if (arg.length == 4)
@@ -622,12 +725,9 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    }
 })
 
-// ***********************
-// Name: 	
+// ************************
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-recoverable-wallet-balance-reply event')
    if (arg.length > 1)
@@ -639,7 +739,7 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
          let cardDataObj = updateCoinDataSetRecoverableBalance(coin, balance);
          
          // Update the displayed card values
-         refreshRecoverableCardData(cardDataObj);
+         refreshCardData(cardDataObj);
 
          return true;
       });
@@ -650,41 +750,26 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    }
 })
 
-// ***********************
-// Name: 	
+// ************************
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 ipcRenderer.on('async-refresh-wallets', (event, arg) => {
    logger.info('Received async-refresh-wallets event');
 
-   getBlockchainSettingsConfiguration();
-
-
-   if (actualBalanceDisplayed)
-      getWalletBalances();
-   else
-      getWalletRecoverableBalances();
+   refreshDashboard();
 })
 
-// ***********************
-// Name: 	
+// ************************
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 ipcRenderer.on('async-add-wallet', (event, arg) => {
    logger.info('Received async-add-wallet event');
    $('#add-wallet').show();
 })
 
-// ***********************
-// Name: 	
+// ************************
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 ipcRenderer.on('async-set-launcher', (event, arg) => {
    logger.info('Received async-set-launcher event');
 

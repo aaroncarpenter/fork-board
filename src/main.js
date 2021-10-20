@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu, MenuItem, ipcMain} = require('electron') 
+const {app, BrowserWindow, Menu, MenuItem, ipcMain, nativeTheme} = require('electron') 
 const url = require('url') 
 const path = require('path')  
 const axios = require('axios')
@@ -13,7 +13,7 @@ let win
 function createWindow() { 
    win = new BrowserWindow({
       width: 1100, 
-      height: 1100,
+      height: 1200,
       webPreferences: {
          nodeIntegration: true,
          contextIsolation: false,
@@ -23,7 +23,7 @@ function createWindow() {
       pathname: path.join(__dirname, 'index.html'), 
       protocol: 'file:', 
       slashes: true 
-   })) 
+   }))
 }
 // #endregion
 
@@ -69,7 +69,7 @@ let nftRecovery
 function createNFTRecoveryWindow() {
    nftRecovery = new BrowserWindow({
      width: 900,
-     height: 1100,
+     height: 1200,
      modal: true,
      show: false,
      parent: win, // Make sure to add parent window here

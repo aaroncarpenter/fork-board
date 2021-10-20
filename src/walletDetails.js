@@ -20,10 +20,10 @@ let coinCfg = {};
 addEventListener('keyup', handleKeyPress, true);
 
 // ***********************
-// Name: 	
+// Name: 	handleKeyPress
 // Purpose: 
 //    Args: 
-//  Return: 
+//  Return: N/A
 // *************************
 function handleKeyPress(event) {
    if (event.key == "Escape")
@@ -34,10 +34,10 @@ function handleKeyPress(event) {
 }
 
 // ***********************
-// Name: 	
+// Name: 	handleWalletDelete
 // Purpose: 
 //    Args: 
-//  Return: 
+//  Return: N/A
 // *************************
 function handleWalletDelete(wallet)
 {
@@ -65,18 +65,16 @@ function handleWalletDelete(wallet)
 // #region Wallet Functions
 
 // ***********************
-// Name: 	
+// Name: 	loadAndDisplayWallets
 // Purpose: 
 //    Args: 
-//  Return: 
+//  Return: N/A
 // *************************
 function loadAndDisplayWallets() {  
    // clearing any existing wallets
    $('.walletCard').remove();
 
    logger.info('Loading Wallet Details for ' + coinCfg.coinDisplayName);
-   //Check if file exists
-   //let coinCfg = getCoinConfigForCoin(coinDisplayName);
 
    $(document).attr("title", coinCfg.coinDisplayName + " Wallet Details");
 
@@ -94,10 +92,10 @@ function loadAndDisplayWallets() {
 }
 
 // ***********************
-// Name: 	
+// Name: 	buildWalletCard
 // Purpose: 
 //    Args: 
-//  Return: 
+//  Return: N/A
 // *************************
 function buildWalletCard(wallet, coinCfg)
 {
@@ -109,12 +107,9 @@ function buildWalletCard(wallet, coinCfg)
 
 // #region Electron Event Handlers
 
-// ***********************
-// Name: 	
+// ************************
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 ipcRenderer.on('load-wallet-details', (event, arg) => {
    logger.info('Received load-wallet-details event');
    if (arg.length == 1)
@@ -130,31 +125,34 @@ ipcRenderer.on('load-wallet-details', (event, arg) => {
    }
 })
 
-// ***********************
-// Name: 	
+// ************************
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-wallet-balance-reply event');
    if (arg.length == 4)
    {
       let wallet = arg[1];
-      let balance = arg[2];
+      let balance = (arg[2] / coinCfg.mojoPerCoin);
+      let balanceUSD = (coinCfg.coinPrice != null) ? balance * coinCfg.coinPrice : null;
     
       if ($('#'+wallet+'-card .card-text').length != 0)
       {
-         //Remove loading spinner if present
          $('#'+wallet+'-card .spinner-border').remove();
+         $('#'+wallet+'-card .card-balances').show();
 
-         if (!isNaN(balance))
+         if (balance != null)
          {
-            $('#'+wallet+'-card .card-text').text((balance / coinCfg.mojoPerCoin).toLocaleString());
+            $('#'+wallet+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
+         }
+         
+         if (balanceUSD != null && balance > 0)
+         {
+            $('#'+wallet+'-card .card-body .balance-usd').text(utils.getAdjustedUSDBalanceLabel(balanceUSD));
          }
          else
          {
-            logger.error('Numbers in incorrect formats');
+            $('#'+wallet+'-card .card-body .balance-usd').text('-');
          }
       }
    }

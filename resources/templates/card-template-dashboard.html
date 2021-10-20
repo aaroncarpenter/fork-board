@@ -1,4 +1,4 @@
-<div id="{3}-card" class="walletCard col-md-4" onclick="loadWalletDetails('{1}')">
+<div id="{3}-card" class="walletCard col-md-4" onclick="loadWalletDetails('{1}')" title="Click here to open the wallet details.">
     <div class="card-header">
         <div class="d-flex flex-row justify-content-between">
             <div>
@@ -9,18 +9,29 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="d-flex flex-row justify-content-between align-items-center">
-                <div class="col-md-7 text-center">
-                    <h1 class="card-text">
-                        <span class="balance"></span>
-                        <div class="spinner-border" role="status"></div>
-                    </h1>
-                </div>
-                <div>
-                    <small class="text-muted">Chg:&nbsp; 
-                        <span class="balanceChange"></span>
-                        <span class="balanceChangeSymbol"></span>
-                    </small>
+            <div class="d-flex justify-content-center col-md-12"><div class="spinner-border" role="status"></div></div>
+            <div class="card-balances"  style="display: none;">
+                <div class="d-flex flex-row align-items-center">
+                    <div class="col-md-6 flex-fill text-center" title="Wallet balance in coins.">
+                        <div>
+                            <h1 class="card-text">
+                                <div class="balance"></div>
+                            </h1>
+                        </div>
+                        <div>
+                            <small class="text-muted">{4}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 flex-fill text-center" style="border-left: 1px solid lightgray" title="Wallet balance in USD.  A '-' indicates that the coin price isn't available.">
+                        <div>
+                            <h1 class="card-text">
+                                <div class="balance-usd"></div>
+                            </h1>
+                        </div>
+                        <div>
+                            <small class="text-muted">usd</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -28,7 +39,10 @@
     <div class="card-footer">
         <div class="d-flex flex-row justify-content-between">
             <div>
-                <small class="text-muted">{4}</small>
+                <small class="text-muted" title="The change in balance over the last 24 hours">Chg:&nbsp; 
+                    <span class="balanceChange"></span>
+                    <span class="balanceChangeSymbol"></span>
+                </small>
             </div>
             <div>
                 <small class="text-muted">

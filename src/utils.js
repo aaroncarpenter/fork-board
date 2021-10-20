@@ -1,17 +1,17 @@
 // ***********************
-// Name: 	
+// Name: Utils	
 // Purpose: 
-//    Args: 
-//  Return: 
-// *************************
+// ************************
 class Utils {
 
    // ***********************
-   // Name: 	
+   // Name: 	showErrorMessage
    // Purpose: 
-   //    Args: 
-   //  Return: 
-   // *************************
+   //    Args: logger - 
+   //          message - 
+   //          timeout - 
+   //  Return: N/A
+   // ************************
    showErrorMessage(logger, message, timeout)
    {
       logger.error(message);
@@ -26,11 +26,11 @@ class Utils {
    } 
 
    // ***********************
-   // Name: 	
+   // Name: 	getAdjustedBalanceLabel
    // Purpose: 
-   //    Args: 
-   //  Return: 
-   // *************************
+   //    Args: balance - wallet balance value
+   //  Return: Formatted balance string
+   // ************************
    getAdjustedBalanceLabel(balance)
    {
       let balanceStr = "";
@@ -47,6 +47,21 @@ class Utils {
       else
          balanceStr = (balance/1000000000).toLocaleString() + "B";
       
+      return balanceStr;
+   } 
+
+   // ***********************
+   // Name: 	getAdjustedUSDBalanceLabel
+   // Purpose: 
+   //    Args: balance - wallet balance value
+   //  Return: Formatted balance string
+   // ************************
+   getAdjustedUSDBalanceLabel(balance)
+   {
+      let balanceStr = "";
+
+      balanceStr = balance.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+
       return balanceStr;
    } 
  }
