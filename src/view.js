@@ -4,6 +4,10 @@ const Utils = require('./utils');
 const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
 const logger = require('electron-log');
 logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/view.log');
+const DisplayMode = {
+   Actual: 'Actual',
+   Recoverable: 'Recoverable'
+ };
 // #endregion
 
 // #region Variable Definitions
@@ -18,18 +22,20 @@ let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig
 let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 
 // write empty file if wallets file is missing.
-if (!fs.existsSync(walletFile))
+if (!fs.existsSync(walletFile)) {
    fs.writeFileSync(walletFile, '[]');
+}
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 // write empty file if wallets file is missing.
-if (!fs.existsSync(clientConfigFile))
+if (!fs.existsSync(clientConfigFile)) {
    fs.writeFileSync(clientConfigFile, '{}'); 
+}
 let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
 let coinPriceObj = JSON.parse(fs.readFileSync(coinPriceFile, 'utf8'));
 
-let actualBalanceDisplayed = true;
+let displayMode = DisplayMode.Actual;
 let walletCache = new Set();
 let utils = new Utils();
 
@@ -49,17 +55,23 @@ $(function () {
 // #region Page Event Handlers
 // ***********************
 // Name: 	handleKeyPress
-// Purpose: 
-//    Args: 
+// Purpose: This function runs when the Enter key is pressed to make entering the wallet information easier.
+//    Args: event
 //  Return: N/A
 // ************************
 function handleKeyPress(event) {
-   if (event.key == "Enter")
-   {
+   if (event.key == "Enter") {
       let walletVal = $('#Wallet').val();
 
-      if (walletVal.length != 0)
-      {
+      if (walletVal.length != 0) {
+         addNewWallet();
+      }
+   }
+
+   if (event.key == "Enter") {
+      let walletVal = $('#Wallet').val();
+
+      if (walletVal.length != 0) {
          addNewWallet();
       }
    }
@@ -67,17 +79,15 @@ function handleKeyPress(event) {
 
 // ***********************
 // Name: 	autoRefreshHandler
-// Purpose: 
+// Purpose: This method handles handles chanages to the auto-refresh switch, activating/deactivating the timer object that refreshes the screen
 //    Args: N/A
 //  Return: N/A
 // ************************
-function autoRefreshHandler(){
-   if ($('#autoRefreshCheck')[0].checked) 
-   {
+function autoRefreshHandler() {
+   if ($('#autoRefreshCheck')[0].checked) {
       refreshTimerId = setInterval(refreshDashboard, refreshTimerLength);
    }
-   else
-   {
+   else {
       clearInterval(refreshTimerId);
       // release our intervalID from the variable
       refreshTimerId = null; 
@@ -92,7 +102,7 @@ $('#show-light-mode').on('click', () => {
    ipcRenderer.send('dark-mode-toggle', []);
 })
 
-$('#add-wallet').on('click', () => {
+$('#check-add-wallet').on('click', () => {
    addNewWallet();
 })
 
@@ -109,9 +119,8 @@ $('#cancel-add-launcher').on('click', () => {
 })
 
 $('#show-actual-balance').on('click', () => {
-   if (!actualBalanceDisplayed)
-   {
-      actualBalanceDisplayed = true;
+   if (displayMode != DisplayMode.Actual) {
+      displayMode = DisplayMode.Actual;
       $('#show-recoverable-balance').addClass('btn-secondary');
       $('#show-recoverable-balance').removeClass('btn-primary');
       $('#show-actual-balance').addClass('btn-primary');
@@ -121,19 +130,16 @@ $('#show-actual-balance').on('click', () => {
 })
 
 $('#show-recoverable-balance').on('click', () => {
-   if (actualBalanceDisplayed)
-   {
-      if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0)
-      {
-         actualBalanceDisplayed = false;
+   if (displayMode != DisplayMode.Recoverable) {
+      if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0) {
+         displayMode = DisplayMode.Recoverable
          $('#show-actual-balance').addClass('btn-secondary');
          $('#show-actual-balance').removeClass('btn-primary');
          $('#show-recoverable-balance').addClass('btn-primary');
          $('#show-recoverable-balance').removeClass('btn-secondary');
          getWalletRecoverableBalances();
       }
-      else
-      {
+      else {
          $('#set-launcher').show();
       }
    }
@@ -147,12 +153,11 @@ $('#open-nft-recovery').on('click', () => {
 
 // ***********************
 // Name: 	saveLauncherId
-// Purpose: 
+// Purpose: This function saves the launcherid entered into the input box
 //    Args: N/A
 //  Return: N/A
 // ************************
-function saveLauncherId()
-{
+function saveLauncherId() {
    $('#set-launcher').hide();
    
    let launcherVal = $('#Launcher').val();
@@ -162,44 +167,40 @@ function saveLauncherId()
    fs.writeFileSync(clientConfigFile, JSON.stringify(clientConfigObj, null, '\t'));
 
    // Render the Recoverable balances if they are being shown
-   if (!actualBalanceDisplayed)
+   if (displayMode === DisplayMode.Recoverable)
+   {
       getWalletRecoverableBalances();
+   }
 }
 
 // ***********************
 // Name: 	addNewWallet
-// Purpose: 
+// Purpose: This function adds a new wallet into the dashboard, saves the updated configuration and initiates the other processes to get the balance information.
 //    Args: N/A
 //  Return: N/A
 // ************************
-function addNewWallet()
-{
+function addNewWallet() {
    $('#add-wallet').hide();
    
    let walletVal = $('#Wallet').val();
    let walletArr = walletVal.split(',');
 
-   if (walletVal.length > 0)
-   {
+   if (walletVal.length > 0) {
       walletArr.every((walletStr) => {
          walletStr = walletStr.trim();
          let coinCfg = getCoinConfigForWallet(walletStr);
 
-         if (coinCfg != null)
-         {
-            if (!walletCache.has(walletStr))
-            {
+         if (coinCfg != null) {
+            if (!walletCache.has(walletStr)) {
                walletObj.push({'wallet': walletStr});
-               addEntry(walletStr, actualBalanceDisplayed);
+               addEntry(walletStr, (displayMode === DisplayMode.Actual));
                fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
             }
-            else
-            {
+            else {
                utils.showErrorMessage(logger, "The wallet (" + walletStr + ") already exists.", 5000);
             }
          }
-         else
-         {
+         else {
             utils.showErrorMessage(logger, "The wallet is currently unsupported.  You entered (" + walletStr + ").", 5000);
          }
 
@@ -217,8 +218,7 @@ function addNewWallet()
 //    Args: coin - the pathname of the coin to load
 //  Return: N/A
 // ************************
-function loadWalletDetails(coin)
-{
+function loadWalletDetails(coin) {
    // Get configuration for the specified coin
    let coinCfg = getCoinConfigForCoin(coin);
 
@@ -234,8 +234,7 @@ function loadWalletDetails(coin)
 //    Args: N/A
 //  Return: N/A
 // ************************
-function openNFTRecoverySite()
-{
+function openNFTRecoverySite() {
    // Copy the LauncherId from configuration to the Clipboard
    clipboard.writeText(clientConfigObj.launcherid);
 
@@ -246,29 +245,26 @@ function openNFTRecoverySite()
 
 // ***********************
 // Name: 	addEntry
-// Purpose: 
-//    Args: 
+// Purpose: This function gets the config for a given wallet, renders the card if necessary and emits the event to refresh the card balance if needed.
+//    Args: wallet - The wallet to be added
+//          loadBalance - A flag indicating whether to load the balance in new cards.
 //  Return: N/A
 // ************************
 function addEntry(wallet, loadBalance) {
-   let coinCfg = getCoinConfigForWallet(wallet);
-   
    if (wallet) {
       let coinCfg = getCoinConfigForWallet(wallet);
 
-      if (coinCfg != null)
-      {
+      if (coinCfg != null) {
          walletCache.add(wallet);
          let coinCfg = getCoinConfigForWallet(wallet);
-         buildWalletCard(wallet, coinCfg)
-         if (loadBalance)
-         {
+         buildWalletCard(coinCfg)
+
+         if (loadBalance) {
             logger.info('Sending async-get-wallet-balance event');
             ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinPathName]);
          }
       }
-      else
-      {
+      else {
          logger.error("Unable to Add Entry for unsupported wallet (" + walletStr + ").");
       }
    }
@@ -276,24 +272,25 @@ function addEntry(wallet, loadBalance) {
 
 // ***********************
 // Name: 	refreshDashboard
-// Purpose: 
+// Purpose: The main function for refreshing the dashboard.
 //    Args: N/A
 //  Return: N/A
 // ************************
-function refreshDashboard()
-{
+function refreshDashboard() {
    getBlockchainSettingsConfiguration();
 
-   if (actualBalanceDisplayed)
+   if (displayMode === DisplayMode.Actual) {
       getWalletBalances();
-   else
+   }
+   else {
       getWalletRecoverableBalances();
+   }
 }
 
 // ***********************
 // Name: 	loadAndDisplayWallets
-// Purpose: 
-//    Args: 
+// Purpose: This function is handles clearing and re-adding cards during refreshes.
+//    Args: loadBalance - a flag indicating whether to load the balance in new cards.
 //  Return: N/A
 // ************************
 function loadAndDisplayWallets(loadBalance) {  
@@ -309,23 +306,23 @@ function loadAndDisplayWallets(loadBalance) {
       });
    }
 
-   lastRefreshed = new Date();
-
-   $('#lastRefreshDate small').show();
-   $('#lastRefreshDate small').text('Refreshed On: ' + lastRefreshed.toLocaleString());
+   // Show the last time the dashboad was refreshed.
+   if (walletCache.size > 0) {
+      lastRefreshed = new Date();
+      $('#lastRefreshDate small').show();
+      $('#lastRefreshDate small').text('Refreshed On: ' + lastRefreshed.toLocaleString());
+   }
 }
-
 
 // #region Coin Dataset Operations
 
 // ***********************
 // Name: 	initializeCoinDataSet
-// Purpose: 
+// Purpose: This function iniitalizes the coinDataObj based the coinConfigObj.
 //    Args: N/A
 //  Return: N/A
 // ************************
-function initializeCoinDataSet()
-{
+function initializeCoinDataSet() {
    coinData = [];
 
    coinConfigObj.every((cfg) => {
@@ -349,18 +346,17 @@ function initializeCoinDataSet()
 
 // ***********************
 // Name: 	updateCoinDataSetBalance
-// Purpose: 
-//    Args: 
-//  Return: 
+// Purpose: This function updates the balance attributes for a coin in the coinDataObj and returns the object to the caller.
+//    Args: coin - The coin path name to be updated.
+//          balance - The updated wallet balance.
+//          change - The change in the wallet balance over the last 24 hours.
+//  Return: The coinDataObj with the dated values.
 // ************************
-function updateCoinDataSetBalance(coin, balance, change)
-{
+function updateCoinDataSetBalance(coin, balance, change) {
    let coinDataObj = {};
-   if (!isNaN(balance) && !isNaN(change))
-   {
+   if (!isNaN(balance) && !isNaN(change)) {
       coinData.every((c) => {
-         if (c.coinPathName === coin)
-         {
+         if (c.coinPathName === coin) {
             c.coinBalance = c.coinBalance + (balance / c.mojoPerCoin);
             c.coinChange = c.coinChange + (change / c.mojoPerCoin);
             c.coinBalanceUSD = (c.coinPrice != null) ? c.coinBalance * c.coinPrice : null;
@@ -380,18 +376,17 @@ function updateCoinDataSetBalance(coin, balance, change)
 
 // ***********************
 // Name: 	updateCoinDataSetRecoverableBalance
-// Purpose: 
-//    Args: 
-//  Return: 
+// Purpose: This function updates the recoverable balance attributes for a coin in the coinDataObj and returns the object to the caller.
+//    Args: coin - The coin path name to be updated.
+//          balance - The updated wallet balance.
+//  Return: The coinDataObj with the dated values.
 // ************************
-function updateCoinDataSetRecoverableBalance(coin, balance)
-{
+function updateCoinDataSetRecoverableBalance(coin, balance) {
    let coinDataObj = {};
-   if (!isNaN(balance))
-   {
+
+   if (!isNaN(balance)) {
       coinData.every((c) => {
-         if (c.coinPathName === coin)
-         {
+         if (c.coinPathName === coin) {
             c.coinRecovBalance = (balance / c.mojoPerCoin);
             c.coinRecovBalanceUSD = (c.coinPrice != null) ? c.coinRecovBalance * c.coinPrice : null;
 
@@ -412,98 +407,84 @@ function updateCoinDataSetRecoverableBalance(coin, balance)
 
 // ***********************
 // Name: 	getBlockchainSettingsConfiguration
-// Purpose: 
+// Purpose: This function sends the 'async-get-blockchain-settings' event to ipcMain to begin retrieving the block chain metadata.
 //    Args:  N/A
 //  Return:  N/A
 // ************************
-function getBlockchainSettingsConfiguration()
-{
+function getBlockchainSettingsConfiguration() {
    ipcRenderer.send('async-get-blockchain-settings', []);
 }
 
 // ***********************
 // Name: 	getCoinConfigForWallet
-// Purpose: 
-//    Args: 
+// Purpose: Retrieves the coin configuration object for a given wallet.
+//    Args: wallet - the wallet address
 //  Return:  N/A
 // ************************
-function getCoinConfigForWallet(wallet)
-{
+function getCoinConfigForWallet(wallet) {
    let coinCfg;
    let coinCfgFound = false;
    coinConfigObj.every((cfg) => {
-      if (wallet.startsWith(cfg.coinPrefix))
-      {
+      if (wallet.startsWith(cfg.coinPrefix)) {
          coinCfg = cfg;
          coinCfgFound = true;
          return false;
       }
-      else
-      {
+      else {
          return true;
       }
    });
 
-   if (coinCfgFound)
-   {
+   if (coinCfgFound) {
       return coinCfg;
    }
-   else
-   {
+   else {
       logger.error('Unable to locate coin configuration settings for ' + wallet);
    }
 }
 
 // ***********************
 // Name: 	getCoinConfigForCoin
-// Purpose: 
-//    Args: 
+// Purpose: Retrieves the coin configuration object for a coin path.
+//    Args: coin - the pathname of the coin
 //  Return: N/A
 // ************************
-function getCoinConfigForCoin(coin)
-{
+function getCoinConfigForCoin(coin) {
    let coinCfg;
    let coinCfgFound = false;
    coinConfigObj.every((cfg) => {
-      if (coin == cfg.coinPathName)
-      {
+      if (coin == cfg.coinPathName) {
          coinCfg = cfg;
          coinCfgFound = true;
          return false;
       }
-      else
-      {
+      else {
          return true;
       }
    });
 
-   if (coinCfgFound)
-   {
+   if (coinCfgFound) {
       return coinCfg;
    }
-   else
-   {
+   else {
       logger.error('Unable to locate coin configuration settings for ' + wallet);
    }
 }
 
 // ***********************
 // Name: 	getPriceForCoinPrefix
-// Purpose: 
-//    Args: 
+// Purpose: Retrieves the coin configuration object for a coin prefix.
+//    Args: coinPrefix - the prefix of the coin
 //  Return: N/A
 // ************************
-function getPriceForCoinPrefix(coinPrefix)
-{
+function getPriceForCoinPrefix(coinPrefix) {
    let price;
    coinPriceObj.every((cp) => {
-      if (coinPrefix == cp.coinPrefix.toLowerCase())
-      {
+      if (coinPrefix == cp.coinPrefix.toLowerCase()) {
          price = cp.usd;
          return false;
       }
-      else
-      {
+      else {
          return true;
       }
    });
@@ -516,60 +497,59 @@ function getPriceForCoinPrefix(coinPrefix)
 
 // ***********************
 // Name: 	buildWalletCard
-// Purpose: 
-//    Args: 
+// Purpose: This function merges the card template from the resource files with the data from the coin configuration object.  Then, it appends the card elements into the "wallet-cards" div on the page.
+//    Args: coinCfg - The coin configuration object
 //  Return: N/A
 // ************************
-function buildWalletCard(wallet, coinCfg)
-{
+function buildWalletCard(coinCfg) {
    let imgPath = coinImgPath.replace('{0}', coinCfg.coinPathName);
    
    let updateString = cardTemplate.replace('{0}', coinCfg.coinDisplayName).replace('{1}', coinCfg.coinPathName).replace('{2}', imgPath).replace('{3}', coinCfg.coinPathName).replace('{4}', coinCfg.coinPrefix).replace('{5}', coinCfg.coinPathName);
 
-   if ($('#'+coinCfg.coinPathName+'-card').length == 0)
+   if ($('#'+coinCfg.coinPathName+'-card').length == 0) {
       $('#wallet-cards').append(updateString);
+   }
 }
 
 // ***********************
 // Name: 	getWalletBalances
-// Purpose: 
+// Purpose: This function is used to refresh all of the cards on the actual wallet balance page.
 //    Args: N/A 
 //  Return: N/A
 // ************************
-function getWalletBalances()
-{
+function getWalletBalances() {
    $('#nft-recovery').hide();
+
+   // Remove all existing cards
+   $('.walletCard').remove();
+
    initializeCoinDataSet();
 
+   // Reload the config data from wallet objects
    walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
-
-   $('.walletCard').remove();
 
    loadAndDisplayWallets(true);
 }
 
 // ***********************
 // Name: 	getWalletRecoverableBalances
-// Purpose: 
+// Purpose: This function is used to refresh all of the cards on the recoverable wallet balance page.
 //    Args: N/A
 //  Return: N/A
 // ************************
-function getWalletRecoverableBalances()
-{
+function getWalletRecoverableBalances() {
    $('#nft-recovery').hide();
 
    initializeCoinDataSet();
 
-   if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0)
-   {
+   if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0) {
       $('.walletCard').remove();
 
       loadAndDisplayWallets(false);
 
       // No Pending Balance to be displayed for Chia
       coinConfigObj.every((cfg) => {
-         if (cfg.coinPathName == 'chia' || cfg.coinPathName == 'cryptodoge' || cfg.coinPathName == 'tad')
-         {
+         if (cfg.coinPathName == 'chia' || cfg.coinPathName == 'cryptodoge' || cfg.coinPathName == 'tad') {
             $('#'+cfg.coinPathName+'-card .spinner-border').remove();
             $('#'+cfg.coinPathName+'-card .card-text').text('N/A');
          }
@@ -579,9 +559,8 @@ function getWalletRecoverableBalances()
       logger.info('Sending async-get-recoverable-wallet-balance event')
       ipcRenderer.send('async-get-recoverable-wallet-balance', [clientConfigObj.launcherid]);
    }
-   else
-   {
-      utils.showErrorMessage(logger, "Unable to get recoverable balances.  Enter your chia launcherid into ./config/clientconfig.json", 1000);
+   else {
+      utils.showErrorMessage(logger, "Unable to get recoverable balances.  Unable to retrieve your launcherid.", 5000);
    }
 }
 // #endregion
@@ -590,78 +569,73 @@ function getWalletRecoverableBalances()
 
 // ***********************
 // Name: 	refreshCardData
-// Purpose: 
-//    Args: 
+// Purpose: This function updates the card data displayed on the screen, typically after balance information events are received from ipcMain.
+//    Args: cardDataObj - the card data object containing all of the coin information
 //  Return: N/A
 // ************************
-function refreshCardData(cardDataObj)
-{
+function refreshCardData(cardDataObj) {
    let coin = cardDataObj.coinPathName;
-   let balance = (actualBalanceDisplayed) ? cardDataObj.coinBalance : cardDataObj.coinRecovBalance;
-   let balanceUSD = (actualBalanceDisplayed) ? cardDataObj.coinBalanceUSD : cardDataObj.coinRecovBalanceUSD;
+   let balance = (displayMode === DisplayMode.Actual) ? cardDataObj.coinBalance : cardDataObj.coinRecovBalance;
+   let balanceUSD = (displayMode === DisplayMode.Actual) ? cardDataObj.coinBalanceUSD : cardDataObj.coinRecovBalanceUSD;
    let change = cardDataObj.coinChange;
    let walletCount = cardDataObj.coinWalletCount;
 
-   if ($('#'+coin+'-card .card-text').length != 0)
-   {
-      //Remove loading spinner if present
+   const pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
+   const neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
+
+   if ($('#'+coin+'-card .card-text').length != 0) {
+      // Remove loading spinner if present
       $('#'+coin+'-card .spinner-border').remove();
       $('#'+coin+'-card .card-balances').show();
 
-      if (balance != null)
-      {
+      // Update the balance
+      if (balance != null) {
          $('#'+coin+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
       }
       
-      if (balanceUSD != null && balance > 0)
-      {
+      // Update the balance in USD, set to '-' if price information isn't available
+      if (balanceUSD != null && balance > 0) {
          $('#'+coin+'-card .card-body .balance-usd').text(utils.getAdjustedUSDBalanceLabel(balanceUSD));
       }
-      else
-      {
+      else {
          $('#'+coin+'-card .card-body .balance-usd').text('-');
       }
 
-      if (actualBalanceDisplayed)
-      {
+      if (displayMode === DisplayMode.Actual) {
          $('#'+coin+'-card #walletCount').text(Number(walletCount));
          $('#'+coin+'-card #walletCountLabel').text(" wallet" + ((walletCount > 1) ? "s" : ""));
 
-         let pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
-         let neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
-
+         // Remove any existing balance change symbol
          $('#'+coin+'-card .balanceChangeSymbol span').remove();
-         if (change > 0)
-         {
+
+         if (change > 0) {
             $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
             $('#'+coin+'-card .balanceChangeSymbol').append(pos_chg_icon);
          }
-         else if (change < 0)
-         {
+         else if (change < 0) {
             $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
             $('#'+coin+'-card .balanceChangeSymbol').append(neg_chg_icon); 
          }
          else
          $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
       }
-      else
-      {
+      else if (displayMode === DisplayMode.Recoverable) {
          $('#nft-recovery').show();
       }
    }
 }
-//#endregion
+// #endregion
 
 // #region Async Event Handlers
 
 // ************************
-// Purpose: 
+// Purpose: This function receives the blockchain settings reply from ipcMain and loads the dashboard
 // ************************
 ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
    logger.info('Received async-get-blockchain-settings-reply event')
    
-   if (arg.length > 1)
-   {
+   if (arg.length > 0) {
+      // Push data from args into the coinConfigObj
       arg.every((blockSettings) => {
          coinConfigObj.push({
             coinPrefix: blockSettings.coinPrefix,
@@ -677,39 +651,21 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
       $('#pageLoadingSpinner').remove();
 
       initializeCoinDataSet();
+
       loadAndDisplayWallets(true);
    }
-   else
-   {
+   else {
       logger.error('Reply args incorrect');
    }
 })
-/*
-"displayName": "Chia",
-    "pathName": "chia",
-    "coinPrefix": "xch",
-    "programName": "chia",
-    "mojoPerCoin": 1000000000000,
-    "numberZeroBitsPlotFilter": 9,
-    "difficultyConstantFactorExponent": 67,
-    "approximateAmountOfBlocksPerDay": 4608,
-    "donationAddress": "xch1k20j8nphw6unnfevkue0u2zleft0erzgewm0muzg65w30d63tgtsy9cet3",
-    "hidden": false,
-    "nftEnabled": true,
-    "git": "https://github.com/Chia-Network/chia-blockchain",
-    "xchforks": "https://xchforks.com/chia/",
-    "chiaforkscalculator": null,
-    "discord": "https://discord.gg/Mz4SG4KrYN",
-    "website": "https://www.chia.net/"
-*/
 
 // ************************
-// Purpose: 
+// Purpose: This function receives the wallet balance reply from ipcMain, refreshes the coin data set balances and initiates the card refresh.
 // ************************
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-wallet-balance-reply event')
-   if (arg.length == 4)
-   {
+   
+   if (arg.length == 4) {
       let coin = arg[0];
       let balance = arg[2];
       let balanceBefore = arg[3];
@@ -719,19 +675,18 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
 
       refreshCardData(cardDataObj);    
    }
-   else
-   {
+   else {
       logger.error('Reply args incorrect');
    }
 })
 
 // ************************
-// Purpose: 
+// Purpose: This function receives the recoverable wallet balance reply from ipcMain, refreshes the coin data set balances and initiates the card refresh.
 // ************************
 ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-recoverable-wallet-balance-reply event')
-   if (arg.length > 1)
-   {
+
+   if (arg.length > 1) {
       arg.every((recovBal) => {
          let coin = recovBal.pathName;
          let balance = recovBal.availableAmount;
@@ -744,14 +699,13 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
          return true;
       });
    }
-   else
-   {
+   else {
       logger.error('Reply args incorrect');
    }
 })
 
 // ************************
-// Purpose: 
+// Purpose: This function receives the refresh wallets event from ipcMain and refresh the dashboard.
 // ************************
 ipcRenderer.on('async-refresh-wallets', (event, arg) => {
    logger.info('Received async-refresh-wallets event');
@@ -760,7 +714,7 @@ ipcRenderer.on('async-refresh-wallets', (event, arg) => {
 })
 
 // ************************
-// Purpose: 
+// Purpose: This function receives the add wallet event from ipcMain and initiates the add wallet process.
 // ************************
 ipcRenderer.on('async-add-wallet', (event, arg) => {
    logger.info('Received async-add-wallet event');
@@ -768,17 +722,15 @@ ipcRenderer.on('async-add-wallet', (event, arg) => {
 })
 
 // ************************
-// Purpose: 
+// Purpose: This function receives the set launcher id event from ipcMain and initiates the set launcher id process.
 // ************************
 ipcRenderer.on('async-set-launcher', (event, arg) => {
    logger.info('Received async-set-launcher event');
 
-   if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0)
-   {
+   if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0) {
       $('#Launcher').val(clientConfigObj.launcherid);
    }
 
    $('#set-launcher').show();
 })
 // #endregion
-

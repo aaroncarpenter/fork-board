@@ -1,8 +1,11 @@
+// #region Const Definitions
 const {ipcRenderer} = require('electron');
 const logger = require('electron-log');
 logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/walletDetails.log');
-
 const Utils = require('./utils');
+// #endregion
+
+// #region Variable Definitions
 let utils = new Utils();
 
 let $ = require('jquery');
@@ -15,19 +18,22 @@ let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 let coinCfg = {};
+// #endregion
+
+$(function () {
+   addEventListener('keyup', handleKeyPress, true);
+});
 
 // #region Page Event Handlers
-addEventListener('keyup', handleKeyPress, true);
 
 // ***********************
 // Name: 	handleKeyPress
-// Purpose: 
-//    Args: 
+// Purpose: This functions send the event to close the wallet details pane to ipcMain.
+//    Args: event
 //  Return: N/A
 // *************************
 function handleKeyPress(event) {
-   if (event.key == "Escape")
-   {
+   if (event.key == "Escape") {
       logger.info('Sending close-wallet-details event');
       ipcRenderer.send('close-wallet-details', []);
    }
@@ -35,18 +41,16 @@ function handleKeyPress(event) {
 
 // ***********************
 // Name: 	handleWalletDelete
-// Purpose: 
-//    Args: 
+// Purpose: This function handles removing a wallet from the configuration, saving the configuration file and removing it from the screen.
+//    Args: wallet - the wallet to remove
 //  Return: N/A
 // *************************
-function handleWalletDelete(wallet)
-{
+function handleWalletDelete(wallet) {
    let newWalletObj = [];
 
    // push wallet values to the new array for all wallets except the one to delete
    walletObj.every((w) => {
-      if (w.wallet != wallet)
-      {
+      if (w.wallet != wallet) {
          newWalletObj.push({'wallet': w.wallet}); 
       }
       return true;
@@ -66,8 +70,8 @@ function handleWalletDelete(wallet)
 
 // ***********************
 // Name: 	loadAndDisplayWallets
-// Purpose: 
-//    Args: 
+// Purpose: This function is handles clearing and re-adding the wallet cards.
+//    Args: N/A
 //  Return: N/A
 // *************************
 function loadAndDisplayWallets() {  
@@ -79,8 +83,7 @@ function loadAndDisplayWallets() {
    $(document).attr("title", coinCfg.coinDisplayName + " Wallet Details");
 
    walletObj.every((w) => {
-      if (w.wallet.startsWith(coinCfg.coinPrefix))
-      {
+      if (w.wallet.startsWith(coinCfg.coinPrefix)) {
          logger.info('Loading Wallet Details for wallet: ' + w.wallet);
          buildWalletCard(w.wallet, coinCfg)
 
@@ -93,12 +96,12 @@ function loadAndDisplayWallets() {
 
 // ***********************
 // Name: 	buildWalletCard
-// Purpose: 
-//    Args: 
+// Purpose: This function merges the card template from the resource files with the data from the coin configuration object.  Then, it appends the card elements into the "wallet-cards" div on the page.
+//    Args: wallet - The wallet address to show.
+//          coinCfg - The coin configuration object.
 //  Return: N/A
 // *************************
-function buildWalletCard(wallet, coinCfg)
-{
+function buildWalletCard(wallet, coinCfg) {
       let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', wallet).replace('{2}', wallet).replace('{3}', coinCfg.coinPrefix);
       
       $('#wallet-cards').append(updateString);
@@ -108,56 +111,50 @@ function buildWalletCard(wallet, coinCfg)
 // #region Electron Event Handlers
 
 // ************************
-// Purpose: 
+// Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
 // ************************
 ipcRenderer.on('load-wallet-details', (event, arg) => {
    logger.info('Received load-wallet-details event');
-   if (arg.length == 1)
-   {
+   
+   if (arg.length == 1) {
       coinCfg = arg[0];
 
       logger.info('Loading details for ' + coinCfg.coinDisplayName);
       loadAndDisplayWallets();
    }
-   else
-   {
+   else {
       logger.error('Reply args incorrect');
    }
 })
 
 // ************************
-// Purpose: 
+// Purpose: This function receives the wallet balance reply from ipcMain, refreshes the coin data set balances and initiates the card refresh.
 // ************************
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-wallet-balance-reply event');
-   if (arg.length == 4)
-   {
+   
+   if (arg.length == 4) {
       let wallet = arg[1];
       let balance = (arg[2] / coinCfg.mojoPerCoin);
       let balanceUSD = (coinCfg.coinPrice != null) ? balance * coinCfg.coinPrice : null;
     
-      if ($('#'+wallet+'-card .card-text').length != 0)
-      {
+      if ($('#'+wallet+'-card .card-text').length != 0) {
          $('#'+wallet+'-card .spinner-border').remove();
          $('#'+wallet+'-card .card-balances').show();
 
-         if (balance != null)
-         {
+         if (balance != null) {
             $('#'+wallet+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
          }
          
-         if (balanceUSD != null && balance > 0)
-         {
+         if (balanceUSD != null && balance > 0) {
             $('#'+wallet+'-card .card-body .balance-usd').text(utils.getAdjustedUSDBalanceLabel(balanceUSD));
          }
-         else
-         {
+         else {
             $('#'+wallet+'-card .card-body .balance-usd').text('-');
          }
       }
    }
-   else
-   {
+   else {
       logger.error('Reply args incorrect');
    }
 })
