@@ -8,6 +8,28 @@ body.light-mode {
    color: black;
 }
 
+div.card-body.dark-mode {
+   background: #333;
+   color: white;
+}
+
+div.card-body.light-mode {
+   background: #ddd;
+   color: black;
+}
+
+div.card-header.dark-mode, 
+div.card-footer.dark-mode {
+   background: rgb(77, 77, 77);
+   color: white;
+}
+
+div.card-header.light-mode, 
+div.card-footer.light-mode {
+   background: rgb(208, 208, 208);
+   color: black;
+}
+
 #wallet-list {
    height: 500px;
    overflow-y: auto;
@@ -38,6 +60,7 @@ small {
    font-variant: small-caps;
 }
 
-h1 {
-   font-size: 3.0vw
+h2 {
+   /*font-size: 200%;/*calc(1.0em + 2vw);*/
+   font-size: 1.8vw;
 }

@@ -61,8 +61,11 @@ function handleWalletDelete(wallet) {
 
    walletObj = newWalletObj;
 
-   //remove the card from the display
+   // remove the card from the display
    $('#'+wallet+'-card').remove();
+
+   // 
+   ipcRenderer.send('async-set-dashboard-refresh-flag', []);
 }
 // #endregion
 

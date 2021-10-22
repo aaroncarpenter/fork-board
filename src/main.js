@@ -42,6 +42,7 @@ function createWindow() {
 
 // #region Wallet Details Window
 let walletDetails;
+let refreshMainCard = false;
 
 function createWalletDetailsWindow(coinCfg) {
    walletDetails = new BrowserWindow({
@@ -74,6 +75,13 @@ function createWalletDetailsWindow(coinCfg) {
    walletDetails.once("ready-to-show", () => {
       logger.info('Ready to show - Wallet Details');
       walletDetails.show();
+   });
+
+   walletDetails.on('close', (e) => {
+      if (win && refreshMainCard) {
+         logger.info('Sending async-refresh-card-display event: ' + coinCfg.coinDisplayName);
+         win.webContents.send('async-refresh-card-display', [coinCfg]);
+      }
    });
 }
 // #endregion
@@ -115,6 +123,11 @@ ipcMain.on("close-wallet-details", (event, arg) => {
 
    logger.info('Sending async-refresh-wallets Event');
    win.webContents.send('async-refresh-wallets', []);
+});
+
+ipcMain.on('async-set-dashboard-refresh-flag', (event, arg) => {
+   logger.info('Received async-set-dashboard-refresh-flag Event');
+   refreshMainCard = true;
 });
 
 // ************************
@@ -231,6 +244,12 @@ const template = [{
             label: 'Refresh',
             click() {
                win.webContents.send('async-refresh-wallets', []);
+            }
+         },
+         {
+            label: 'Debug Data',
+            click() {
+               win.webContents.send('async-populate-debug-data', []);
             }
          },
          {

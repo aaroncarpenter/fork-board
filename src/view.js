@@ -1,53 +1,59 @@
 // #region Const Definitions
-const {ipcRenderer, clipboard} = require('electron');
-const Utils = require('./utils');
-const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
-const logger = require('electron-log');
-logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/view.log');
-const DisplayMode = {
-   Actual: 'Actual',
-   Recoverable: 'Recoverable'
- };
+   const {ipcRenderer, clipboard} = require('electron');
+   const Utils = require('./utils');
+   const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
+   const logger = require('electron-log');
+   logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/view.log');
+   const DisplayMode = {
+      Actual: 'Actual',
+      Recoverable: 'Recoverable'
+   };
+   const DisplayTheme = {
+      Dark: 'Dark',
+      Light: 'Light'
+   };
 // #endregion
 
 // #region Variable Definitions
-let $ = require('jquery');
-let fs = require('fs');
-let path = require('path');
+   let $ = require('jquery');
+   let fs = require('fs');
+   let path = require('path');
 
-let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
-let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
-let coinPriceFile = path.resolve(__dirname, '../resources/config/coinprices.json');
-let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig.json');
-let cardTemplate = fs.readFileSync(templateFile, 'utf8');
+   let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
+   let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
+   let coinPriceFile = path.resolve(__dirname, '../resources/config/coinprices.json');
+   let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig.json');
+   let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 
-// write empty file if wallets file is missing.
-if (!fs.existsSync(walletFile)) {
-   fs.writeFileSync(walletFile, '[]');
-}
-let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
+   // write empty file if wallets file is missing.
+   if (!fs.existsSync(walletFile)) {
+      fs.writeFileSync(walletFile, '[]');
+   }
+   let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
-// write empty file if wallets file is missing.
-if (!fs.existsSync(clientConfigFile)) {
-   fs.writeFileSync(clientConfigFile, '{}'); 
-}
-let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
+   // write empty file if wallets file is missing.
+   if (!fs.existsSync(clientConfigFile)) {
+      fs.writeFileSync(clientConfigFile, '{}'); 
+   }
+   let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
-let coinPriceObj = JSON.parse(fs.readFileSync(coinPriceFile, 'utf8'));
+   let coinPriceObj = JSON.parse(fs.readFileSync(coinPriceFile, 'utf8'));
 
-let displayMode = DisplayMode.Actual;
-let walletCache = new Set();
-let utils = new Utils();
+   let displayMode = DisplayMode.Actual;
+   let displayTheme = (clientConfigObj.appSettings == null || clientConfigObj.appSettings.displayTheme == null ? DisplayTheme.Light : clientConfigObj.appSettings.displayTheme);
+   let walletCache = new Set();
+   let utils = new Utils();
 
-let coinConfigObj = [];
-let coinData = [];   
-let lastRefreshed = new Date();
-let refreshTimerLength = 5*60*60; // 5 minutes
-let refreshTimerId;
+   let coinConfigObj = [];
+   let coinData = [];   
+   let lastRefreshed = new Date();
+   let refreshTimerLength = 5*60*60; // 5 minutes
+   let refreshTimerId;
 // #endregion
 
 
 $(function () {
+   applyAppSettings();
    getBlockchainSettingsConfiguration();
    addEventListener('keyup', handleKeyPress, true);
 });
@@ -84,6 +90,8 @@ function handleKeyPress(event) {
 //  Return: N/A
 // ************************
 function autoRefreshHandler() {
+   clientConfigObj.appSettings.autoRefreshEnabled = $('#autoRefreshCheck')[0].checked;
+
    if ($('#autoRefreshCheck')[0].checked) {
       refreshTimerId = setInterval(refreshDashboard, refreshTimerLength);
    }
@@ -92,22 +100,32 @@ function autoRefreshHandler() {
       // release our intervalID from the variable
       refreshTimerId = null; 
    }
+
+   storeAppSettings()
 }
 
 $('#show-dark-mode').on('click', () => {
-   ipcRenderer.send('dark-mode-toggle', []);
+   displayTheme = DisplayTheme.Dark;
+   setDisplayTheme();
 })
 
 $('#show-light-mode').on('click', () => {
-   ipcRenderer.send('dark-mode-toggle', []);
+   displayTheme = DisplayTheme.Light;
+   setDisplayTheme();
 })
 
 $('#check-add-wallet').on('click', () => {
    addNewWallet();
+   
+   // Clear the value for the next entry
+   $('#Wallet').val(null);
 })
 
 $('#cancel-add-wallet').on('click', () => {
    $('#add-wallet').hide();
+
+   // Clear the value for the next entry
+   $('#Wallet').val(null);
 })
 
 $('#add-launcher').on('click', () => {
@@ -131,7 +149,7 @@ $('#show-actual-balance').on('click', () => {
 
 $('#show-recoverable-balance').on('click', () => {
    if (displayMode != DisplayMode.Recoverable) {
-      if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0) {
+      if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
          displayMode = DisplayMode.Recoverable
          $('#show-actual-balance').addClass('btn-secondary');
          $('#show-actual-balance').removeClass('btn-primary');
@@ -151,9 +169,10 @@ $('#open-nft-recovery').on('click', () => {
 })
 // #endregion
 
+// #region Client Settings Mgmt
 // ***********************
 // Name: 	saveLauncherId
-// Purpose: This function saves the launcherid entered into the input box
+// Purpose: This function saves the launcher-id entered into the input box
 //    Args: N/A
 //  Return: N/A
 // ************************
@@ -162,9 +181,9 @@ function saveLauncherId() {
    
    let launcherVal = $('#Launcher').val();
 
-   clientConfigObj.launcherid = launcherVal;
+   clientConfigObj.launcherId = launcherVal;
    
-   fs.writeFileSync(clientConfigFile, JSON.stringify(clientConfigObj, null, '\t'));
+   storeAppSettings();
 
    // Render the Recoverable balances if they are being shown
    if (displayMode === DisplayMode.Recoverable)
@@ -172,6 +191,73 @@ function saveLauncherId() {
       getWalletRecoverableBalances();
    }
 }
+
+// ***********************
+// Name: 	storeAppSettings
+// Purpose: 
+//    Args: N/A
+//  Return: N/A
+// ************************
+function storeAppSettings() {
+   fs.writeFileSync(clientConfigFile, JSON.stringify(clientConfigObj, null, '\t'));
+}
+
+// ***********************
+// Name: 	applyAppSettings
+// Purpose: 
+//    Args: N/A
+//  Return: N/A
+// ************************
+function applyAppSettings() {
+   if (clientConfigObj.appSettings == null) {
+      clientConfigObj.appSettings = {};
+   }
+
+   setDisplayTheme();
+
+   if (clientConfigObj != null && clientConfigObj.appSettings != null && clientConfigObj.appSettings.autoRefreshEnabled != null) {
+      $('#autoRefreshCheck').prop("checked", clientConfigObj.appSettings.autoRefreshEnabled);
+   }
+
+}
+
+// ***********************
+// Name: 	setDisplayTheme
+// Purpose: This function stores the configuration file
+//    Args: N/A
+//  Return: N/A
+// ************************
+function setDisplayTheme() {
+   clientConfigObj.appSettings.displayTheme = displayTheme;
+
+   if (displayTheme === DisplayTheme.Dark) {
+      $('#show-dark-mode').hide();
+      $('#show-light-mode').show();
+   }
+   else {
+      $('#show-light-mode').hide();
+      $('#show-dark-mode').show();   
+   }
+
+   $('#theme-selector').show();
+
+   //$('#show-' + (displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode').hide();
+   //$('#show-' + (displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode').show();
+
+   $('body').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
+   $('div.card-body').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
+   $('div.card-header').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
+   $('div.card-footer').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
+
+   $('body').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
+   $('div.card-body').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
+   $('div.card-header').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
+   $('div.card-footer').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
+   
+   storeAppSettings();
+}
+
+// #endregion
 
 // ***********************
 // Name: 	addNewWallet
@@ -207,9 +293,6 @@ function addNewWallet() {
          return true;
       });
    }
-
-   // Clear the value for the next entry
-   $('#Wallet').val(null);
 }
 
 // ***********************
@@ -236,11 +319,11 @@ function loadWalletDetails(coin) {
 // ************************
 function openNFTRecoverySite() {
    // Copy the LauncherId from configuration to the Clipboard
-   clipboard.writeText(clientConfigObj.launcherid);
+   clipboard.writeText(clientConfigObj.launcherId);
 
    // Send the event to ipcMain to open the nft recovery page.
    logger.info('Sending open-nft-recovery-site event');
-   ipcRenderer.send('open-nft-recovery-site', [clientConfigObj.launcherid]);
+   ipcRenderer.send('open-nft-recovery-site', [clientConfigObj.launcherId]);
 }
 
 // ***********************
@@ -312,6 +395,8 @@ function loadAndDisplayWallets(loadBalance) {
       $('#lastRefreshDate small').show();
       $('#lastRefreshDate small').text('Refreshed On: ' + lastRefreshed.toLocaleString());
    }
+
+   setDisplayTheme();
 }
 
 // #region Coin Dataset Operations
@@ -501,13 +586,16 @@ function getPriceForCoinPrefix(coinPrefix) {
 //    Args: coinCfg - The coin configuration object
 //  Return: N/A
 // ************************
-function buildWalletCard(coinCfg) {
+function buildWalletCard(coinCfg, replaceExistingCard = false) {
    let imgPath = coinImgPath.replace('{0}', coinCfg.coinPathName);
    
    let updateString = cardTemplate.replace('{0}', coinCfg.coinDisplayName).replace('{1}', coinCfg.coinPathName).replace('{2}', imgPath).replace('{3}', coinCfg.coinPathName).replace('{4}', coinCfg.coinPrefix).replace('{5}', coinCfg.coinPathName);
 
-   if ($('#'+coinCfg.coinPathName+'-card').length == 0) {
+   if (!replaceExistingCard && $('#'+coinCfg.coinPathName+'-card').length == 0) {
       $('#wallet-cards').append(updateString);
+   }
+   else if (replaceExistingCard && $('#'+coinCfg.coinPathName+'-card').length > 0) {
+      $('#'+coinCfg.coinPathName+'-card').replaceWith(updateString);
    }
 }
 
@@ -542,7 +630,7 @@ function getWalletRecoverableBalances() {
 
    initializeCoinDataSet();
 
-   if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0) {
+   if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
       $('.walletCard').remove();
 
       loadAndDisplayWallets(false);
@@ -557,10 +645,10 @@ function getWalletRecoverableBalances() {
       });
 
       logger.info('Sending async-get-recoverable-wallet-balance event')
-      ipcRenderer.send('async-get-recoverable-wallet-balance', [clientConfigObj.launcherid]);
+      ipcRenderer.send('async-get-recoverable-wallet-balance', [clientConfigObj.launcherId]);
    }
    else {
-      utils.showErrorMessage(logger, "Unable to get recoverable balances.  Unable to retrieve your launcherid.", 5000);
+      utils.showErrorMessage(logger, "Unable to get recoverable balances.  Unable to retrieve your launcher id.", 5000);
    }
 }
 // #endregion
@@ -727,10 +815,108 @@ ipcRenderer.on('async-add-wallet', (event, arg) => {
 ipcRenderer.on('async-set-launcher', (event, arg) => {
    logger.info('Received async-set-launcher event');
 
-   if (clientConfigObj != null && clientConfigObj.launcherid != null && clientConfigObj.launcherid.length > 0) {
-      $('#Launcher').val(clientConfigObj.launcherid);
+   if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
+      $('#Launcher').val(clientConfigObj.launcherId);
    }
 
    $('#set-launcher').show();
+})
+
+// ************************
+// Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
+// ************************
+ipcRenderer.on('async-refresh-card-display', (event, arg) => {
+   logger.info('Received async-refresh-card-display event');
+   
+   if (arg.length == 1) {
+      coinCfg = arg[0];
+
+      logger.info('Loading details for ' + coinCfg.coinDisplayName);
+
+      // Reload the config data from wallet objects
+      walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
+
+      // Replace the existing card with a new one, ready to load.
+      buildWalletCard(coinCfg, true);
+
+      coinData = coinData.filter(function(obj, index, arr){ 
+         return obj.coinPathName != coinCfg.coinPathName;
+      });
+
+      coinData.push({
+         coinPrefix: coinCfg.coinPrefix,
+         coinPathName: coinCfg.coinPathName,
+         coinDisplayName: coinCfg.coinDisplayName,
+         mojoPerCoin: coinCfg.mojoPerCoin,
+         coinPrice: coinCfg.coinPrice,
+         coinBalance: 0,
+         coinBalanceUSD: 0,
+         coinChange: 0,
+         coinRecovBalance: 0,
+         coinRecovBalanceUSD: 0,
+         coinWalletCount: 0
+      })
+
+      // Reset the wallet cache
+      walletCache.clear();
+
+      let walletPresent = false;
+      walletObj.every((w) => {
+         walletCache.add(w.wallet);
+
+         if (w.wallet.startsWith(coinCfg.coinPrefix)) {
+            addEntry(w.wallet, true);
+            walletPresent = true;
+         }
+
+         return true;
+      });
+
+      if (!walletPresent) {
+         $('#'+coinCfg.coinPathName+'-card').remove();
+      }
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+})
+
+// ************************
+// Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
+// ************************
+ipcRenderer.on('async-populate-debug-data', (event, arg) => {
+   logger.info('Received async-refresh-card-display event');
+
+   $('.walletCard').remove();
+   
+   coinData = [];
+   coinConfigObj.every((cfg) => {
+      buildWalletCard(cfg);
+
+      let bal = Math.random() * (cfg.coinPathName === 'chia' ? 100 : 1000);
+      coinData.push({
+         coinPrefix: cfg.coinPrefix,
+         coinPathName: cfg.coinPathName,
+         coinDisplayName: cfg.coinDisplayName,
+         mojoPerCoin: cfg.mojoPerCoin,
+         coinPrice: cfg.coinPrice,
+         coinBalance: bal,
+         coinBalanceUSD: (cfg.coinPrice != null) ? bal * cfg.coinPrice : null,
+         coinChange: 0,
+         coinRecovBalance: 0,
+         coinRecovBalanceUSD: 0,
+         coinWalletCount: 0
+      })
+
+      return true;
+   });
+
+   coinData.every((cfg) => {
+      refreshCardData(cfg);
+   
+      return true;
+   });
+
+   setDisplayTheme();
 })
 // #endregion
