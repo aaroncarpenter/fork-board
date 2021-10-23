@@ -1,8 +1,5 @@
 [
 	{
-		"wallet": "xch1vs77adnwhac9ctjzt90tk78fs02yazcnmeu8j648g0v4qdhdq6zsqn73kj"
-	},
-	{
 		"wallet": "xch1l50tvv3ad87psw078ydjklf2g2kx7j0t9qav5smwmtzpma7kz2wse7gdw5"
 	},
 	{
@@ -85,5 +82,8 @@
 	},
 	{
 		"wallet": "stai1wv2sez76p6w4us0s3n7qrkscd87705pzrkg8qecxa00n5v653kvss559hs"
+	},
+	{
+		"wallet": "xch1vs77adnwhac9ctjzt90tk78fs02yazcnmeu8j648g0v4qdhdq6zsqn73kj"
 	}
 ]

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "axios": "^0.21.4",
+    "electron-context-menu": "^3.1.1",
     "electron-installer-windows": "^3.0.0",
     "electron-log": "^4.4.1",
     "electron-packager": "^15.4.0",

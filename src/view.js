@@ -67,7 +67,7 @@ $(function () {
 // ************************
 function handleKeyPress(event) {
    if (event.key == "Enter") {
-      let walletVal = $('#Wallet').val();
+      let walletVal = $('#wallet-text-box').val();
 
       if (walletVal.length != 0) {
          addNewWallet();
@@ -75,12 +75,25 @@ function handleKeyPress(event) {
    }
 
    if (event.key == "Enter") {
-      let walletVal = $('#Wallet').val();
+      let walletVal = $('#wallet-text-box').val();
 
       if (walletVal.length != 0) {
          addNewWallet();
       }
    }
+}
+
+// ***********************
+// Name: 	pasteWalletAddress
+// Purpose: This function runs when the Enter key is pressed to make entering the wallet information easier.
+//    Args: event
+//  Return: N/A
+// ************************
+function pasteWalletAddress() {
+   let walletVal = $('#wallet-text-box').val();
+   let clipboardTxt = clipboard.readText();
+
+   $('#wallet-text-box').val(walletVal + clipboardTxt);
 }
 
 // ***********************
@@ -118,14 +131,14 @@ $('#check-add-wallet').on('click', () => {
    addNewWallet();
    
    // Clear the value for the next entry
-   $('#Wallet').val(null);
+   $('#wallet-text-box').val(null);
 })
 
 $('#cancel-add-wallet').on('click', () => {
    $('#add-wallet').hide();
 
    // Clear the value for the next entry
-   $('#Wallet').val(null);
+   $('#wallet-text-box').val(null);
 })
 
 $('#add-launcher').on('click', () => {
@@ -241,18 +254,17 @@ function setDisplayTheme() {
 
    $('#theme-selector').show();
 
-   //$('#show-' + (displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode').hide();
-   //$('#show-' + (displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode').show();
-
    $('body').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
    $('div.card-body').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
    $('div.card-header').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
    $('div.card-footer').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
+   $('div.alert.alert-info').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
 
    $('body').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
    $('div.card-body').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
    $('div.card-header').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
    $('div.card-footer').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
+   $('div.alert.alert-info').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
    
    storeAppSettings();
 }
@@ -268,7 +280,7 @@ function setDisplayTheme() {
 function addNewWallet() {
    $('#add-wallet').hide();
    
-   let walletVal = $('#Wallet').val();
+   let walletVal = $('#wallet-text-box').val();
    let walletArr = walletVal.split(',');
 
    if (walletVal.length > 0) {
@@ -875,6 +887,8 @@ ipcRenderer.on('async-refresh-card-display', (event, arg) => {
       if (!walletPresent) {
          $('#'+coinCfg.coinPathName+'-card').remove();
       }
+
+      setDisplayTheme
    }
    else {
       logger.error('Reply args incorrect');

@@ -1,33 +1,15 @@
-body.dark-mode {
-   background: #333;
-   color: white;
-}
-
-body.light-mode {
-   background: #ddd;
-   color: black;
-}
-
+body.dark-mode,
 div.card-body.dark-mode {
-   background: #333;
-   color: white;
+   background: #121212;
+   color: lightgrey;
 }
 
-div.card-body.light-mode {
-   background: #ddd;
-   color: black;
-}
-
+div.alert.alert-info.dark-mode,
 div.card-header.dark-mode, 
-div.card-footer.dark-mode {
-   background: rgb(77, 77, 77);
-   color: white;
-}
-
-div.card-header.light-mode, 
-div.card-footer.light-mode {
-   background: rgb(208, 208, 208);
-   color: black;
+div.card-footer.dark-mode,
+div.alert.dark-mode {
+   background: rgb(40, 40, 40);
+   color:lightgray;
 }
 
 #wallet-list {
@@ -48,7 +30,7 @@ div.card-footer.light-mode {
    padding-left: 0.25rem;
 }
 
-.walletCard {
+.walletCard, i , #autoRefreshCheck{
    cursor: pointer;
 }
 
@@ -58,9 +40,4 @@ div.card-footer.light-mode {
 
 small {
    font-variant: small-caps;
-}
-
-h2 {
-   /*font-size: 200%;/*calc(1.0em + 2vw);*/
-   font-size: 1.8vw;
 }

@@ -12,24 +12,25 @@
    <body>
       <div class = "container">
          <p></p>
-         <div class="d-flex row align-items-center">
+         <div class="d-flex flex-row align-items-center">
             <div class="btn-group btn-group-sm col-md-6" role="group">
                <button type="button" id="show-actual-balance" class="btn btn-primary btn-small"><small>Show Actual Balance</small></button>
                <button type="button" id="show-recoverable-balance" class="btn btn-secondary btn-small"><small>Show Recoverable Balance</small></button>
             </div>
-            <div class="col-md-2"></div>
-            <div class="d-flex col-sm-4 justify-content-end">
-               <div id='theme-selector' style="display: none">
-                  <i id="show-dark-mode" class="fas fa-sun" data-toggle="tooltip" title="Show Dark Mode"></i>
-                  <i id="show-light-mode" class="fas fa-moon" data-toggle="tooltip" title="Show Light Mode"></i>
-               </div>
+            <div class="d-flex col-md-6 align-items-end flex-column">
                <div>
                   <div class="form-check form-switch">
                      <input class="form-check-input" type="checkbox" id="autoRefreshCheck" onclick="autoRefreshHandler();" title="Every 5 mins" />
                      <label class="form-check-label" for="flexSwitchCheckDefault" title="Every 5 mins"><small class="text-muted">Auto-Refresh</small></label>
                   </div>
                </div>
-            </div>
+               <div>
+                  <div id='theme-selector' style="display: none">
+                     <i id="show-dark-mode" class="fas fa-sun" data-toggle="tooltip" title="Show Dark Mode"></i>
+                     <i id="show-light-mode" class="fas fa-moon" data-toggle="tooltip" title="Show Light Mode"></i>
+                  </div>
+               </div>
+           </div>
          </div>
          <div id="alertBox" class="alert alert-warning" style="display: none" role="alert">
          </div>
@@ -37,7 +38,7 @@
             <form>
                <div class="form-group row d-flex align-items-center">
                   <div class="col-sm-11">
-                     <input type = "text" name = "Wallet" value = "" id = "Wallet" placeholder = "You can enter multiple wallets separated by commas.  Click the checkmark to Save." class = "form-control" required>
+                     <input type = "text" name = "Wallet" value = "" id = "wallet-text-box" placeholder = "You can enter multiple wallets separated by commas.  Click the checkmark to Save." class = "form-control" required >
                   </div>
 
                   <div class="col-sm-1">
@@ -77,8 +78,29 @@
          <div id="lastRefreshDate" class="d-flex justify-content-end" style="display: none;">
             <small class="text-muted font-italic font-weight-light"></small>
          </div>
-         
+      </div>   
       <script src = "./view.js" ></script>
-      </div>
+      <script type = "text/javascript">
+         const {remote} = require('electron')
+         const {Menu, MenuItem} = remote
+
+         const menu = new Menu()
+
+         // Build menu one item at a time, unlike
+         menu.append(new MenuItem ({
+            label: 'Paste',
+            click() { 
+               pasteWalletAddress();
+            }
+         }))
+
+         // Prevent default action of right click in chromium. Replace with our menu.
+         window.addEventListener('contextmenu', (e) => {
+            e.preventDefault()
+            if (e.target.id === 'wallet-text-box') {
+               menu.popup(remote.getCurrentWindow())
+            }
+         }, false)
+      </script>
    </body>
 </html>

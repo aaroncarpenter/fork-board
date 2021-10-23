@@ -12,6 +12,7 @@ const path = require('path')
 const axios = require('axios')
 const https = require('https');
 const logger = require('electron-log');
+//const contextMenu = require('electron-context-menu');
 logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/main.log');
 const agent = new https.Agent({
    rejectUnauthorized: false
