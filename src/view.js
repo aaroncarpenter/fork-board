@@ -254,18 +254,23 @@ function setDisplayTheme() {
 
    $('#theme-selector').show();
 
-   $('body').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
-   $('div.card-body').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
-   $('div.card-header').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
-   $('div.card-footer').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
-   $('div.alert.alert-info').addClass((displayTheme === DisplayTheme.Dark) ? 'dark-mode' : 'light-mode');
+   if (displayTheme === DisplayTheme.Dark) {
+      $('body').addClass('dark-mode');
+      $('div.card-body').addClass('dark-mode');
+      $('div.card-header').addClass('dark-mode');
+      $('div.card-footer').addClass('dark-mode');
+      $('div.alert.alert-info').addClass('dark-mode');
+      $('div.card').addClass('dark-mode');
+   }
+   else {
+      $('body').removeClass('dark-mode');
+      $('div.card-body').removeClass('dark-mode');
+      $('div.card-header').removeClass('dark-mode');
+      $('div.card-footer').removeClass('dark-mode');
+      $('div.alert.alert-info').removeClass('dark-mode');
+      $('div.card').removeClass('dark-mode');
+   }
 
-   $('body').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
-   $('div.card-body').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
-   $('div.card-header').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
-   $('div.card-footer').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
-   $('div.alert.alert-info').removeClass((displayTheme === DisplayTheme.Dark) ? 'light-mode' : 'dark-mode');
-   
    storeAppSettings();
 }
 
@@ -317,10 +322,9 @@ function loadWalletDetails(coin) {
    // Get configuration for the specified coin
    let coinCfg = getCoinConfigForCoin(coin);
 
-
    // Send the event to ipcMain to open the details page.
    logger.info('Sending open-wallet-details event');
-   ipcRenderer.send('open-wallet-details', [coinCfg]);
+   ipcRenderer.send('open-wallet-details', [coinCfg, displayTheme]);
 }
 
 // ***********************
@@ -372,8 +376,6 @@ function addEntry(wallet, loadBalance) {
 //  Return: N/A
 // ************************
 function refreshDashboard() {
-   getBlockchainSettingsConfiguration();
-
    if (displayMode === DisplayMode.Actual) {
       getWalletBalances();
    }
@@ -680,6 +682,8 @@ function refreshCardData(cardDataObj) {
    let change = cardDataObj.coinChange;
    let walletCount = cardDataObj.coinWalletCount;
 
+   logger.info('Coin: ' + coin + ', Balance: ' + balance + ', Balance USD: ' + balanceUSD + ', Change: ' + change + ', Wallet Count: ' + walletCount);
+
    const pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
    const neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
 
@@ -735,6 +739,8 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
    logger.info('Received async-get-blockchain-settings-reply event')
    
    if (arg.length > 0) {
+      coinConfigObj = [];
+
       // Push data from args into the coinConfigObj
       arg.every((blockSettings) => {
          coinConfigObj.push({
@@ -770,6 +776,8 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
       let balance = arg[2];
       let balanceBefore = arg[3];
       let change = balance - balanceBefore;
+
+      logger.info('Coin: ' + coin + ', Balance: ' + balance + ', Change: ' + change);
 
       let cardDataObj = updateCoinDataSetBalance(coin, balance, change);
 
@@ -888,7 +896,7 @@ ipcRenderer.on('async-refresh-card-display', (event, arg) => {
          $('#'+coinCfg.coinPathName+'-card').remove();
       }
 
-      setDisplayTheme
+      setDisplayTheme();
    }
    else {
       logger.error('Reply args incorrect');

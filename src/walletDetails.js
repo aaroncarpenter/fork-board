@@ -3,6 +3,10 @@ const {ipcRenderer} = require('electron');
 const logger = require('electron-log');
 logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/walletDetails.log');
 const Utils = require('./utils');
+const DisplayTheme = {
+   Dark: 'Dark',
+   Light: 'Light'
+};
 // #endregion
 
 // #region Variable Definitions
@@ -18,6 +22,7 @@ let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 let coinCfg = {};
+let displayTheme;
 // #endregion
 
 $(function () {
@@ -109,6 +114,31 @@ function buildWalletCard(wallet, coinCfg) {
       
       $('#wallet-cards').append(updateString);
 }
+
+// ***********************
+// Name: 	setDisplayTheme
+// Purpose: This function stores the configuration file
+//    Args: N/A
+//  Return: N/A
+// ************************
+function setDisplayTheme() {
+   if (displayTheme === DisplayTheme.Dark) {
+      $('body').addClass('dark-mode');
+      $('div.card-body').addClass('dark-mode');
+      $('div.card-header').addClass('dark-mode');
+      $('div.card-footer').addClass('dark-mode');
+      $('div.alert.alert-info').addClass('dark-mode');
+      $('div.card').addClass('dark-mode');
+   }
+   else {
+      $('body').removeClass('dark-mode');
+      $('div.card-body').removeClass('dark-mode');
+      $('div.card-header').removeClass('dark-mode');
+      $('div.card-footer').removeClass('dark-mode');
+      $('div.alert.alert-info').removeClass('dark-mode');
+      $('div.card').removeClass('dark-mode');
+   }
+}
 // #endregion
 
 // #region Electron Event Handlers
@@ -119,11 +149,15 @@ function buildWalletCard(wallet, coinCfg) {
 ipcRenderer.on('load-wallet-details', (event, arg) => {
    logger.info('Received load-wallet-details event');
    
-   if (arg.length == 1) {
+   if (arg.length == 2) {
       coinCfg = arg[0];
+      displayTheme = arg[1];
 
       logger.info('Loading details for ' + coinCfg.coinDisplayName);
       loadAndDisplayWallets();
+
+      //Setting theme
+      setDisplayTheme();
    }
    else {
       logger.error('Reply args incorrect');

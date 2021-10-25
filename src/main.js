@@ -45,7 +45,7 @@ function createWindow() {
 let walletDetails;
 let refreshMainCard = false;
 
-function createWalletDetailsWindow(coinCfg) {
+function createWalletDetailsWindow(coinCfg, displayTheme) {
    walletDetails = new BrowserWindow({
       width: 600,
       height: 600,
@@ -70,7 +70,7 @@ function createWalletDetailsWindow(coinCfg) {
 
    walletDetails.once("show", function () {
       logger.info('Sending load-wallet-details event: ' + coinCfg.coinDisplayName);
-      walletDetails.webContents.send("load-wallet-details", [coinCfg]);
+      walletDetails.webContents.send("load-wallet-details", [coinCfg, displayTheme]);
    });
 
    walletDetails.once("ready-to-show", () => {
@@ -137,12 +137,13 @@ ipcMain.on('async-set-dashboard-refresh-flag', (event, arg) => {
 ipcMain.on("open-wallet-details", (event, arg) => {
    logger.info('Received open-wallet-details Event');
 
-   if (arg.length == 1) {
+   if (arg.length == 2) {
       let coinCfg = arg[0];
+      let displayTheme = arg[1];
 
       logger.info("Create wallet details window for :" + coinCfg.coinDisplayName);
 
-      createWalletDetailsWindow(coinCfg);
+      createWalletDetailsWindow(coinCfg, displayTheme);
    }
 });
 
