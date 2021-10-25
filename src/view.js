@@ -310,6 +310,8 @@ function addNewWallet() {
          return true;
       });
    }
+
+   setDisplayTheme();
 }
 
 // ***********************
@@ -941,4 +943,19 @@ ipcRenderer.on('async-populate-debug-data', (event, arg) => {
 
    setDisplayTheme();
 })
+
+// ************************
+// Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
+// ************************
+ipcRenderer.on('async-sort-test', (event, arg) => {
+   logger.info('Received async-sort-test event');
+
+   coinData.sort(utils.applySort('coinDisplayName', 'asc'));
+
+   coinData.sort(utils.applySort('coinBalance', 'desc'));
+
+   coinData.sort(utils.applySort('coinBalanceUSD', 'desc'));
+
+
+});
 // #endregion
