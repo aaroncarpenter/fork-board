@@ -1,85 +1,94 @@
 [{
         "coinPrefix": "XCH",
-        "usd": 155.56
-    },
-    {
-        "coinPrefix": "XFX",
-        "usd": 0.2574
+        "usd": 151.67
     },
     {
         "coinPrefix": "XCC",
-        "usd": 0.0148
+        "usd": 0.0229
     },
     {
-        "coinPrefix": "SIT",
-        "usd": 0.2862
-    },
-    {
-        "coinPrefix": "NCH",
-        "usd": 0.1157
-    },
-    {
-        "coinPrefix": "HDD",
-        "usd": 0.2411
-    },
-    {
-        "coinPrefix": "SPARE",
-        "usd": 0.0175
-    },
-    {
-        "coinPrefix": "XFL",
-        "usd": 0.0692
+        "coinPrefix": "XFX",
+        "usd": 0.2524
     },
     {
         "coinPrefix": "GDOG",
-        "usd": 0.0063
+        "usd": 0.0051
+    },
+    {
+        "coinPrefix": "HDD",
+        "usd": 0.1828
     },
     {
         "coinPrefix": "STAI",
-        "usd": 0.2938
+        "usd": 0.2762
     },
     {
-        "coinPrefix": "XDG",
-        "usd": 0.0249
+        "coinPrefix": "XFL",
+        "usd": 0.076
     },
     {
-        "coinPrefix": "APPLE",
-        "usd": 0.0165
+        "coinPrefix": "STOR",
+        "usd": 0.1041
     },
     {
-        "coinPrefix": "WHEAT",
-        "usd": 0.0202
+        "coinPrefix": "SPARE",
+        "usd": 0.0248
     },
     {
-        "coinPrefix": "TAD",
-        "usd": 0.0101
-    },
-    {
-        "coinPrefix": "XMZ",
-        "usd": 0.0063
-    },
-    {
-        "coinPrefix": "SOCK",
-        "usd": 0.0075
-    },
-    {
-        "coinPrefix": "SIX",
-        "usd": 0.0054
+        "coinPrefix": "NCH",
+        "usd": 0.1024
     },
     {
         "coinPrefix": "CGN",
         "usd": 0.0002
     },
     {
-        "coinPrefix": "XKM",
-        "usd": 0.0042
+        "coinPrefix": "XDG",
+        "usd": 0.021
     },
     {
-        "coinPrefix": "MGA",
-        "usd": 0.0033
+        "coinPrefix": "XBTC",
+        "usd": 0.0767
+    },
+    {
+        "coinPrefix": "SIX",
+        "usd": 0.0056
+    },
+    {
+        "coinPrefix": "WHEAT",
+        "usd": 0.0215
+    },
+    {
+        "coinPrefix": "XMZ",
+        "usd": 0.0178
+    },
+    {
+        "coinPrefix": "XTX",
+        "usd": 0.0176
+    },
+    {
+        "coinPrefix": "APPLE",
+        "usd": 0.0159
     },
     {
         "coinPrefix": "XGJ",
-        "usd": 0.0111
+        "usd": 0.0087
+    },
+    {
+        "coinPrefix": "SOCK",
+        "usd": 0.0056
+    },
+    {
+        "coinPrefix": "TAD",
+        "usd": 0.0054
+    },
+    {
+        "coinPrefix": "MGA",
+        "usd": 0.0019
+    },
+    {
+        "coinPrefix": "XKM",
+        "usd": 0.0023
     }
+
 ]
