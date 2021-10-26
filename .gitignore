@@ -3,6 +3,4 @@ out
 dist
 logs   
 resources/config/wallets_amc.json
-resources/config/wallets.json
-resources/config/clientconfig.json
-resources/config/wallets.json
+resources/config/wallets_phil.json
