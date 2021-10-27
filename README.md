@@ -1,4 +1,4 @@
-# chia-forks-dashboard
+# sit1wl06hx90qvuw2ha4lmnvdp97jg27xjpggnhrx62xttyhgzu2cwksm2r4kw
 
 <div id="top"></div>
 <!--
@@ -31,23 +31,23 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/aaroncarpenter/chia-forks-dashboard">
+  <a href="https://github.com/aaroncarpenter/fork-board">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Chia Forks Dashboard</h3>
+<h3 align="center">ForkBoard</h3>
 
   <p align="center">
     A small dashboard application to show balances of wallets from Chia and Forks.
     <br />
-    <a href="https://github.com/aaroncarpenter/chia-forks-dashboard"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/aaroncarpenter/fork-board"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/aaroncarpenter/chia-forks-dashboard">View Demo</a>
+    <a href="https://github.com/aaroncarpenter/fork-board">View Demo</a>
     ·
-    <a href="https://github.com/aaroncarpenter/chia-forks-dashboard/issues">Report Bug</a>
+    <a href="https://github.com/aaroncarpenter/fork-board/issues">Report Bug</a>
     ·
-    <a href="https://github.com/aaroncarpenter/chia-forks-dashboard/issues">Request Feature</a>
+    <a href="https://github.com/aaroncarpenter/fork-board/issues">Request Feature</a>
   </p>
 </div>
 
@@ -84,7 +84,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Chia Forks Dashboard
+ForkBoard
 
 <!--
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
@@ -124,12 +124,6 @@ This is an example of how to list things you need to use the software and how to
 ### Windows Installation
 
 1. Download the EXE from the Releases.
-2. Enter your Chia LauncherId in `C:\Users\[username]\AppData\Local\chia_forks_dashboard\app-[version]\resources\app\resources\config\clientConfig.json`
-   ```json
-   {
-    "launcherid": ""
-    }
-     ```
 3. Click File -> Add Wallet to enter your wallets from Chia and any Forks.  Most users will have multiple wallets per coin.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -182,7 +176,7 @@ Don't forget to give the project a star! Thanks again!
 
 Aaron Carpenter - [@discord](https://discordapp.com/users/872708817899646978) - aaron@redwolftek.com
 
-Project Link: [https://github.com/aaroncarpenter/chia-forks-dashboard](https://github.com/aaroncarpenter/chia-forks-dashboard)
+Project Link: [https://github.com/aaroncarpenter/fork-board](https://github.com/aaroncarpenter/fork-board)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -199,16 +193,16 @@ Project Link: [https://github.com/aaroncarpenter/chia-forks-dashboard](https://g
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/aaroncarpenter/chia-forks-dashboard.svg?style=for-the-badge
-[contributors-url]: https://github.com/aaroncarpenter/chia-forks-dashboard/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/aaroncarpenter/chia-forks-dashboard.svg?style=for-the-badge
-[forks-url]: https://github.com/aaroncarpenter/chia-forks-dashboard/network/members
-[stars-shield]: https://img.shields.io/github/stars/aaroncarpenter/chia-forks-dashboard.svg?style=for-the-badge
-[stars-url]: https://github.com/aaroncarpenter/chia-forks-dashboard/stargazers
-[issues-shield]: https://img.shields.io/github/issues/aaroncarpenter/chia-forks-dashboard.svg?style=for-the-badge
-[issues-url]: https://github.com/aaroncarpenter/chia-forks-dashboard/issues
-[license-shield]: https://img.shields.io/github/license/aaroncarpenter/chia-forks-dashboard.svg?style=for-the-badge
-[license-url]: https://github.com/aaroncarpenter/chia-forks-dashboard/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/aaroncarpenter/fork-board.svg?style=for-the-badge
+[contributors-url]: https://github.com/aaroncarpenter/fork-board/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/aaroncarpenter/fork-board.svg?style=for-the-badge
+[forks-url]: https://github.com/aaroncarpenter/fork-board/network/members
+[stars-shield]: https://img.shields.io/github/stars/aaroncarpenter/fork-board.svg?style=for-the-badge
+[stars-url]: https://github.com/aaroncarpenter/fork-board/stargazers
+[issues-shield]: https://img.shields.io/github/issues/aaroncarpenter/fork-board.svg?style=for-the-badge
+[issues-url]: https://github.com/aaroncarpenter/fork-board/issues
+[license-shield]: https://img.shields.io/github/license/aaroncarpenter/fork-board.svg?style=for-the-badge
+[license-url]: https://github.com/aaroncarpenter/fork-board/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/aaronmcarpenter
 [product-screenshot]: images/screenshot.png
