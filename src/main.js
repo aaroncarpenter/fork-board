@@ -6,14 +6,15 @@ const {
    MenuItem,
    ipcMain,
    nativeTheme
-} = require('electron')
-const url = require('url')
-const path = require('path')
-const axios = require('axios')
+} = require('electron');
+const url = require('url');
+const path = require('path');
+const axios = require('axios');
 const https = require('https');
 const logger = require('electron-log');
-//const contextMenu = require('electron-context-menu');
-logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/main.log');
+logger.transports.file.resolvePath = function () {
+   return path.join(__dirname, 'logs/main.log');
+};
 const agent = new https.Agent({
    rejectUnauthorized: false
 });
@@ -32,12 +33,12 @@ function createWindow() {
          contextIsolation: false,
          enableRemoteModule: true
       }
-   })
+   });
    win.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file:',
       slashes: true
-   }))
+   }));
 }
 // #endregion
 
@@ -66,7 +67,7 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
       pathname: path.join(__dirname, 'walletDetails.html'),
       protocol: 'file:',
       slashes: true
-   }))
+   }));
 
    walletDetails.once("show", function () {
       logger.info('Sending load-wallet-details event: ' + coinCfg.coinDisplayName);
@@ -104,7 +105,7 @@ function createNFTRecoveryWindow() {
       pathname: '/nft-recovery',
       protocol: 'https',
       hostname: 'alltheblocks.net'
-   }))
+   }));
 
    nftRecovery.once("ready-to-show", () => {
       logger.info('Ready to show - NFT Recovery');
@@ -214,13 +215,13 @@ ipcMain.on('async-get-blockchain-settings', (event, arg) => {
    axios.get(url, {
          httpsAgent: agent
       })
-      .then((result) => {
-         logger.info('Sending async-get-blockchain-settings-reply event');
-         event.sender.send('async-get-blockchain-settings-reply', result.data);
-      })
-      .catch((error) => {
-         logger.error(error);
-      });
+      .then(function (result) {
+            logger.info('Sending async-get-blockchain-settings-reply event');
+            event.sender.send('async-get-blockchain-settings-reply', result.data);
+         })
+      .catch(function (error) {
+            logger.error(error);
+         });
 });
 
 //https://xchscan.com/api/chia-price
@@ -320,7 +321,7 @@ const template = [{
    }
 ]
 
-const menu = Menu.buildFromTemplate(template)
+const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 // #endregion
 
@@ -329,14 +330,14 @@ Menu.setApplicationMenu(menu);
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow);
 
-app.on('window-all-closed', () => {
-   if (process.platform !== 'darwin') {
-      app.quit();
-   }
-});
+app.on('window-all-closed', function () {
+      if (process.platform !== 'darwin') {
+         app.quit();
+      }
+   });
 
-app.on('activate', () => {
-   if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-   }
-});
+app.on('activate', function () {
+      if (BrowserWindow.getAllWindows().length === 0) {
+         createWindow();
+      }
+   });
