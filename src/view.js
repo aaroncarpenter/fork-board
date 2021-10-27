@@ -40,7 +40,7 @@
 
    // write empty file if wallets file is missing.
    if (!fs.existsSync(clientConfigFile)) {
-      fs.writeFileSync(clientConfigFile, '{}'); 
+      fs.writeFileSync(clientConfigFile, '{"launcherId": "", "appSettings": { "displayTheme": "Light", "sortField": "None", "autoRefreshEnabled": false}}'); 
    }
    let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
@@ -67,6 +67,8 @@ $(function () {
 
    if (walletObj.length == 0)
    {
+      $('#show-recoverable-balance').prop('disabled', true);
+      $('#show-actual-balance').prop('disabled', true);
       $('#no-wallets-found').show();
    }
 });
@@ -326,6 +328,8 @@ function setSortOrder() {
 //  Return: N/A
 // ************************
 function addNewWallet() {
+   $('#show-recoverable-balance').prop('disabled', false);
+   $('#show-actual-balance').prop('disabled', false);
    $('#add-wallet').hide();
    
    let walletVal = $('#wallet-text-box').val();
