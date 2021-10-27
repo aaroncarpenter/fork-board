@@ -3,7 +3,9 @@
    const Utils = require('./utils');
    const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
    const logger = require('electron-log');
-   logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/view.log');
+   logger.transports.file.resolvePath = function () {
+      return path.join(__dirname, 'logs/view.log');
+   };
    const DisplayMode = {
       Actual: 'Actual',
       Recoverable: 'Recoverable'
@@ -445,6 +447,7 @@ function loadAndDisplayWallets(loadBalance) {
    // Show the last time the dashboad was refreshed.
    if (walletCache.size > 0) {
       lastRefreshed = new Date();
+
       $('#refreshDiv').show();
       $('#lastRefreshDate small').text('Refreshed On: ' + lastRefreshed.toLocaleString());
    }
