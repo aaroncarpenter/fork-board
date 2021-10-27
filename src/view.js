@@ -64,6 +64,11 @@ $(function () {
    applyAppSettings();
    getBlockchainSettingsConfiguration();
    addEventListener('keyup', handleKeyPress, true);
+
+   if (walletObj.length == 0)
+   {
+      $('#no-wallets-found').show();
+   }
 });
 
 // #region Page Event Handlers
@@ -870,7 +875,10 @@ ipcRenderer.on('async-refresh-wallets', (event, arg) => {
 // ************************
 ipcRenderer.on('async-add-wallet', (event, arg) => {
    logger.info('Received async-add-wallet event');
+   // Show the add wallet panel
    $('#add-wallet').show();
+   // Hide No wallets panel
+   $('#no-wallets-found').hide();
 })
 
 // ************************

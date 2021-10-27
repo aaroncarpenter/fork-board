@@ -4,7 +4,7 @@
   "description": "A small dashboard application to show balances of wallets from Chia and Forks.",
   "keywords": [],
   "main": "./src/main.js",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "Aaron Carpenter",
   "scripts": {
     "start": "electron-forge start",
@@ -57,7 +57,24 @@
           "name": "@electron-forge/maker-rpm",
           "config": {}
         }
-      ]
+      ],
+      "electronPackagerConfig": {
+        "packageManager": "yarn",
+        "icon": "src/img/app-icon.ico",
+        "appCopyright": "RedWolfTek LLC",
+        "ignore": [
+          "/resources/config/wallets.json",
+          "/resources/config/clientconfig.json",
+          ".+.test.js",
+          ".*.env",
+          ".eslintrc",
+          ".gitignore",
+          "README.md",
+          "yarn.lock",
+          ".jshintrc",
+          ".babelrc"
+        ]
+      }
     }
   }
 }
