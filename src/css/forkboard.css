@@ -1,5 +1,7 @@
 body.dark-mode,
-div.card-body.dark-mode {
+div.card-body.dark-mode,
+div.dropdown-content.dark-mode,
+div.dropdown-content.dark-mode a {
    background: #121212;
    color: lightgrey;
 }
@@ -12,7 +14,8 @@ div.alert.dark-mode {
    color:lightgray;
 }
 
-div.card.dark-mode {
+div.card.dark-mode,
+div.dropdown-content.dark-mode {
    border: 1px solid rgb(50, 50, 50);
 }
 
@@ -29,6 +32,7 @@ div.card.dark-mode {
 
 .card {
    margin-bottom: 0.5rem;
+   
 }
 
 .card-header {
@@ -48,9 +52,3 @@ div.card.dark-mode {
 small {
    font-variant: small-caps;
 }
-
-.fadeInRight {
-   -webkit-animation-name: fadeInRight;
-   animation-name: fadeInRight;
- }
- 

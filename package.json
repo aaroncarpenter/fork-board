@@ -39,7 +39,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "chia-forks-dashboard"
+            "name": "fork-board"
           }
         },
         {

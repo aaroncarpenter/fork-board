@@ -12,6 +12,11 @@
       Dark: 'Dark',
       Light: 'Light'
    };
+   const SortField = {
+      Name: 'Name',
+      USD: 'USD',
+      None: 'None'
+   };
 // #endregion
 
 // #region Variable Definitions
@@ -41,6 +46,7 @@
 
    let displayMode = DisplayMode.Actual;
    let displayTheme = (clientConfigObj.appSettings == null || clientConfigObj.appSettings.displayTheme == null ? DisplayTheme.Light : clientConfigObj.appSettings.displayTheme);
+   let sortField = (clientConfigObj.appSettings == null || clientConfigObj.appSettings.sortField == null ? SortField.USD : clientConfigObj.appSettings.sortField);
    let walletCache = new Set();
    let utils = new Utils();
 
@@ -114,72 +120,74 @@ function autoRefreshHandler() {
       refreshTimerId = null; 
    }
 
-   storeAppSettings()
+   storeAppSettings();
 }
 
-$('#show-dark-mode').on('click', () => {
+$('#show-dark-mode').on('click', function () {
    displayTheme = DisplayTheme.Dark;
    setDisplayTheme();
-})
+});
 
-$('#show-light-mode').on('click', () => {
+$('#show-light-mode').on('click', function () {
    displayTheme = DisplayTheme.Light;
    setDisplayTheme();
-})
+});
 
-$('#check-add-wallet').on('click', () => {
+$('#check-add-wallet').on('click', function () {
    addNewWallet();
    
    // Clear the value for the next entry
    $('#wallet-text-box').val(null);
-})
+});
 
-$('#cancel-add-wallet').on('click', () => {
+$('#cancel-add-wallet').on('click', function () {
    $('#add-wallet').hide();
 
    // Clear the value for the next entry
    $('#wallet-text-box').val(null);
-})
+});
 
-$('#add-launcher').on('click', () => {
+$('#add-launcher').on('click', function () {
    saveLauncherId();
-})
+});
 
-$('#cancel-add-launcher').on('click', () => {
+$('#cancel-add-launcher').on('click', function () {
    $('#set-launcher').hide();
-})
+});
 
-$('#show-actual-balance').on('click', () => {
+$('#show-actual-balance').on('click', function () {
    if (displayMode != DisplayMode.Actual) {
       displayMode = DisplayMode.Actual;
       $('#show-recoverable-balance').addClass('btn-secondary');
       $('#show-recoverable-balance').removeClass('btn-primary');
       $('#show-actual-balance').addClass('btn-primary');
       $('#show-actual-balance').removeClass('btn-secondary');
+      $('#sort-order-label small').text('Sort: ' + sortField);
       getWalletBalances();
    }
-})
+});
 
-$('#show-recoverable-balance').on('click', () => {
+$('#show-recoverable-balance').on('click', function () {
    if (displayMode != DisplayMode.Recoverable) {
       if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
-         displayMode = DisplayMode.Recoverable
+         displayMode = DisplayMode.Recoverable;
          $('#show-actual-balance').addClass('btn-secondary');
          $('#show-actual-balance').removeClass('btn-primary');
          $('#show-recoverable-balance').addClass('btn-primary');
          $('#show-recoverable-balance').removeClass('btn-secondary');
+         $('#sort-order-label small').text(null);
          getWalletRecoverableBalances();
       }
       else {
          $('#set-launcher').show();
       }
    }
-})
+});
 
-$('#open-nft-recovery').on('click', () => {
+$('#open-nft-recovery').on('click', function () {
    $('#nft-recovery').hide();
    openNFTRecoverySite();
-})
+});
 // #endregion
 
 // #region Client Settings Mgmt
@@ -227,6 +235,7 @@ function applyAppSettings() {
    }
 
    setDisplayTheme();
+   setSortOrder();
 
    if (clientConfigObj != null && clientConfigObj.appSettings != null && clientConfigObj.appSettings.autoRefreshEnabled != null) {
       $('#autoRefreshCheck').prop("checked", clientConfigObj.appSettings.autoRefreshEnabled);
@@ -236,7 +245,7 @@ function applyAppSettings() {
 
 // ***********************
 // Name: 	setDisplayTheme
-// Purpose: This function stores the configuration file
+// Purpose: This function sets the display theme.
 //    Args: N/A
 //  Return: N/A
 // ************************
@@ -261,6 +270,7 @@ function setDisplayTheme() {
       $('div.card-footer').addClass('dark-mode');
       $('div.alert.alert-info').addClass('dark-mode');
       $('div.card').addClass('dark-mode');
+      $('div.dropdown-content').addClass('dark-mode');
    }
    else {
       $('body').removeClass('dark-mode');
@@ -269,9 +279,35 @@ function setDisplayTheme() {
       $('div.card-footer').removeClass('dark-mode');
       $('div.alert.alert-info').removeClass('dark-mode');
       $('div.card').removeClass('dark-mode');
+      $('div.dropdown-content').removeClass('dark-mode');
    }
 
    storeAppSettings();
+}
+
+// ***********************
+// Name: 	setSortOrder
+// Purpose: This function sets the sort order.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function setSortOrder() {
+   $('#sort-order-label small').text('Sort: ' + sortField);
+
+   if (sortField != SortField.None)
+   {
+      if (sortField === SortField.Name) {
+         coinData.sort(utils.applySort('coinDisplayName', 'asc'));   
+      }
+      else if (sortField === SortField.USD) {
+         coinData.sort(utils.applySort('coinBalanceUSD', 'desc'));  
+      }
+
+      for (let i = 0; i < coinData.length; i++)
+      {
+         $('#' + coinData[i].coinPathName + '-card').css("order", i);
+      }
+   }
 }
 
 // #endregion
@@ -289,13 +325,13 @@ function addNewWallet() {
    let walletArr = walletVal.split(',');
 
    if (walletVal.length > 0) {
-      walletArr.every((walletStr) => {
+      walletArr.every(function (walletStr) {
          walletStr = walletStr.trim();
          let coinCfg = getCoinConfigForWallet(walletStr);
 
          if (coinCfg != null) {
             if (!walletCache.has(walletStr)) {
-               walletObj.push({'wallet': walletStr});
+               walletObj.push({ 'wallet': walletStr });
                addEntry(walletStr, (displayMode === DisplayMode.Actual));
                fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
             }
@@ -312,6 +348,7 @@ function addNewWallet() {
    }
 
    setDisplayTheme();
+   setSortOrder();
 }
 
 // ***********************
@@ -358,7 +395,7 @@ function addEntry(wallet, loadBalance) {
       if (coinCfg != null) {
          walletCache.add(wallet);
          let coinCfg = getCoinConfigForWallet(wallet);
-         buildWalletCard(coinCfg)
+         buildWalletCard(coinCfg);
 
          if (loadBalance) {
             logger.info('Sending async-get-wallet-balance event');
@@ -366,7 +403,7 @@ function addEntry(wallet, loadBalance) {
          }
       }
       else {
-         logger.error("Unable to Add Entry for unsupported wallet (" + walletStr + ").");
+         logger.error("Unable to Add Entry for unsupported wallet (" + wallet + ").");
       }
    }
 }
@@ -398,7 +435,7 @@ function loadAndDisplayWallets(loadBalance) {
 
    //Check if file exists
    if(fs.existsSync(walletFile)) {
-      walletObj.every((w) => {
+      walletObj.every(function (w) {
          addEntry(w.wallet, loadBalance);
 
          return true;
@@ -408,7 +445,7 @@ function loadAndDisplayWallets(loadBalance) {
    // Show the last time the dashboad was refreshed.
    if (walletCache.size > 0) {
       lastRefreshed = new Date();
-      $('#lastRefreshDate small').show();
+      $('#refreshDiv').show();
       $('#lastRefreshDate small').text('Refreshed On: ' + lastRefreshed.toLocaleString());
    }
 
@@ -426,7 +463,7 @@ function loadAndDisplayWallets(loadBalance) {
 function initializeCoinDataSet() {
    coinData = [];
 
-   coinConfigObj.every((cfg) => {
+   coinConfigObj.every(function (cfg) {
       coinData.push({
          coinPrefix: cfg.coinPrefix,
          coinPathName: cfg.coinPathName,
@@ -439,7 +476,7 @@ function initializeCoinDataSet() {
          coinRecovBalance: 0,
          coinRecovBalanceUSD: 0,
          coinWalletCount: 0
-      })
+      });
 
       return true;
    });
@@ -456,13 +493,13 @@ function initializeCoinDataSet() {
 function updateCoinDataSetBalance(coin, balance, change) {
    let coinDataObj = {};
    if (!isNaN(balance) && !isNaN(change)) {
-      coinData.every((c) => {
+      coinData.every(function (c) {
          if (c.coinPathName === coin) {
             c.coinBalance = c.coinBalance + (balance / c.mojoPerCoin);
             c.coinChange = c.coinChange + (change / c.mojoPerCoin);
             c.coinBalanceUSD = (c.coinPrice != null) ? c.coinBalance * c.coinPrice : null;
             c.coinWalletCount++;
-            
+
             coinDataObj = c;
 
             return false;
@@ -486,7 +523,7 @@ function updateCoinDataSetRecoverableBalance(coin, balance) {
    let coinDataObj = {};
 
    if (!isNaN(balance)) {
-      coinData.every((c) => {
+      coinData.every(function (c) {
          if (c.coinPathName === coin) {
             c.coinRecovBalance = (balance / c.mojoPerCoin);
             c.coinRecovBalanceUSD = (c.coinPrice != null) ? c.coinRecovBalance * c.coinPrice : null;
@@ -525,7 +562,7 @@ function getBlockchainSettingsConfiguration() {
 function getCoinConfigForWallet(wallet) {
    let coinCfg;
    let coinCfgFound = false;
-   coinConfigObj.every((cfg) => {
+   coinConfigObj.every(function (cfg) {
       if (wallet.startsWith(cfg.coinPrefix)) {
          coinCfg = cfg;
          coinCfgFound = true;
@@ -553,7 +590,7 @@ function getCoinConfigForWallet(wallet) {
 function getCoinConfigForCoin(coin) {
    let coinCfg;
    let coinCfgFound = false;
-   coinConfigObj.every((cfg) => {
+   coinConfigObj.every(function (cfg) {
       if (coin == cfg.coinPathName) {
          coinCfg = cfg;
          coinCfgFound = true;
@@ -580,7 +617,7 @@ function getCoinConfigForCoin(coin) {
 // ************************
 function getPriceForCoinPrefix(coinPrefix) {
    let price;
-   coinPriceObj.every((cp) => {
+   coinPriceObj.every(function (cp) {
       if (coinPrefix == cp.coinPrefix.toLowerCase()) {
          price = cp.usd;
          return false;
@@ -652,10 +689,10 @@ function getWalletRecoverableBalances() {
       loadAndDisplayWallets(false);
 
       // No Pending Balance to be displayed for Chia
-      coinConfigObj.every((cfg) => {
+      coinConfigObj.every(function (cfg) {
          if (cfg.coinPathName == 'chia' || cfg.coinPathName == 'cryptodoge' || cfg.coinPathName == 'tad') {
-            $('#'+cfg.coinPathName+'-card .spinner-border').remove();
-            $('#'+cfg.coinPathName+'-card .card-text').text('N/A');
+            $('#' + cfg.coinPathName + '-card .spinner-border').remove();
+            $('#' + cfg.coinPathName + '-card .card-text').text('N/A');
          }
          return true;
       });
@@ -724,6 +761,8 @@ function refreshCardData(cardDataObj) {
          }
          else
          $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
+
+         setSortOrder();
       }
       else if (displayMode === DisplayMode.Recoverable) {
          $('#nft-recovery').show();
@@ -744,7 +783,7 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
       coinConfigObj = [];
 
       // Push data from args into the coinConfigObj
-      arg.every((blockSettings) => {
+      arg.every(function (blockSettings) {
          coinConfigObj.push({
             coinPrefix: blockSettings.coinPrefix,
             coinPathName: blockSettings.pathName,
@@ -797,12 +836,12 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    logger.info('Received async-get-recoverable-wallet-balance-reply event')
 
    if (arg.length > 1) {
-      arg.every((recovBal) => {
+      arg.every(function (recovBal) {
          let coin = recovBal.pathName;
          let balance = recovBal.availableAmount;
 
          let cardDataObj = updateCoinDataSetRecoverableBalance(coin, balance);
-         
+
          // Update the displayed card values
          refreshCardData(cardDataObj);
 
@@ -861,7 +900,7 @@ ipcRenderer.on('async-refresh-card-display', (event, arg) => {
       // Replace the existing card with a new one, ready to load.
       buildWalletCard(coinCfg, true);
 
-      coinData = coinData.filter(function(obj, index, arr){ 
+      coinData = coinData.filter(function(obj, index, arr) { 
          return obj.coinPathName != coinCfg.coinPathName;
       });
 
@@ -914,7 +953,7 @@ ipcRenderer.on('async-populate-debug-data', (event, arg) => {
    $('.walletCard').remove();
    
    coinData = [];
-   coinConfigObj.every((cfg) => {
+   coinConfigObj.every(function (cfg) {
       buildWalletCard(cfg);
 
       let bal = Math.random() * (cfg.coinPathName === 'chia' ? 100 : 1000);
@@ -930,7 +969,7 @@ ipcRenderer.on('async-populate-debug-data', (event, arg) => {
          coinRecovBalance: 0,
          coinRecovBalanceUSD: 0,
          coinWalletCount: 0
-      })
+      });
 
       return true;
    });
@@ -947,15 +986,31 @@ ipcRenderer.on('async-populate-debug-data', (event, arg) => {
 // ************************
 // Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
 // ************************
-ipcRenderer.on('async-sort-test', (event, arg) => {
-   logger.info('Received async-sort-test event');
+ipcRenderer.on('async-set-sort-order', (event, arg) => {
+   logger.info('Received async-set-sort-order');
 
-   coinData.sort(utils.applySort('coinDisplayName', 'asc'));
+   if (arg.length == 1)
+   {
+      let sortFld = arg[0];
 
-   coinData.sort(utils.applySort('coinBalance', 'desc'));
+      if (sortFld != sortField) {
+         if (sortFld === 'name') {
+            sortField = SortField.Name;
+            setSortOrder();
+         }
+         else if (sortFld === 'usd') {
+            sortField = SortField.USD;
+            setSortOrder();
+         }
+         else if (sortFld === 'none') {
+            sortField = SortField.None;
+            refreshDashboard();
+         }
 
-   coinData.sort(utils.applySort('coinBalanceUSD', 'desc'));
-
-
+         clientConfigObj.appSettings.sortField = sortField;
+         storeAppSettings();
+      }
+   }
 });
+
 // #endregion

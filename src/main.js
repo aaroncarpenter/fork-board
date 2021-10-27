@@ -263,6 +263,28 @@ const template = [{
       ]
    },
    {
+      label: 'Sort',
+      submenu: [{
+            label: 'Name',
+            click() {
+               win.webContents.send('async-set-sort-order', ['name']);
+            }
+         },
+         {
+            label: 'USD',
+            click() {
+               win.webContents.send('async-set-sort-order', ['usd']);
+            }
+         },
+         {
+            label: 'None',
+            click() {
+               win.webContents.send('async-set-sort-order', ['none']);
+            }
+         }
+      ]
+   },
+   {
       label: 'View',
       submenu: [{
             role: 'toggledevtools'
