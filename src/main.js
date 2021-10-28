@@ -47,6 +47,7 @@ let walletDetails;
 let refreshMainCard = false;
 
 function createWalletDetailsWindow(coinCfg, displayTheme) {
+   refreshMainCard = false;
    walletDetails = new BrowserWindow({
       width: 600,
       height: 600,
@@ -74,12 +75,12 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
       walletDetails.webContents.send("load-wallet-details", [coinCfg, displayTheme]);
    });
 
-   walletDetails.once("ready-to-show", () => {
+   walletDetails.once("ready-to-show", function () {
       logger.info('Ready to show - Wallet Details');
       walletDetails.show();
    });
 
-   walletDetails.on('close', (e) => {
+   walletDetails.on('close', function (_e) {
       if (win && refreshMainCard) {
          logger.info('Sending async-refresh-card-display event: ' + coinCfg.coinDisplayName);
          win.webContents.send('async-refresh-card-display', [coinCfg]);
@@ -107,7 +108,7 @@ function createNFTRecoveryWindow() {
       hostname: 'alltheblocks.net'
    }));
 
-   nftRecovery.once("ready-to-show", () => {
+   nftRecovery.once("ready-to-show", function () {
       logger.info('Ready to show - NFT Recovery');
       nftRecovery.show();
    });
@@ -119,7 +120,7 @@ function createNFTRecoveryWindow() {
 // ************************
 // Purpose: This function handles the close-wallet-details event from the Renderer.  It closes the Wallet Details page.  This event is used to handle a user hitting "Escape" to close the wallet details.
 // ************************
-ipcMain.on("close-wallet-details", (event, arg) => {
+ipcMain.on("close-wallet-details", function (_event, _arg) {
    logger.info('Received close-wallet-details Event');
    walletDetails.hide();
 
@@ -127,7 +128,7 @@ ipcMain.on("close-wallet-details", (event, arg) => {
    win.webContents.send('async-refresh-wallets', []);
 });
 
-ipcMain.on('async-set-dashboard-refresh-flag', (event, arg) => {
+ipcMain.on('async-set-dashboard-refresh-flag', function (_event, _arg) {
    logger.info('Received async-set-dashboard-refresh-flag Event');
    refreshMainCard = true;
 });
@@ -135,7 +136,7 @@ ipcMain.on('async-set-dashboard-refresh-flag', (event, arg) => {
 // ************************
 // Purpose: This function handles the open-wallet-details event from the Renderer.  It opens the Wallet Details page for a given coin.
 // ************************
-ipcMain.on("open-wallet-details", (event, arg) => {
+ipcMain.on("open-wallet-details", function (_event, arg) {
    logger.info('Received open-wallet-details Event');
 
    if (arg.length == 2) {
@@ -151,14 +152,14 @@ ipcMain.on("open-wallet-details", (event, arg) => {
 // ************************
 // Purpose: This function handles the open-nft-recovery-site event from the Renderer.  It opens the NFT Recovery page from ATB.
 // ************************
-ipcMain.on("open-nft-recovery-site", (event, arg) => {
+ipcMain.on("open-nft-recovery-site", function (_event, _arg) {
    createNFTRecoveryWindow();
 });
 
 // ************************
 // Purpose: This function handles the async-get-wallet-balance event from the Renderer.  It retrieves the wallet balance from ATB and sends the reply event with the data to the Renderer.
 // ************************
-ipcMain.on('async-get-wallet-balance', (event, arg) => {
+ipcMain.on('async-get-wallet-balance', function (event, arg) {
    logger.info('Received async-get-wallet-balance event');
 
    if (arg.length == 2) {
@@ -169,22 +170,22 @@ ipcMain.on('async-get-wallet-balance', (event, arg) => {
       logger.info('Wallet: ' + wallet + ', Coin: ' + coin);
 
       axios.get(url, {
-            httpsAgent: agent
-         })
-         .then((result) => {
-            logger.info('Sending async-get-wallet-balance-reply event');
-            event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
-         })
-         .catch((error) => {
-            logger.error(error);
-         });
+         httpsAgent: agent
+      })
+      .then(function (result) {
+         logger.info('Sending async-get-wallet-balance-reply event');
+         event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
+      })
+      .catch(function (error) {
+         logger.error(error);
+      });
    }
 });
 
 // ************************
 // Purpose: This function handles the async-get-blockchain-settings event from the Renderer.  It retrieves the recoverable balances for the launcherid from ATB and sends the reply event with the data to the Renderer. 
 // ************************
-ipcMain.on('async-get-recoverable-wallet-balance', (event, arg) => {
+ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
    logger.info('Received async-get-recoverable-wallet-balance event');
 
    if (arg.length == 1) {
@@ -192,36 +193,36 @@ ipcMain.on('async-get-recoverable-wallet-balance', (event, arg) => {
       let url = baseAllTheBlocksApiUrl + "/atb/nft/" + launcherid + "/eligible";
 
       axios.get(url, {
-            httpsAgent: agent
-         })
-         .then((result) => {
-            logger.info('Sending async-get-recoverable-wallet-balance-reply event');
-            event.sender.send('async-get-recoverable-wallet-balance-reply', result.data);
-         })
-         .catch((error) => {
-            logger.error(error);
-         });
+         httpsAgent: agent
+      })
+      .then(function (result) {
+         logger.info('Sending async-get-recoverable-wallet-balance-reply event');
+         event.sender.send('async-get-recoverable-wallet-balance-reply', result.data);
+      })
+      .catch(function (error) {
+         logger.error(error);
+      });
    }
 });
 
 // ************************
 // Purpose: This function handles the async-get-blockchain-settings event from the Renderer.  It retrieves the block chain settings from ATB and sends the reply event with the data to the Renderer.
 // ************************
-ipcMain.on('async-get-blockchain-settings', (event, arg) => {
+ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
    logger.info('Received async-get-blockchain-settings event');
 
    let url = baseAllTheBlocksApiUrl + "/atb/blockchain/settings";
 
    axios.get(url, {
-         httpsAgent: agent
-      })
-      .then(function (result) {
-            logger.info('Sending async-get-blockchain-settings-reply event');
-            event.sender.send('async-get-blockchain-settings-reply', result.data);
-         })
-      .catch(function (error) {
-            logger.error(error);
-         });
+      httpsAgent: agent
+   })
+   .then(function (result) {
+      logger.info('Sending async-get-blockchain-settings-reply event');
+      event.sender.send('async-get-blockchain-settings-reply', result.data);
+   })
+   .catch(function (error) {
+      logger.error(error);
+   });
 });
 
 //https://xchscan.com/api/chia-price
@@ -275,6 +276,12 @@ const template = [{
             label: 'USD',
             click() {
                win.webContents.send('async-set-sort-order', ['usd']);
+            }
+         },
+         {
+            label: 'Coins',
+            click() {
+               win.webContents.send('async-set-sort-order', ['coins']);
             }
          },
          {

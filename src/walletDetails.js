@@ -51,26 +51,28 @@ function handleKeyPress(event) {
 //  Return: N/A
 // *************************
 function handleWalletDelete(wallet) {
-   let newWalletObj = [];
+   if (confirm("Are you sure you want to delete this wallet?"))
+   {
+      let newWalletObj = [];
 
-   // push wallet values to the new array for all wallets except the one to delete
-   walletObj.every((w) => {
-      if (w.wallet != wallet) {
-         newWalletObj.push({'wallet': w.wallet}); 
-      }
-      return true;
-   });
-   
-   //write the new wallet file
-   fs.writeFile(walletFile, JSON.stringify(newWalletObj, null, '\t'));
+      // push wallet values to the new array for all wallets except the one to delete
+      walletObj.every(function (w) {
+         if (w.wallet != wallet) {
+            newWalletObj.push({ 'wallet': w.wallet });
+         }
+         return true;
+      });
+      
+      //write the new wallet file
+      fs.writeFile(walletFile, JSON.stringify(newWalletObj, null, '\t'));
 
-   walletObj = newWalletObj;
+      walletObj = newWalletObj;
 
-   // remove the card from the display
-   $('#'+wallet+'-card').remove();
-
-   // 
-   ipcRenderer.send('async-set-dashboard-refresh-flag', []);
+      // remove the card from the display
+      $('#'+wallet+'-card').remove();
+ 
+      ipcRenderer.send('async-set-dashboard-refresh-flag', []);
+   }
 }
 // #endregion
 
@@ -90,10 +92,10 @@ function loadAndDisplayWallets() {
 
    $(document).attr("title", coinCfg.coinDisplayName + " Wallet Details");
 
-   walletObj.every((w) => {
+   walletObj.every(function (w) {
       if (w.wallet.startsWith(coinCfg.coinPrefix)) {
          logger.info('Loading Wallet Details for wallet: ' + w.wallet);
-         buildWalletCard(w.wallet, coinCfg)
+         buildWalletCard(w.wallet, coinCfg);
 
          ipcRenderer.send('async-get-wallet-balance', [w.wallet, coinCfg.coinPathName]);
       }
@@ -162,7 +164,7 @@ ipcRenderer.on('load-wallet-details', (event, arg) => {
    else {
       logger.error('Reply args incorrect');
    }
-})
+});
 
 // ************************
 // Purpose: This function receives the wallet balance reply from ipcMain, refreshes the coin data set balances and initiates the card refresh.
@@ -194,5 +196,5 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    else {
       logger.error('Reply args incorrect');
    }
-})
+});
 // #endregion

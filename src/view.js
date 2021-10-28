@@ -15,9 +15,10 @@
       Light: 'Light'
    };
    const SortField = {
-      Name: 'Name',
-      USD: 'USD',
-      None: 'None'
+      Name: 'name',
+      USD: 'usd',
+      Coins: 'coins',
+      None: 'none'
    };
 // #endregion
 
@@ -55,7 +56,7 @@
    let coinConfigObj = [];
    let coinData = [];   
    let lastRefreshed = new Date();
-   let refreshTimerLength = 5*60*60; // 5 minutes
+   let refreshTimerLength = 5*60*1000; // 5 minutes
    let refreshTimerId;
 // #endregion
 
@@ -307,6 +308,9 @@ function setSortOrder() {
    {
       if (sortField === SortField.Name) {
          coinData.sort(utils.applySort('coinDisplayName', 'asc'));   
+      }
+      else if (sortField === SortField.Coins) {
+         coinData.sort(utils.applySort('coinBalance', 'desc'));   
       }
       else if (sortField === SortField.USD) {
          coinData.sort(utils.applySort('coinBalanceUSD', 'desc'));  
@@ -1009,19 +1013,15 @@ ipcRenderer.on('async-set-sort-order', (event, arg) => {
       let sortFld = arg[0];
 
       if (sortFld != sortField) {
-         if (sortFld === 'name') {
-            sortField = SortField.Name;
-            setSortOrder();
-         }
-         else if (sortFld === 'usd') {
-            sortField = SortField.USD;
-            setSortOrder();
-         }
-         else if (sortFld === 'none') {
-            sortField = SortField.None;
+         sortField = sortFld;
+
+         if (sortFld === 'none') {
             refreshDashboard();
          }
-
+         else {
+            setSortOrder();
+         }
+         
          clientConfigObj.appSettings.sortField = sortField;
          storeAppSettings();
       }
