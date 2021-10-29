@@ -19,6 +19,7 @@ const agent = new https.Agent({
    rejectUnauthorized: false
 });
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
+const baseXCHForksApiUrl = "https://xchforks.com";
 // #endregion
 
 // #region Main Window
@@ -212,6 +213,26 @@ ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
    logger.info('Received async-get-blockchain-settings event');
 
    let url = baseAllTheBlocksApiUrl + "/atb/blockchain/settings";
+
+   axios.get(url, {
+      httpsAgent: agent
+   })
+   .then(function (result) {
+      logger.info('Sending async-get-blockchain-settings-reply event');
+      event.sender.send('async-get-blockchain-settings-reply', result.data);
+   })
+   .catch(function (error) {
+      logger.error(error);
+   });
+});
+
+// ************************
+// Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from XCHForks.com and sends the reply event with the data to the Renderer.
+// ************************
+ipcMain.on('async-get-fork-prices', function (event, _arg) {
+   logger.info('Received async-get-fork-prices event');
+ 
+   let url = baseXCHForksApiUrl + "/sample.json";
 
    axios.get(url, {
       httpsAgent: agent

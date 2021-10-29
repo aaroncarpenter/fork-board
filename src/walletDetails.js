@@ -64,7 +64,7 @@ function handleWalletDelete(wallet) {
       });
       
       //write the new wallet file
-      fs.writeFile(walletFile, JSON.stringify(newWalletObj, null, '\t'));
+      fs.writeFileSync(walletFile, JSON.stringify(newWalletObj, null, '\t'));
 
       walletObj = newWalletObj;
 

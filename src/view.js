@@ -634,8 +634,8 @@ function getCoinConfigForCoin(coin) {
 function getPriceForCoinPrefix(coinPrefix) {
    let price;
    coinPriceObj.every(function (cp) {
-      if (coinPrefix == cp.coinPrefix.toLowerCase()) {
-         price = cp.usd;
+      if (coinPrefix == cp.symbol.toLowerCase()) {
+         price = cp.price;
          return false;
       }
       else {
