@@ -15,7 +15,8 @@ div.alert.dark-mode {
 }
 
 div.card.dark-mode,
-div.dropdown-content.dark-mode {
+div.dropdown-content.dark-mode,
+div.alert.dark-mode {
    border: 1px solid rgb(50, 50, 50);
 }
 

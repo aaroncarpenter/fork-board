@@ -90,28 +90,61 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
 }
 // #endregion
 
-// #region NFT Recovery Window
-let nftRecovery;
+// #region About Window
+let aboutPage;
 
-function createNFTRecoveryWindow() {
-   nftRecovery = new BrowserWindow({
-      width: 900,
-      height: 1200,
+function createAboutWindow() {
+   aboutPage = new BrowserWindow({
+      width: 500,
+      height: 500,
       modal: true,
       show: false,
       parent: win, // Make sure to add parent window here
       autoHideMenuBar: true,
+
+      // Make sure to add webPreferences with below configuration
+      webPreferences: {
+         nodeIntegration: true,
+         contextIsolation: false,
+         enableRemoteModule: true
+      },
    });
 
-   nftRecovery.loadURL(url.format({
-      pathname: '/nft-recovery',
-      protocol: 'https',
-      hostname: 'alltheblocks.net'
+   aboutPage.loadURL(url.format({
+      pathname: path.join(__dirname, 'about.html'),
+      protocol: 'file:',
+      slashes: true
    }));
 
-   nftRecovery.once("ready-to-show", function () {
-      logger.info('Ready to show - NFT Recovery');
-      nftRecovery.show();
+   aboutPage.once("ready-to-show", function () {
+      logger.info('Ready to show - About');
+      aboutPage.show();
+   });
+}
+// #endregion
+
+// #region Web Page Window
+let webPageWin;
+
+function createWebPageWindow(winProtocol, winHost, winPath, winParent, winModal, winWidth = 900, winHeight = 1200) {
+   webPageWin = new BrowserWindow({
+      width: winWidth,
+      height: winHeight,
+      modal: winModal,
+      show: false,
+      parent: winParent, // Make sure to add parent window here
+      autoHideMenuBar: true,
+   });
+
+   webPageWin.loadURL(url.format({
+      pathname: winPath,
+      protocol: winProtocol,
+      hostname: winHost
+   }));
+
+   webPageWin.once("ready-to-show", function () {
+      logger.info('Ready to show - Web Page');
+      webPageWin.show();
    });
 }
 // #endregion
@@ -154,7 +187,7 @@ ipcMain.on("open-wallet-details", function (_event, arg) {
 // Purpose: This function handles the open-nft-recovery-site event from the Renderer.  It opens the NFT Recovery page from ATB.
 // ************************
 ipcMain.on("open-nft-recovery-site", function (_event, _arg) {
-   createNFTRecoveryWindow();
+   createWebPageWindow('https', 'alltheblocks.net', '/nft-recovery', win, true, 900, 1200);
 });
 
 // ************************
@@ -238,20 +271,19 @@ ipcMain.on('async-get-fork-prices', function (event, _arg) {
       httpsAgent: agent
    })
    .then(function (result) {
-      logger.info('Sending async-get-blockchain-settings-reply event');
-      event.sender.send('async-get-blockchain-settings-reply', result.data);
+      logger.info('Sending async-get-fork-prices-reply event');
+      event.sender.send('async-get-fork-prices-reply', result.data);
    })
    .catch(function (error) {
       logger.error(error);
    });
 });
-
-//https://xchscan.com/api/chia-price
-
 // #endregion
 
 //#region Menu Setup
-const template = [{
+const template = [
+   {
+      id: 'fileMenu',
       label: 'File',
       submenu: [{
             label: 'Set Launcher Id',
@@ -269,12 +301,6 @@ const template = [{
             label: 'Refresh',
             click() {
                win.webContents.send('async-refresh-wallets', []);
-            }
-         },
-         {
-            label: 'Debug Data',
-            click() {
-               win.webContents.send('async-populate-debug-data', []);
             }
          },
          {
@@ -342,14 +368,64 @@ const template = [{
       ]
    },
    {
-      role: 'help',
+      label: 'Sponsors',
       submenu: [{
-         label: 'Learn More'
-      }]
+            label: 'SpaceFarmers.io',
+            click() {
+               require("electron").shell.openExternal('https://spacefarmers.io');
+            }
+         }
+      ]
+   },
+   {
+      label: 'About',
+      submenu: [
+         {
+            label: 'ForkBoard Wiki',
+            click() {
+               require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board/wiki');
+            }
+         },
+         {
+            label: 'Contribute on GitHub',
+            click() {
+               require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board');
+            }
+         },
+         {
+            type: 'separator'
+         },
+         {
+            label: 'Report an Issue',
+            click() {
+               require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board/issues');
+            }
+         },
+         {
+            type: 'separator'
+         },
+         {
+            label: 'About ForkBoard',
+            click() {
+               createAboutWindow();
+            }
+         }  
+      ]
    }
-]
+];
 
 const menu = Menu.buildFromTemplate(template);
+
+/*
+if (!app.isPackaged) {
+   let menuItem = menu.getMenuItemById('fileMenu');
+
+   menuItem.submenu.append(new MenuItem({
+     label: 'Debug Data',
+     click: function () { win.webContents.send('async-populate-debug-data', []); }
+   }));
+}
+*/
 Menu.setApplicationMenu(menu);
 // #endregion
 

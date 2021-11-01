@@ -45,7 +45,7 @@
    }
    let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
-   let coinPriceObj = JSON.parse(fs.readFileSync(coinPriceFile, 'utf8'));
+   //let coinPriceObj = JSON.parse(fs.readFileSync(coinPriceFile, 'utf8'));
 
    let displayMode = DisplayMode.Actual;
    let displayTheme = (clientConfigObj.appSettings == null || clientConfigObj.appSettings.displayTheme == null ? DisplayTheme.Light : clientConfigObj.appSettings.displayTheme);
@@ -53,6 +53,7 @@
    let walletCache = new Set();
    let utils = new Utils();
 
+   let coinPriceObj = [];
    let coinConfigObj = [];
    let coinData = [];   
    let lastRefreshed = new Date();
@@ -63,6 +64,8 @@
 
 $(function () {
    applyAppSettings();
+   getConfigurationSettings();
+
    getBlockchainSettingsConfiguration();
    addEventListener('keyup', handleKeyPress, true);
 
@@ -560,13 +563,13 @@ function updateCoinDataSetRecoverableBalance(coin, balance) {
 // #region Configuration
 
 // ***********************
-// Name: 	getBlockchainSettingsConfiguration
+// Name: 	getConfigurationSettings
 // Purpose: This function sends the 'async-get-blockchain-settings' event to ipcMain to begin retrieving the block chain metadata.
 //    Args:  N/A
 //  Return:  N/A
 // ************************
-function getBlockchainSettingsConfiguration() {
-   ipcRenderer.send('async-get-blockchain-settings', []);
+function getConfigurationSettings() {
+   ipcRenderer.send('async-get-fork-prices', []);
 }
 
 // ***********************
@@ -823,6 +826,33 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
 })
 
 // ************************
+// Purpose: This function receives the blockchain settings reply from ipcMain and loads the dashboard
+// ************************
+ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
+   logger.info('Received async-get-fork-prices-reply event')
+   
+   if (arg.length > 0) {
+      coinPriceObj = [];
+
+      // Push data from args into the coinConfigObj
+      arg.every(function (coinPrice){
+         coinPriceObj.push({
+            name: coinPrice.name,
+            symbol: coinPrice.symbol,
+            price: coinPrice.price
+         });
+
+         return true;
+      });
+
+      ipcRenderer.send('async-get-blockchain-settings', []);
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+})
+
+// ************************
 // Purpose: This function receives the wallet balance reply from ipcMain, refreshes the coin data set balances and initiates the card refresh.
 // ************************
 ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
@@ -887,6 +917,8 @@ ipcRenderer.on('async-add-wallet', (event, arg) => {
    $('#add-wallet').show();
    // Hide No wallets panel
    $('#no-wallets-found').hide();
+   // Hide Set Launcher
+   $('#set-launcher').hide();
 })
 
 // ************************
@@ -900,6 +932,9 @@ ipcRenderer.on('async-set-launcher', (event, arg) => {
    }
 
    $('#set-launcher').show();
+
+   // Hide the add wallet panel
+   $('#add-wallet').hide();
 })
 
 // ************************
