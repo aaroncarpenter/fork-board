@@ -276,7 +276,7 @@ ipcMain.on('async-get-fork-prices', function (event, _arg) {
    axios.get(url, {
       httpsAgent: agent,
       headers : {
-         'Authorization' : 'Basic YW1jYXJwODo1eGJCTExoZm1wd2o1MkU4'
+         'Authorization' : Buffer.from('QmFzaWMgWVcxallYSndPRG8xZUdKQ1RFeG9abTF3ZDJvMU1rVTQ=', 'base64')
       }
    })
    .then(function (result) {

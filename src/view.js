@@ -58,6 +58,7 @@
    let coinData = [];   
    let lastRefreshed = new Date();
    let refreshTimerLength = 5*60*1000; // 5 minutes
+
    let refreshTimerId;
 // #endregion
 
@@ -123,7 +124,7 @@ function autoRefreshHandler() {
    clientConfigObj.appSettings.autoRefreshEnabled = $('#autoRefreshCheck')[0].checked;
 
    if ($('#autoRefreshCheck')[0].checked) {
-      refreshTimerId = setInterval(refreshDashboard, refreshTimerLength);
+      refreshTimerId = setInterval(function() {refreshDashboard();}, refreshTimerLength);
    }
    else {
       clearInterval(refreshTimerId);
