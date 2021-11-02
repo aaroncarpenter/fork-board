@@ -48,6 +48,7 @@ let walletDetails;
 let refreshMainCard = false;
 
 function createWalletDetailsWindow(coinCfg, displayTheme) {
+   logger.info(`Creating the Wallet Details window for ${coinCfg.coinDisplayName}`);
    refreshMainCard = false;
    walletDetails = new BrowserWindow({
       width: 600,
@@ -72,7 +73,7 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
    }));
 
    walletDetails.once("show", function () {
-      logger.info('Sending load-wallet-details event: ' + coinCfg.coinDisplayName);
+      logger.info(`Sending load-wallet-details event: ${coinCfg.coinDisplayName}`);
       walletDetails.webContents.send("load-wallet-details", [coinCfg, displayTheme]);
    });
 
@@ -83,7 +84,7 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
 
    walletDetails.on('close', function (_e) {
       if (win && refreshMainCard) {
-         logger.info('Sending async-refresh-card-display event: ' + coinCfg.coinDisplayName);
+         logger.info(`Sending async-refresh-card-display event: ${coinCfg.coinDisplayName}`);
          win.webContents.send('async-refresh-card-display', [coinCfg]);
       }
    });
@@ -94,6 +95,7 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
 let aboutPage;
 
 function createAboutWindow() {
+   logger.info('Creating the About window');
    aboutPage = new BrowserWindow({
       width: 500,
       height: 500,
@@ -127,6 +129,7 @@ function createAboutWindow() {
 let webPageWin;
 
 function createWebPageWindow(winProtocol, winHost, winPath, winParent, winModal, winWidth = 900, winHeight = 1200) {
+   logger.info(`Creating the Web Page window - Protocol: ${winProtocol}, Host: ${winHost}, Path: ${winPath}, Parent: ${winParent}, Model: ${winModal}, Width: ${winWidth}, Height: ${winHeight}`);
    webPageWin = new BrowserWindow({
       width: winWidth,
       height: winHeight,
@@ -162,6 +165,9 @@ ipcMain.on("close-wallet-details", function (_event, _arg) {
    win.webContents.send('async-refresh-wallets', []);
 });
 
+// ************************
+// Purpose: This function handles setting the card refresh flag when wallets are deleted from the wallet details page.
+// ************************
 ipcMain.on('async-set-dashboard-refresh-flag', function (_event, _arg) {
    logger.info('Received async-set-dashboard-refresh-flag Event');
    refreshMainCard = true;
@@ -177,8 +183,7 @@ ipcMain.on("open-wallet-details", function (_event, arg) {
       let coinCfg = arg[0];
       let displayTheme = arg[1];
 
-      logger.info("Create wallet details window for :" + coinCfg.coinDisplayName);
-
+      logger.info(`Create wallet details window for : ${coinCfg.coinDisplayName}`);
       createWalletDetailsWindow(coinCfg, displayTheme);
    }
 });
@@ -187,6 +192,7 @@ ipcMain.on("open-wallet-details", function (_event, arg) {
 // Purpose: This function handles the open-nft-recovery-site event from the Renderer.  It opens the NFT Recovery page from ATB.
 // ************************
 ipcMain.on("open-nft-recovery-site", function (_event, _arg) {
+   logger.info('Received open-nft-recovery-site event');
    createWebPageWindow('https', 'alltheblocks.net', '/nft-recovery', win, true, 900, 1200);
 });
 
@@ -245,7 +251,7 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
 ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
    logger.info('Received async-get-blockchain-settings event');
 
-   let url = baseAllTheBlocksApiUrl + "/atb/blockchain/settings";
+   let url = `${baseAllTheBlocksApiUrl}/atb/blockchain/settings`;
 
    axios.get(url, {
       httpsAgent: agent
@@ -265,10 +271,13 @@ ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
 ipcMain.on('async-get-fork-prices', function (event, _arg) {
    logger.info('Received async-get-fork-prices event');
  
-   let url = baseXCHForksApiUrl + "/sample.json";
+   let url = `${baseXCHForksApiUrl}/api/v1/listings`;
 
    axios.get(url, {
-      httpsAgent: agent
+      httpsAgent: agent,
+      headers : {
+         'Authorization' : 'Basic YW1jYXJwODo1eGJCTExoZm1wd2o1MkU4'
+      }
    })
    .then(function (result) {
       logger.info('Sending async-get-fork-prices-reply event');
@@ -288,20 +297,26 @@ const template = [
       submenu: [{
             label: 'Set Launcher Id',
             click() {
+               logger.info('Sending async-set-launcher event');
                win.webContents.send('async-set-launcher', []);
-            }
+            },
+            accelerator: 'Alt+CmdOrCtrl+L'
          },
          {
             label: 'Add Wallet',
             click() {
+               logger.info('Sending async-add-wallet event');
                win.webContents.send('async-add-wallet', []);
-            }
+            },
+            accelerator: 'Alt+CmdOrCtrl+A'
          },
          {
             label: 'Refresh',
             click() {
+               logger.info('Sending async-refresh-wallets event');
                win.webContents.send('async-refresh-wallets', []);
-            }
+            },
+            accelerator: 'Alt+CmdOrCtrl+R'
          },
          {
             type: 'separator'
@@ -316,26 +331,34 @@ const template = [
       submenu: [{
             label: 'Name',
             click() {
+               logger.info('Sending set-sort-order (name) event');
                win.webContents.send('async-set-sort-order', ['name']);
-            }
+            },
+            accelerator: 'Alt+CmdOrCtrl+N'
          },
          {
             label: 'USD',
             click() {
+               logger.info('Sending set-sort-order (usd) event');
                win.webContents.send('async-set-sort-order', ['usd']);
-            }
+            },
+            accelerator: 'Alt+CmdOrCtrl+U'
          },
          {
             label: 'Coins',
             click() {
+               logger.info('Sending set-sort-order (coins) event');
                win.webContents.send('async-set-sort-order', ['coins']);
-            }
+            },
+            accelerator: 'Alt+CmdOrCtrl+C'
          },
          {
             label: 'None',
             click() {
+               logger.info('Sending set-sort-order (none) event');
                win.webContents.send('async-set-sort-order', ['none']);
-            }
+            },
+            accelerator: 'Alt+CmdOrCtrl+X'
          }
       ]
    },
@@ -372,6 +395,7 @@ const template = [
       submenu: [{
             label: 'SpaceFarmers.io',
             click() {
+               logger.info('Opening SpaceFarmers.IO page in Browser');
                require("electron").shell.openExternal('https://spacefarmers.io');
             }
          }
@@ -383,12 +407,14 @@ const template = [
          {
             label: 'ForkBoard Wiki',
             click() {
-               require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board/wiki');
+               logger.info('Opening ForkBoard Wiki in Browser');
+               require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board/wiki/1.--Home');
             }
          },
          {
             label: 'Contribute on GitHub',
             click() {
+               logger.info('Opening ForkBoard Github in Browser');
                require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board');
             }
          },
@@ -398,6 +424,7 @@ const template = [
          {
             label: 'Report an Issue',
             click() {
+               logger.info('Opening FOrkBoard Issues in Browser');
                require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board/issues');
             }
          },

@@ -88,13 +88,13 @@ function loadAndDisplayWallets() {
    // clearing any existing wallets
    $('.walletCard').remove();
 
-   logger.info('Loading Wallet Details for ' + coinCfg.coinDisplayName);
+   logger.info(`Loading Wallet Details for ${coinCfg.coinDisplayName}`);
 
-   $(document).attr("title", coinCfg.coinDisplayName + " Wallet Details");
+   $(document).attr("title", `${coinCfg.coinDisplayName} Wallet Details`);
 
    walletObj.every(function (w) {
       if (w.wallet.startsWith(coinCfg.coinPrefix)) {
-         logger.info('Loading Wallet Details for wallet: ' + w.wallet);
+         logger.info(`Loading Wallet Details for wallet: ${w.wallet}`);
          buildWalletCard(w.wallet, coinCfg);
 
          ipcRenderer.send('async-get-wallet-balance', [w.wallet, coinCfg.coinPathName]);
@@ -155,7 +155,7 @@ ipcRenderer.on('load-wallet-details', (event, arg) => {
       coinCfg = arg[0];
       displayTheme = arg[1];
 
-      logger.info('Loading details for ' + coinCfg.coinDisplayName);
+      logger.info(`Loading details for ${coinCfg.coinDisplayName}`);
       loadAndDisplayWallets();
 
       //Setting theme

@@ -58,10 +58,17 @@ class Utils {
    getAdjustedUSDBalanceLabel(balance) {
       let balanceStr = "";
 
-      balanceStr = balance.toLocaleString('en-US', {
-         style: 'currency',
-         currency: 'USD'
-      });
+      // Round balance to whoel number if higher than 10000.
+      if (balance > 10000) {
+         balance = Math.round(balance);
+      }
+
+      balanceStr = balance.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+
+      // Strip the ending decimals if over 10000 since it was rounded above.
+      if (balance >= 10000) {
+         balanceStr = balanceStr.replace('.00','');
+      }
 
       return balanceStr;
    }

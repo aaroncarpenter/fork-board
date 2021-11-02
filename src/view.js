@@ -65,8 +65,6 @@
 $(function () {
    applyAppSettings();
    getConfigurationSettings();
-
-   getBlockchainSettingsConfiguration();
    addEventListener('keyup', handleKeyPress, true);
 
    if (walletObj.length == 0)
@@ -354,11 +352,11 @@ function addNewWallet() {
                fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
             }
             else {
-               utils.showErrorMessage(logger, "The wallet (" + walletStr + ") already exists.", 5000);
+               utils.showErrorMessage(logger, `The wallet (${walletStr}) already exists.`, 5000);
             }
          }
          else {
-            utils.showErrorMessage(logger, "The wallet is currently unsupported.  You entered (" + walletStr + ").", 5000);
+            utils.showErrorMessage(logger, `The wallet is currently unsupported.  You entered (${walletStr}).`, 5000);
          }
 
          return true;
@@ -421,7 +419,7 @@ function addEntry(wallet, loadBalance) {
          }
       }
       else {
-         logger.error("Unable to Add Entry for unsupported wallet (" + wallet + ").");
+         logger.error(`Unable to Add Entry for unsupported wallet (${wallet}).`);
       }
    }
 }
@@ -465,7 +463,7 @@ function loadAndDisplayWallets(loadBalance) {
       lastRefreshed = new Date();
 
       $('#refreshDiv').show();
-      $('#lastRefreshDate small').text('Refreshed On: ' + lastRefreshed.toLocaleString());
+      $('#lastRefreshDate small').text(`Refreshed On: ${lastRefreshed.toLocaleString()}`);
    }
 
    setDisplayTheme();
@@ -494,7 +492,8 @@ function initializeCoinDataSet() {
          coinChange: 0,
          coinRecovBalance: 0,
          coinRecovBalanceUSD: 0,
-         coinWalletCount: 0
+         coinWalletCount: 0,
+         hidden: cfg.hidden
       });
 
       return true;
@@ -596,7 +595,7 @@ function getCoinConfigForWallet(wallet) {
       return coinCfg;
    }
    else {
-      logger.error('Unable to locate coin configuration settings for ' + wallet);
+      logger.error(`Unable to locate coin configuration settings for ${wallet}`);
    }
 }
 
@@ -624,7 +623,7 @@ function getCoinConfigForCoin(coin) {
       return coinCfg;
    }
    else {
-      logger.error('Unable to locate coin configuration settings for ' + wallet);
+      logger.error(`Unable to locate coin configuration settings for ${wallet}`);
    }
 }
 
@@ -709,9 +708,8 @@ function getWalletRecoverableBalances() {
 
       // No Pending Balance to be displayed for Chia
       coinConfigObj.every(function (cfg) {
-         if (cfg.coinPathName == 'chia' || cfg.coinPathName == 'cryptodoge' || cfg.coinPathName == 'tad') {
-            $('#' + cfg.coinPathName + '-card .spinner-border').remove();
-            $('#' + cfg.coinPathName + '-card .card-text').text('N/A');
+         if (cfg.coinPathName == 'chia' || cfg.coinPathName == 'cryptodoge' || cfg.coinPathName == 'tad' || cfg.hidden) {
+            $('#' + cfg.coinPathName + '-card').remove();
          }
          return true;
       });
@@ -740,7 +738,7 @@ function refreshCardData(cardDataObj) {
    let change = cardDataObj.coinChange;
    let walletCount = cardDataObj.coinWalletCount;
 
-   logger.info('Coin: ' + coin + ', Balance: ' + balance + ', Balance USD: ' + balanceUSD + ', Change: ' + change + ', Wallet Count: ' + walletCount);
+   logger.info(`Coin: ${coin}, Balance: ${balance}, Balance USD: ${balanceUSD}, Change: ${change}, Wallet Count: ${walletCount}`);
 
    const pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
    const neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
@@ -778,9 +776,10 @@ function refreshCardData(cardDataObj) {
             $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
             $('#'+coin+'-card .balanceChangeSymbol').append(neg_chg_icon); 
          }
-         else
-         $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
-
+         else {
+            $('#'+coin+'-card .balanceChange').text(change.toLocaleString());
+         }
+         
          setSortOrder();
       }
       else if (displayMode === DisplayMode.Recoverable) {
@@ -808,7 +807,8 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
             coinPathName: blockSettings.pathName,
             coinDisplayName: blockSettings.displayName,
             mojoPerCoin: blockSettings.mojoPerCoin,
-            coinPrice: getPriceForCoinPrefix(blockSettings.coinPrefix)
+            coinPrice: getPriceForCoinPrefix(blockSettings.coinPrefix),
+            hidden: blockSettings.hidden
          });
 
          return true;
@@ -864,7 +864,7 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
       let balanceBefore = arg[3];
       let change = balance - balanceBefore;
 
-      logger.info('Coin: ' + coin + ', Balance: ' + balance + ', Change: ' + change);
+      logger.info(`Coin: ${coin}, Balance: ${balance}, Change: ${change}`);
 
       let cardDataObj = updateCoinDataSetBalance(coin, balance, change);
 
@@ -885,6 +885,9 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
       arg.every(function (recovBal) {
          let coin = recovBal.pathName;
          let balance = recovBal.availableAmount;
+
+         if (coin == 'silicoin')
+            coin = recovBal.pathName;
 
          let cardDataObj = updateCoinDataSetRecoverableBalance(coin, balance);
 
@@ -946,7 +949,7 @@ ipcRenderer.on('async-refresh-card-display', (event, arg) => {
    if (arg.length == 1) {
       coinCfg = arg[0];
 
-      logger.info('Loading details for ' + coinCfg.coinDisplayName);
+      logger.info(`Loading details for ${coinCfg.coinDisplayName}`);
 
       // Reload the config data from wallet objects
       walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
@@ -962,6 +965,7 @@ ipcRenderer.on('async-refresh-card-display', (event, arg) => {
          coinPrefix: coinCfg.coinPrefix,
          coinPathName: coinCfg.coinPathName,
          coinDisplayName: coinCfg.coinDisplayName,
+         coinHidden: coinCfg.hidden,
          mojoPerCoin: coinCfg.mojoPerCoin,
          coinPrice: coinCfg.coinPrice,
          coinBalance: 0,
