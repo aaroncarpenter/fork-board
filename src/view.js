@@ -251,6 +251,7 @@ function applyAppSettings() {
 
    if (clientConfigObj != null && clientConfigObj.appSettings != null && clientConfigObj.appSettings.autoRefreshEnabled != null) {
       $('#autoRefreshCheck').prop("checked", clientConfigObj.appSettings.autoRefreshEnabled);
+      autoRefreshHandler();
    }
 
 }
