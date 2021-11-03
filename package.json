@@ -63,11 +63,11 @@
       ],
       "electronPackagerConfig": {
         "packageManager": "yarn",
-        "icon": "src/img/app-icon.ico",
-        "appCopyright": "RedWolfTek LLC",
+        "icon": "../resources/icons/fork-board-gray.png",
+        "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter",
         "ignore": [
-          "/resources/config/wallets.json",
-          "/resources/config/clientconfig.json",
+          "../resources/config/wallets.json",
+          "../resources/config/clientconfig.json",
           ".+.test.js",
           ".*.env",
           ".eslintrc",
