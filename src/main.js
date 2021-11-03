@@ -20,6 +20,7 @@ const agent = new https.Agent({
 });
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
 const baseXCHForksApiUrl = "https://xchforks.com";
+const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net";
 // #endregion
 
 // #region Main Window
@@ -230,7 +231,8 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
 
    if (arg.length == 1) {
       let launcherid = arg[0];
-      let url = baseAllTheBlocksApiUrl + "/atb/nft/" + launcherid + "/eligible";
+
+      let url = `${baseForkBoardApi}/fork-board/recovery?launcherId=${launcherid}`;
 
       axios.get(url, {
          httpsAgent: agent
@@ -251,8 +253,7 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
 ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
    logger.info('Received async-get-blockchain-settings event');
 
-   let url = `${baseAllTheBlocksApiUrl}/atb/blockchain/settings`;
-
+   let url = `${baseForkBoardApi}/fork-board/config`;
    axios.get(url, {
       httpsAgent: agent
    })
@@ -271,7 +272,9 @@ ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
 ipcMain.on('async-get-fork-prices', function (event, _arg) {
    logger.info('Received async-get-fork-prices event');
  
-   let url = `${baseXCHForksApiUrl}/api/v1/listings`;
+   //let url = `${baseXCHForksApiUrl}/api/v1/listings`;
+   //let url = 'https://localhost:44393/api/fork-board/price';
+      let url = `${baseForkBoardApi}/fork-board/price`;
 
    axios.get(url, {
       httpsAgent: agent,
