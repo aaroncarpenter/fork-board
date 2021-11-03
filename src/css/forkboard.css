@@ -53,3 +53,7 @@ div.alert.dark-mode {
 small {
    font-variant: small-caps;
 }
+
+.walletCard {
+   width: 350px;
+}

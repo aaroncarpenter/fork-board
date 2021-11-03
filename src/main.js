@@ -19,7 +19,6 @@ const agent = new https.Agent({
    rejectUnauthorized: false
 });
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
-const baseXCHForksApiUrl = "https://xchforks.com";
 const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net";
 // #endregion
 
@@ -210,6 +209,7 @@ ipcMain.on('async-get-wallet-balance', function (event, arg) {
 
       logger.info('Wallet: ' + wallet + ', Coin: ' + coin);
 
+      logger.info(`Requesting data from ${url}`);
       axios.get(url, {
          httpsAgent: agent
       })
@@ -234,6 +234,7 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
 
       let url = `${baseForkBoardApi}/fork-board/recovery?launcherId=${launcherid}`;
 
+      logger.info(`Requesting data from ${url}`);
       axios.get(url, {
          httpsAgent: agent
       })
@@ -254,6 +255,8 @@ ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
    logger.info('Received async-get-blockchain-settings event');
 
    let url = `${baseForkBoardApi}/fork-board/config`;
+
+   logger.info(`Requesting data from ${url}`);
    axios.get(url, {
       httpsAgent: agent
    })
@@ -274,13 +277,11 @@ ipcMain.on('async-get-fork-prices', function (event, _arg) {
  
    //let url = `${baseXCHForksApiUrl}/api/v1/listings`;
    //let url = 'https://localhost:44393/api/fork-board/price';
-      let url = `${baseForkBoardApi}/fork-board/price`;
+   let url = `${baseForkBoardApi}/fork-board/price`;
 
+   logger.info(`Requesting data from ${url}`);
    axios.get(url, {
-      httpsAgent: agent,
-      headers : {
-         'Authorization' : Buffer.from('QmFzaWMgWVcxallYSndPRG8xZUdKQ1RFeG9abTF3ZDJvMU1rVTQ=', 'base64')
-      }
+      httpsAgent: agent
    })
    .then(function (result) {
       logger.info('Sending async-get-fork-prices-reply event');
