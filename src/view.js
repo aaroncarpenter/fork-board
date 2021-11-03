@@ -29,7 +29,7 @@
 
    let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
    let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
-   let coinPriceFile = path.resolve(__dirname, '../resources/config/coinprices.json');
+   //let coinPriceFile = path.resolve(__dirname, '../resources/config/coinprices.json');
    let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig.json');
    let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 
@@ -708,9 +708,11 @@ function getWalletRecoverableBalances() {
 
       loadAndDisplayWallets(false);
 
+      let fullRewardCoins = ['chia', 'cryptodoge', 'tad', 'chives', 'kiwi', 'covid', 'pipscoin']
+
       // No Pending Balance to be displayed for Chia
       coinConfigObj.every(function (cfg) {
-         if (cfg.coinPathName == 'chia' || cfg.coinPathName == 'cryptodoge' || cfg.coinPathName == 'tad' || cfg.hidden) {
+         if ($.inArray(cfg.coinPathName, fullRewardCoins) >= 0 || cfg.hidden) {
             $('#' + cfg.coinPathName + '-card').remove();
          }
          return true;

@@ -33,7 +33,8 @@ function createWindow() {
          nodeIntegration: true,
          contextIsolation: false,
          enableRemoteModule: true
-      }
+      },
+      icon: path.resolve(__dirname, '../resources/icons/fork-board-gray.png')
    });
    win.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
@@ -275,8 +276,6 @@ ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
 ipcMain.on('async-get-fork-prices', function (event, _arg) {
    logger.info('Received async-get-fork-prices event');
  
-   //let url = `${baseXCHForksApiUrl}/api/v1/listings`;
-   //let url = 'https://localhost:44393/api/fork-board/price';
    let url = `${baseForkBoardApi}/fork-board/price`;
 
    logger.info(`Requesting data from ${url}`);
