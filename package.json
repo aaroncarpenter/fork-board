@@ -63,7 +63,7 @@
       ],
       "electronPackagerConfig": {
         "packageManager": "yarn",
-        "icon": "../resources/icons/fork-board-gray.png",
+        "icon": "../resources/icons/fork-board-gray",
         "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter",
         "ignore": [
           "../resources/config/wallets.json",
