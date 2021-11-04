@@ -14,15 +14,35 @@ class Utils {
    showErrorMessage(logger, message, timeout) {
       logger.error(message);
 
-      $('#alertBox').text(message);
-      $('#alertBox').show();
+      $('#warnAlertBox').text(message);
+      $('#warnAlertBox').show();
       setTimeout(
          function () {
-            $('#alertBox').hide();
+            $('#warnAlertBox').hide();
          }, timeout
       );
    }
 
+   // ***********************
+   // Name: 	showInfoMessage
+   // Purpose: 
+   //    Args: logger - 
+   //          message - 
+   //          timeout - 
+   //  Return: N/A
+   // ************************
+   showInfoMessage(logger, message, timeout) {
+      logger.info(message);
+
+      $('#infoAlertBox').text(message);
+      $('#infoAlertBox').show();
+      setTimeout(
+         function () {
+            $('#infoAlertBox').hide();
+            $('#infoAlertBox').text(null);
+         }, timeout
+      );
+   }
    // ***********************
    // Name: 	getAdjustedBalanceLabel
    // Purpose: 

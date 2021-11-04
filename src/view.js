@@ -24,8 +24,8 @@
 
 // #region Variable Definitions
    let $ = require('jquery');
-   let fs = require('fs');
-   let path = require('path');
+   const fs = require('fs');
+   const path = require('path');
 
    let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
    let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
@@ -1068,6 +1068,52 @@ ipcRenderer.on('async-set-sort-order', (event, arg) => {
          clientConfigObj.appSettings.sortField = sortField;
          storeAppSettings();
       }
+   }
+});
+
+// ************************
+// Purpose: This function is a handler for an event from ipcMain, triggered when the the wallet backup is initiated
+// ************************
+ipcRenderer.on('async-backup-wallet-config-action', (event, arg) => {
+   logger.info('Received async-backup-wallet-config-action');
+
+   if (arg.length == 1) {
+      let backupDest = arg[0];
+      let backupFilename = path.join(backupDest, 'wallets.json');
+      // write the walletObj to the backup location
+
+
+
+      
+      fs.writeFileSync(backupFilename, JSON.stringify(walletObj, null, '\t'));
+
+      utils.showInfoMessage(logger, `Successfully created backup file - ${backupFilename}`, 4000);
+   }
+});
+
+// ************************
+// Purpose: This function is a handler for an event from ipcMain, triggered when the the wallet restore is initiated
+// ************************
+ipcRenderer.on('async-restore-wallet-config-action', (event, arg) => {
+   logger.info('Received async-restore-wallet-config-action');
+
+   if (arg.length == 1) {
+      let restoreFilename = arg[0].toString();
+
+      if(fs.existsSync(restoreFilename)) {
+         // clear the wallet object
+         walletObj = [];
+         
+         // read data from backup file
+         walletObj = JSON.parse(fs.readFileSync(restoreFilename, 'utf8'));
+
+         // write new wallets.json file in config folder.
+         fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
+
+         utils.showInfoMessage(logger, `Successfully restored wallets from backup file - ${restoreFilename}`, 4000);
+      }
+
+      refreshDashboard();
    }
 });
 

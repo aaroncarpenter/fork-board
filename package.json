@@ -21,8 +21,7 @@
     "electron-packager": "^15.4.0",
     "electron-prompt": "^1.7.0",
     "electron-squirrel-startup": "^1.0.0",
-    "jquery": "^3.6.0",
-    "md5": "^2.3.0"
+    "jquery": "^3.6.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.61",
@@ -65,19 +64,9 @@
         "packageManager": "yarn",
         "icon": "../resources/icons/fork-board-gray",
         "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter",
-        "ignore": [
-          "../resources/config/wallets.json",
-          "../resources/config/clientconfig.json",
-          ".+.test.js",
-          ".*.env",
-          ".eslintrc",
-          ".gitignore",
-          "README.md",
-          "yarn.lock",
-          ".jshintrc",
-          ".babelrc"
-        ]
-      }
+        "afterCopy": "./packaging/forge-hooks"
+      },
+      "hooks": "require:./src/packaging/forge-hooks.js"
     }
   }
 }

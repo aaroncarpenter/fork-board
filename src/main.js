@@ -5,7 +5,7 @@ const {
    Menu,
    MenuItem,
    ipcMain,
-   nativeTheme
+   dialog
 } = require('electron');
 const url = require('url');
 const path = require('path');
@@ -15,11 +15,86 @@ const logger = require('electron-log');
 logger.transports.file.resolvePath = function () {
    return path.join(__dirname, 'logs/main.log');
 };
+
 const agent = new https.Agent({
    rejectUnauthorized: false
 });
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
 const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net";
+// #endregion
+
+// quit if startup from squirrel installation.
+if (require('electron-squirrel-startup')) return app.quit();
+
+// #region Squirrel Handlers
+// this should be placed at top of main.js to handle setup events quickly
+if (handleSquirrelEvent()) {
+   // squirrel event handled and app will exit in 1000ms, so don't do anything else
+   return;
+}
+  
+function handleSquirrelEvent() {
+   if (process.argv.length === 1) {
+     return false;
+   }
+ 
+   const ChildProcess = require('child_process');
+   const path = require('path');
+ 
+   const appFolder = path.resolve(process.execPath, '..');
+   const rootAtomFolder = path.resolve(appFolder, '..');
+   const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
+   const exeName = path.basename(process.execPath);
+ 
+   const spawn = function(command, args) {
+     let spawnedProcess, error;
+ 
+     try {
+       spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
+     } catch (error) {}
+ 
+     return spawnedProcess;
+   };
+ 
+   const spawnUpdate = function(args) {
+     return spawn(updateDotExe, args);
+   };
+ 
+   const squirrelEvent = process.argv[1];
+   switch (squirrelEvent) {
+     case '--squirrel-install':
+     case '--squirrel-updated':
+       // Optionally do things such as:
+       // - Add your .exe to the PATH
+       // - Write to the registry for things like file associations and
+       //   explorer context menus
+ 
+       // Install desktop and start menu shortcuts
+       spawnUpdate(['--createShortcut', exeName]);
+ 
+       setTimeout(app.quit, 1000);
+       return true;
+ 
+     case '--squirrel-uninstall':
+       // Undo anything you did in the --squirrel-install and
+       // --squirrel-updated handlers
+ 
+       // Remove desktop and start menu shortcuts
+       spawnUpdate(['--removeShortcut', exeName]);
+ 
+       setTimeout(app.quit, 1000);
+       return true;
+ 
+     case '--squirrel-obsolete':
+       // This is called on the outgoing version of your app before
+       // we update to the new version - it's the opposite of
+       // --squirrel-updated
+ 
+       app.quit();
+       return true;
+   }
+}
+
 // #endregion
 
 // #region Main Window
@@ -34,7 +109,7 @@ function createWindow() {
          contextIsolation: false,
          enableRemoteModule: true
       },
-      icon: path.resolve(__dirname, '../resources/icons/fork-board-gray.png')
+      icon: path.resolve(__dirname, '../resources/icons/fork-board-gray.ico')
    });
    win.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
@@ -325,6 +400,22 @@ const template = [
             type: 'separator'
          },
          {
+            label: 'Backup Wallet Config',
+            click() {
+               backupWalletConfig();   
+            },
+            accelerator: 'Alt+CmdOrCtrl+B'
+         },
+         {
+            label: 'Restore Wallet Config',
+            click() {
+               restoreWalletConfig();
+            }
+         },
+         {
+            type: 'separator'
+         },
+         {
             role: 'close'
          }
       ]
@@ -427,7 +518,7 @@ const template = [
          {
             label: 'Report an Issue',
             click() {
-               logger.info('Opening FOrkBoard Issues in Browser');
+               logger.info('Opening ForkBoard Issues in Browser');
                require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board/issues');
             }
          },
@@ -446,16 +537,6 @@ const template = [
 
 const menu = Menu.buildFromTemplate(template);
 
-/*
-if (!app.isPackaged) {
-   let menuItem = menu.getMenuItemById('fileMenu');
-
-   menuItem.submenu.append(new MenuItem({
-     label: 'Debug Data',
-     click: function () { win.webContents.send('async-populate-debug-data', []); }
-   }));
-}
-*/
 Menu.setApplicationMenu(menu);
 // #endregion
 
@@ -465,13 +546,48 @@ Menu.setApplicationMenu(menu);
 app.on('ready', createWindow);
 
 app.on('window-all-closed', function () {
-      if (process.platform !== 'darwin') {
-         app.quit();
-      }
-   });
+   if (process.platform !== 'darwin') {
+      app.quit();
+   }
+});
 
 app.on('activate', function () {
-      if (BrowserWindow.getAllWindows().length === 0) {
-         createWindow();
-      }
+   if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+   }
+});
+
+function backupWalletConfig() {
+   let filePaths = dialog.showOpenDialog(win, { 
+      title: 'Select a Backup Destination',
+      buttonLabel: 'Backup',
+      message: 'Please select the location to backup the wallet configuration',
+      properties: ['openDirectory'] 
    });
+   
+   if (filePaths != undefined && filePaths.length > 0) {
+      logger.info('Sending async-backup-wallet-config-action event');
+      win.webContents.send('async-backup-wallet-config-action', [filePaths[0]]);      
+   }
+}  
+
+function restoreWalletConfig() {
+   let filePaths = dialog.showOpenDialog(win, { 
+      title: 'Select a Wallet Backup to Restore',
+      buttonLabel: 'Restore',
+      message: 'Please select the wallet backup file to Restore',
+      properties: ['openFiles'],
+      filters: [
+         { name: 'JSON', extensions: ['json'] },
+         { name: 'All Files', extensions: ['*'] }
+       ] 
+   });
+
+  // TODO #27 Validate the wallets.json file
+
+   
+   if (filePaths != undefined && filePaths.length > 0) {
+      logger.info('Sending async-restore-wallet-config-action event');
+      win.webContents.send('async-restore-wallet-config-action', [filePaths[0]]);      
+   }
+}  
