@@ -29,7 +29,6 @@
 
    let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
    let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
-   //let coinPriceFile = path.resolve(__dirname, '../resources/config/coinprices.json');
    let clientConfigFile = path.resolve(__dirname, '../resources/config/clientconfig.json');
    let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 
@@ -45,11 +44,7 @@
    }
    let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
-   //let coinPriceObj = JSON.parse(fs.readFileSync(coinPriceFile, 'utf8'));
-
    let displayMode = DisplayMode.Actual;
-   let displayTheme = (clientConfigObj.appSettings == null || clientConfigObj.appSettings.displayTheme == null ? DisplayTheme.Light : clientConfigObj.appSettings.displayTheme);
-   let sortField = (clientConfigObj.appSettings == null || clientConfigObj.appSettings.sortField == null ? SortField.USD : clientConfigObj.appSettings.sortField);
    let walletCache = new Set();
    let utils = new Utils();
 
@@ -65,7 +60,7 @@
 
 $(function () {
    applyAppSettings();
-   getConfigurationSettings();
+   refreshDashboard();
    addEventListener('keyup', handleKeyPress, true);
 
    if (walletObj.length == 0)
@@ -136,12 +131,12 @@ function autoRefreshHandler() {
 }
 
 $('#show-dark-mode').on('click', function () {
-   displayTheme = DisplayTheme.Dark;
+   clientConfigObj.appSettings.displayTheme = DisplayTheme.Dark;
    setDisplayTheme();
 });
 
 $('#show-light-mode').on('click', function () {
-   displayTheme = DisplayTheme.Light;
+   clientConfigObj.appSettings.displayTheme = DisplayTheme.Light;
    setDisplayTheme();
 });
 
@@ -174,7 +169,7 @@ $('#show-actual-balance').on('click', function () {
       $('#show-recoverable-balance').removeClass('btn-primary');
       $('#show-actual-balance').addClass('btn-primary');
       $('#show-actual-balance').removeClass('btn-secondary');
-      $('#sort-order-label small').text('Sort: ' + sortField);
+      $('#sort-order-label small').text('Sort: ' + clientConfigObj.appSettings.sortField);
       getWalletBalances();
    }
 });
@@ -263,9 +258,7 @@ function applyAppSettings() {
 //  Return: N/A
 // ************************
 function setDisplayTheme() {
-   clientConfigObj.appSettings.displayTheme = displayTheme;
-
-   if (displayTheme === DisplayTheme.Dark) {
+   if (clientConfigObj.appSettings.displayTheme === DisplayTheme.Dark) {
       $('#show-dark-mode').hide();
       $('#show-light-mode').show();
    }
@@ -276,7 +269,7 @@ function setDisplayTheme() {
 
    $('#theme-selector').show();
 
-   if (displayTheme === DisplayTheme.Dark) {
+   if (clientConfigObj.appSettings.displayTheme === DisplayTheme.Dark) {
       $('body').addClass('dark-mode');
       $('div.card-body').addClass('dark-mode');
       $('div.card-header').addClass('dark-mode');
@@ -305,17 +298,17 @@ function setDisplayTheme() {
 //  Return: N/A
 // ************************
 function setSortOrder() {
-   $('#sort-order-label small').text('Sort: ' + sortField);
+   $('#sort-order-label small').text('Sort: ' + clientConfigObj.appSettings.sortField);
 
-   if (sortField != SortField.None)
+   if (clientConfigObj.appSettings.sortField != SortField.None)
    {
-      if (sortField === SortField.Name) {
+      if (clientConfigObj.appSettings.sortField === SortField.Name) {
          coinData.sort(utils.applySort('coinDisplayName', 'asc'));   
       }
-      else if (sortField === SortField.Coins) {
+      else if (clientConfigObj.appSettings.sortField === SortField.Coins) {
          coinData.sort(utils.applySort('coinBalance', 'desc'));   
       }
-      else if (sortField === SortField.USD) {
+      else if (clientConfigObj.appSettings.sortField === SortField.USD) {
          coinData.sort(utils.applySort('coinBalanceUSD', 'desc'));  
       }
 
@@ -381,7 +374,7 @@ function loadWalletDetails(coin) {
 
    // Send the event to ipcMain to open the details page.
    logger.info('Sending open-wallet-details event');
-   ipcRenderer.send('open-wallet-details', [coinCfg, displayTheme]);
+   ipcRenderer.send('open-wallet-details', [coinCfg, clientConfigObj.appSettings.displayTheme]);
 }
 
 // ***********************
@@ -428,11 +421,21 @@ function addEntry(wallet, loadBalance) {
 
 // ***********************
 // Name: 	refreshDashboard
-// Purpose: The main function for refreshing the dashboard.
+// Purpose: The main function for refreshing the full dashboard.
 //    Args: N/A
 //  Return: N/A
 // ************************
 function refreshDashboard() {
+   ipcRenderer.send('async-get-fork-prices', []);
+}
+
+// ***********************
+// Name: 	refreshWalletView
+// Purpose: The main function for wallet views on the dashboard.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function refreshWalletView() {
    if (displayMode === DisplayMode.Actual) {
       getWalletBalances();
    }
@@ -562,16 +565,6 @@ function updateCoinDataSetRecoverableBalance(coin, balance) {
 // #endregion
 
 // #region Configuration
-
-// ***********************
-// Name: 	getConfigurationSettings
-// Purpose: This function sends the 'async-get-blockchain-settings' event to ipcMain to begin retrieving the block chain metadata.
-//    Args:  N/A
-//  Return:  N/A
-// ************************
-function getConfigurationSettings() {
-   ipcRenderer.send('async-get-fork-prices', []);
-}
 
 // ***********************
 // Name: 	getCoinConfigForWallet
@@ -708,11 +701,9 @@ function getWalletRecoverableBalances() {
 
       loadAndDisplayWallets(false);
 
-      let fullRewardCoins = ['chia', 'cryptodoge', 'tad', 'chives', 'kiwi', 'covid', 'pipscoin']
-
       // No Pending Balance to be displayed for Chia
       coinConfigObj.every(function (cfg) {
-         if ($.inArray(cfg.coinPathName, fullRewardCoins) >= 0 || cfg.hidden) {
+         if (cfg.hidden) {
             $('#' + cfg.coinPathName + '-card').remove();
          }
          return true;
@@ -849,7 +840,36 @@ ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
          return true;
       });
 
-      ipcRenderer.send('async-get-blockchain-settings', []);
+      // if coin config blank, retrieve the settings.  Else, update the prices in the current coin confog object.
+      if (coinConfigObj.length == 0) {
+         ipcRenderer.send('async-get-blockchain-settings', []);   
+      }
+      else {
+         let updatedCoinConfigObj = [];
+
+         // Push data from args into the coinConfigObj
+         coinConfigObj.every(function (coinCfgSetting) {
+            updatedCoinConfigObj.push({
+               coinPrefix: coinCfgSetting.coinPrefix,
+               coinPathName: coinCfgSetting.coinPathName,
+               coinDisplayName: coinCfgSetting.coinDisplayName,
+               mojoPerCoin: coinCfgSetting.mojoPerCoin,
+               coinPrice: getPriceForCoinPrefix(coinCfgSetting.coinPrefix),
+               hidden: coinCfgSetting.hidden
+            });
+
+            return true;
+         });
+
+         coinConfigObj = updatedCoinConfigObj;
+
+         if (displayMode === DisplayMode.Actual) {
+            getWalletBalances();
+         }
+         else {
+            getWalletRecoverableBalances();
+         }
+      }
    }
    else {
       logger.error('Reply args incorrect');
@@ -890,13 +910,16 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
          let coin = recovBal.pathName;
          let balance = recovBal.availableAmount;
 
-         if (coin == 'silicoin')
-            coin = recovBal.pathName;
+         // if data api returns balance of -1, its non-recoverable and shouldn't be shown
+         if (balance == -1) {
+            $(`#${coin}-card`).remove();
+         }
+         else {
+            let cardDataObj = updateCoinDataSetRecoverableBalance(coin, balance);
 
-         let cardDataObj = updateCoinDataSetRecoverableBalance(coin, balance);
-
-         // Update the displayed card values
-         refreshCardData(cardDataObj);
+            // Update the displayed card values
+            refreshCardData(cardDataObj);   
+         }
 
          return true;
       });
@@ -1055,17 +1078,16 @@ ipcRenderer.on('async-set-sort-order', (event, arg) => {
    {
       let sortFld = arg[0];
 
-      if (sortFld != sortField) {
-         sortField = sortFld;
+      if (sortFld != clientConfigObj.appSettings.sortField) {
+         clientConfigObj.appSettings.sortField = sortFld;
 
          if (sortFld === 'none') {
-            refreshDashboard();
+            refreshWalletView();
          }
          else {
             setSortOrder();
          }
          
-         clientConfigObj.appSettings.sortField = sortField;
          storeAppSettings();
       }
    }
@@ -1079,13 +1101,18 @@ ipcRenderer.on('async-backup-wallet-config-action', (event, arg) => {
 
    if (arg.length == 1) {
       let backupDest = arg[0];
-      let backupFilename = path.join(backupDest, 'wallets.json');
+      let backupFilename = path.join(backupDest, 'forkboard-backup.json');
       // write the walletObj to the backup location
 
-
-
+      let backFileStr = `{
+         "name": "ForkBoard Backup File",
+         "version": "0.5.0",
+         "date": "${new Date().toLocaleString('en-US')}",
+         "walletConfiguration": ${JSON.stringify(walletObj, null, '\t')},
+         "clientConfiguration": ${JSON.stringify(clientConfigObj, null, '\t')}
+      }`;
       
-      fs.writeFileSync(backupFilename, JSON.stringify(walletObj, null, '\t'));
+      fs.writeFileSync(backupFilename, backFileStr);
 
       utils.showInfoMessage(logger, `Successfully created backup file - ${backupFilename}`, 4000);
    }
@@ -1101,18 +1128,34 @@ ipcRenderer.on('async-restore-wallet-config-action', (event, arg) => {
       let restoreFilename = arg[0].toString();
 
       if(fs.existsSync(restoreFilename)) {
+
+         let restoreObj = JSON.parse(fs.readFileSync(restoreFilename, 'utf8'));
+
          // clear the wallet object
          walletObj = [];
+         clientConfigObj = {};
          
          // read data from backup file
-         walletObj = JSON.parse(fs.readFileSync(restoreFilename, 'utf8'));
+         walletObj = restoreObj.walletConfiguration;
+         clientConfigObj = restoreObj.clientConfiguration;
 
          // write new wallets.json file in config folder.
          fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
 
-         utils.showInfoMessage(logger, `Successfully restored wallets from backup file - ${restoreFilename}`, 4000);
-      }
+         // write new wallets.json file in config folder.
+         fs.writeFileSync(clientConfigFile, JSON.stringify(clientConfigObj, null, '\t'));
 
+         utils.showInfoMessage(logger, `Successfully restored a version ${restoreObj.version} backup file from ${restoreObj.date} - ${restoreFilename}`, 4000);
+
+         if (walletObj.length != 0)
+         {
+            $('#show-recoverable-balance').prop('disabled', false);
+            $('#show-actual-balance').prop('disabled', false);
+            $('#no-wallets-found').hide();
+         }
+      }
+   
+      applyAppSettings();
       refreshDashboard();
    }
 });

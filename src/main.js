@@ -400,14 +400,14 @@ const template = [
             type: 'separator'
          },
          {
-            label: 'Backup Wallet Config',
+            label: 'Backup ForkBoard Settings',
             click() {
                backupWalletConfig();   
             },
             accelerator: 'Alt+CmdOrCtrl+B'
          },
          {
-            label: 'Restore Wallet Config',
+            label: 'Restore ForkBoard Settings',
             click() {
                restoreWalletConfig();
             }
