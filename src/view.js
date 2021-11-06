@@ -1131,32 +1131,38 @@ ipcRenderer.on('async-restore-wallet-config-action', (event, arg) => {
 
          let restoreObj = JSON.parse(fs.readFileSync(restoreFilename, 'utf8'));
 
-         // clear the wallet object
-         walletObj = [];
-         clientConfigObj = {};
-         
-         // read data from backup file
-         walletObj = restoreObj.walletConfiguration;
-         clientConfigObj = restoreObj.clientConfiguration;
-
-         // write new wallets.json file in config folder.
-         fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
-
-         // write new wallets.json file in config folder.
-         fs.writeFileSync(clientConfigFile, JSON.stringify(clientConfigObj, null, '\t'));
-
-         utils.showInfoMessage(logger, `Successfully restored a version ${restoreObj.version} backup file from ${restoreObj.date} - ${restoreFilename}`, 4000);
-
-         if (walletObj.length != 0)
-         {
-            $('#show-recoverable-balance').prop('disabled', false);
-            $('#show-actual-balance').prop('disabled', false);
-            $('#no-wallets-found').hide();
+         //validate file
+         if (restoreObj.name == null || restoreObj.version == null || restoreObj.date == null || restoreObj.walletConfiguration == null || restoreObj.clientConfiguration == null) {
+            utils.showInfoMessage(logger, `Invalid file format detected attempting to restore the backup file from ${restoreFilename}`, 4000);
          }
-      }
-   
-      applyAppSettings();
-      refreshDashboard();
+         else {
+            // clear the wallet object
+            walletObj = [];
+            clientConfigObj = {};
+            
+            // read data from backup file
+            walletObj = restoreObj.walletConfiguration;
+            clientConfigObj = restoreObj.clientConfiguration;
+
+            // write new wallets.json file in config folder.
+            fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
+
+            // write new wallets.json file in config folder.
+            fs.writeFileSync(clientConfigFile, JSON.stringify(clientConfigObj, null, '\t'));
+
+            utils.showInfoMessage(logger, `Successfully restored a version ${restoreObj.version} backup file from ${restoreObj.date} - ${restoreFilename}`, 4000);
+
+            if (walletObj.length != 0)
+            {
+               $('#show-recoverable-balance').prop('disabled', false);
+               $('#show-actual-balance').prop('disabled', false);
+               $('#no-wallets-found').hide();
+            }
+            
+            applyAppSettings();
+            refreshDashboard();
+         }
+      }      
    }
 });
 

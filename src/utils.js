@@ -52,7 +52,13 @@ class Utils {
    getAdjustedBalanceLabel(balance) {
       let balanceStr = "";
 
-      if (balance > 1000) {
+      if (balance < 1000 && balance >= 1) {
+         balance = Math.round(balance*100)/100;
+      }
+      else if (balance < 1) {
+         balance = Math.round(balance*1000)/1000;
+      }
+      else {
          balance = Math.round(balance);
       }
 
