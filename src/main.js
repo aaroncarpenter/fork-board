@@ -558,36 +558,11 @@ app.on('activate', function () {
 });
 
 function backupWalletConfig() {
-   let filePaths = dialog.showOpenDialog(win, { 
-      title: 'Select a Backup Destination',
-      buttonLabel: 'Backup',
-      message: 'Please select the location to backup the wallet configuration',
-      properties: ['openDirectory'] 
-   });
-   
-   if (filePaths != undefined && filePaths.length > 0) {
-      logger.info('Sending async-backup-wallet-config-action event');
-      win.webContents.send('async-backup-wallet-config-action', [filePaths[0]]);      
-   }
+   logger.info('Sending async-backup-wallet-config-action event');
+   win.webContents.send('async-backup-wallet-config-action', []); 
 }  
 
 function restoreWalletConfig() {
-   let filePaths = dialog.showOpenDialog(win, { 
-      title: 'Select a Wallet Backup to Restore',
-      buttonLabel: 'Restore',
-      message: 'Please select the wallet backup file to Restore',
-      properties: ['openFiles'],
-      filters: [
-         { name: 'JSON', extensions: ['json'] },
-         { name: 'All Files', extensions: ['*'] }
-       ] 
-   });
-
-  // TODO #27 Validate the wallets.json file
-
-   
-   if (filePaths != undefined && filePaths.length > 0) {
-      logger.info('Sending async-restore-wallet-config-action event');
-      win.webContents.send('async-restore-wallet-config-action', [filePaths[0]]);      
-   }
+   logger.info('Sending async-restore-wallet-config-action event');
+   win.webContents.send('async-restore-wallet-config-action', []);
 }  
