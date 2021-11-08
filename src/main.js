@@ -372,7 +372,8 @@ const template = [
    {
       id: 'fileMenu',
       label: 'File',
-      submenu: [{
+      submenu: [
+         {
             label: 'Set Launcher Id',
             click() {
                logger.info('Sending async-set-launcher event');
@@ -421,8 +422,34 @@ const template = [
       ]
    },
    {
+      label: 'Edit',
+      submenu: [
+         {
+            label: 'Cut',
+            accelerator: 'CommandOrControl+X',
+            role: 'cut',
+         },
+         {
+            label: 'Copy',
+            accelerator: 'CommandOrControl+C',
+            role: 'copy',
+         },
+         {
+            label: 'Paste',
+            accelerator: 'CommandOrControl+V',
+            role: 'paste',
+         },
+         {
+            label: 'Select All',
+            accelerator: 'CommandOrControl+A',
+            role: 'selectall',
+         },
+      ],
+   },
+   {
       label: 'Sort',
-      submenu: [{
+      submenu: [
+         {
             label: 'Name',
             click() {
                logger.info('Sending set-sort-order (name) event');
@@ -458,7 +485,8 @@ const template = [
    },
    {
       label: 'View',
-      submenu: [{
+      submenu: [
+         {
             role: 'toggledevtools'
          },
          {
@@ -486,7 +514,8 @@ const template = [
    },
    {
       label: 'Sponsors',
-      submenu: [{
+      submenu: [
+         {
             label: 'SpaceFarmers.io',
             click() {
                logger.info('Opening SpaceFarmers.IO page in Browser');

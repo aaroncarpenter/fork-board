@@ -57,3 +57,7 @@ small {
 .walletCard {
    width: 350px;
 }
+
+.small-caps {
+   font-variant: small-caps;
+}

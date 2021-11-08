@@ -1,7 +1,5 @@
 // #region Const Definitions
    const {ipcRenderer, clipboard} = require('electron');
-   //const {Menu, MenuItem} = remote;
-   //const {Menu, MenuItem} = remote;
    const Utils = require('./utils');
    const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
    const logger = require('electron-log');
@@ -58,16 +56,9 @@
 
    let refreshTimerId;
 
-   //renderer.js - a renderer process
-   //dialog = remote.dialog;
-   //WIN = remote.getCurrentWindow();
-   // #endregion
-
-
 $(function () {
    applyAppSettings();
    refreshDashboard();
-   addEventListener('keyup', handleKeyPress, true);
 
    if (walletObj.length == 0)
    {
@@ -75,61 +66,9 @@ $(function () {
       $('#show-actual-balance').prop('disabled', true);
       $('#no-wallets-found').show();
    }
-/*
-   // Define wallet paste context menu
-   const menu = new Menu();
-
-   // Build menu one item at a time, unlike
-   menu.append(new MenuItem ({label: 'Paste', click() { pasteWalletAddress(); }}));
-
-   // Prevent default action of right click in chromium. Replace with our menu.
-   window.addEventListener('contextmenu', function (e) {
-         e.preventDefault();
-         if (e.target.id === 'wallet-text-box') {
-            menu.popup(remote.getCurrentWindow());
-         }
-      }, false);
-      */
 });
 
 // #region Page Event Handlers
-// ***********************
-// Name: 	handleKeyPress
-// Purpose: This function runs when the Enter key is pressed to make entering the wallet information easier.
-//    Args: event
-//  Return: N/A
-// ************************
-function handleKeyPress(event) {
-   if (event.key == "Enter") {
-      let walletVal = $('#wallet-text-box').val();
-
-      if (walletVal.length != 0) {
-         addNewWallet();
-      }
-   }
-
-   if (event.key == "Enter") {
-      let walletVal = $('#wallet-text-box').val();
-
-      if (walletVal.length != 0) {
-         addNewWallet();
-      }
-   }
-}
-
-// ***********************
-// Name: 	pasteWalletAddress
-// Purpose: This function runs when the Enter key is pressed to make entering the wallet information easier.
-//    Args: event
-//  Return: N/A
-// ************************
-function pasteWalletAddress() {
-   let walletVal = $('#wallet-text-box').val();
-   let clipboardTxt = clipboard.readText();
-
-   $('#wallet-text-box').val(walletVal + clipboardTxt);
-}
-
 // ***********************
 // Name: 	autoRefreshHandler
 // Purpose: This method handles handles chanages to the auto-refresh switch, activating/deactivating the timer object that refreshes the screen
@@ -191,6 +130,7 @@ $('#show-actual-balance').on('click', function () {
       $('#show-actual-balance').addClass('btn-primary');
       $('#show-actual-balance').removeClass('btn-secondary');
       $('#sort-order-label small').text('Sort: ' + clientConfigObj.appSettings.sortField);
+      $('#total-balance-type').text(displayMode);
       getWalletBalances();
    }
 });
@@ -204,6 +144,7 @@ $('#show-recoverable-balance').on('click', function () {
          $('#show-recoverable-balance').addClass('btn-primary');
          $('#show-recoverable-balance').removeClass('btn-secondary');
          $('#sort-order-label small').text(null);
+         $('#total-balance-type').text(displayMode);
          getWalletRecoverableBalances();
       }
       else {
@@ -447,6 +388,8 @@ function addEntry(wallet, loadBalance) {
 //  Return: N/A
 // ************************
 function refreshDashboard() {
+   $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(0));
+
    ipcRenderer.send('async-get-fork-prices', []);
 }
 
@@ -472,6 +415,7 @@ function refreshWalletView() {
 //  Return: N/A
 // ************************
 function loadAndDisplayWallets(loadBalance) {  
+   $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(0));
    //clear the wallet cache
    walletCache.clear();
 
@@ -583,6 +527,31 @@ function updateCoinDataSetRecoverableBalance(coin, balance) {
 
    return coinDataObj;
 }
+
+// ***********************
+// Name: 	updateCoinTotalBalance
+// Purpose: This function updates the total balance UI across all wallets.
+//  Return: .
+// ************************
+function updateCoinTotalBalance() {
+   var totalBalance = 0;
+   coinData.every(function (c) {
+      if (displayMode == DisplayMode.Actual) {
+         if (c.coinBalanceUSD != null) {
+            totalBalance += c.coinBalanceUSD;
+         }
+      }
+      else if (displayMode == DisplayMode.Recoverable) {
+         if (c.coinRecovBalanceUSD != null) {
+            totalBalance += c.coinRecovBalanceUSD;
+         }
+      }
+
+      return true;
+   });
+
+   $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(totalBalance));
+}
 // #endregion
 
 // #region Configuration
@@ -693,6 +662,8 @@ function buildWalletCard(coinCfg, replaceExistingCard = false) {
 //  Return: N/A
 // ************************
 function getWalletBalances() {
+   $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(0));
+
    $('#nft-recovery').hide();
 
    // Remove all existing cards
@@ -801,6 +772,8 @@ function refreshCardData(cardDataObj) {
       else if (displayMode === DisplayMode.Recoverable) {
          $('#nft-recovery').show();
       }
+
+      updateCoinTotalBalance();
    }
 }
 // #endregion
