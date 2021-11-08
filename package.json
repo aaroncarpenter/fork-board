@@ -14,14 +14,15 @@
     "lint": "echo \"No linting configured\""
   },
   "dependencies": {
-    "axios": "^0.21.4",
+    "axios": "^0.24.0",
     "electron-context-menu": "^3.1.1",
     "electron-installer-windows": "^3.0.0",
-    "electron-log": "^4.4.1",
     "electron-packager": "^15.4.0",
     "electron-prompt": "^1.7.0",
     "electron-squirrel-startup": "^1.0.0",
-    "jquery": "^3.6.0"
+    "jquery": "^3.6.0",
+    "electron": "^15.3.0",
+    "electron-log": "^4.4.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.61",
@@ -29,7 +30,8 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.61",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
     "@electron-forge/maker-zip": "^6.0.0-beta.61",
-    "electron": "13.1.7"
+    "electron": "^15.3.0",
+    "electron-log": "^4.4.1"
   },
   "config": {
     "forge": {
@@ -65,8 +67,7 @@
         "icon": "../resources/icons/fork-board-gray",
         "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter",
         "afterCopy": "./packaging/forge-hooks"
-      },
-      "hooks": "require:./src/packaging/forge-hooks.js"
+      }
     }
   }
 }

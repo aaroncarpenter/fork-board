@@ -92,28 +92,5 @@
         </div>
       </div>   
       <script src = "./view.js" ></script>
-      <script type = "text/javascript">
-         const {remote} = require('electron')
-         const {Menu, MenuItem} = remote
-
-         const menu = new Menu()
-
-         // Build menu one item at a time, unlike
-         menu.append(new MenuItem ({
-            label: 'Paste',
-            click() { 
-               pasteWalletAddress();
-            }
-         }))
-
-         // Prevent default action of right click in chromium. Replace with our menu.
-         window.addEventListener('contextmenu', (e) => {
-            e.preventDefault()
-            if (e.target.id === 'wallet-text-box') {
-               menu.popup(remote.getCurrentWindow())
-            }
-         }, false)
-      </script>
-      
    </body>
 </html>

@@ -1,5 +1,7 @@
 // #region Const Definitions
    const {ipcRenderer, clipboard} = require('electron');
+   //const {Menu, MenuItem} = remote;
+   //const {Menu, MenuItem} = remote;
    const Utils = require('./utils');
    const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
    const logger = require('electron-log');
@@ -57,9 +59,8 @@
    let refreshTimerId;
 
    //renderer.js - a renderer process
-   const {remote} = require('electron');
-   dialog = remote.dialog;
-   WIN = remote.getCurrentWindow();
+   //dialog = remote.dialog;
+   //WIN = remote.getCurrentWindow();
    // #endregion
 
 
@@ -74,6 +75,21 @@ $(function () {
       $('#show-actual-balance').prop('disabled', true);
       $('#no-wallets-found').show();
    }
+/*
+   // Define wallet paste context menu
+   const menu = new Menu();
+
+   // Build menu one item at a time, unlike
+   menu.append(new MenuItem ({label: 'Paste', click() { pasteWalletAddress(); }}));
+
+   // Prevent default action of right click in chromium. Replace with our menu.
+   window.addEventListener('contextmenu', function (e) {
+         e.preventDefault();
+         if (e.target.id === 'wallet-text-box') {
+            menu.popup(remote.getCurrentWindow());
+         }
+      }, false);
+      */
 });
 
 // #region Page Event Handlers
@@ -1103,16 +1119,9 @@ ipcRenderer.on('async-set-sort-order', (event, arg) => {
 // ************************
 ipcRenderer.on('async-backup-wallet-config-action', (event, arg) => {
    logger.info('Received async-backup-wallet-config-action');
-   
-   dialog.showOpenDialog(WIN, { 
-      title: 'Select a Backup Destination',
-      buttonLabel: 'Backup',
-      message: 'Please select the location to backup the wallet configuration',
-      properties: ['openDirectory'] 
-   },
-   folderPath => {     
-      if (folderPath != undefined) {
-         let backupDest = folderPath[0];
+  
+      if (arg.length == 1) {
+         let backupDest = arg[0];
          let backupFilename = path.join(backupDest, 'forkboard-backup.json');
          // write the walletObj to the backup location
 
@@ -1128,7 +1137,6 @@ ipcRenderer.on('async-backup-wallet-config-action', (event, arg) => {
 
          utils.showInfoMessage(logger, `Successfully created backup file - ${backupFilename}`, 4000);
       }
-   });
 });
 
 // ************************
@@ -1136,72 +1144,11 @@ ipcRenderer.on('async-backup-wallet-config-action', (event, arg) => {
 // ************************
 ipcRenderer.on('async-restore-wallet-config-action', (event, arg) => {
    logger.info('Received async-restore-wallet-config-action');
-
-   let filePaths = dialog.showOpenDialog(WIN, { 
-      title: 'Select a Wallet Backup to Restore',
-      buttonLabel: 'Restore',
-      message: 'Please select the wallet backup file to Restore',
-      properties: ['openFiles'],
-      filters: [
-         { name: 'JSON', extensions: ['json'] },
-         { name: 'All Files', extensions: ['*'] }
-       ] 
-   },
-   filePath => {     
-      if (filePath != undefined) {
-         let restoreFilename = filePath[0].toString();
-
-         if (fs.existsSync(restoreFilename)) {
-
-            let restoreObj = JSON.parse(fs.readFileSync(restoreFilename, 'utf8'));
-
-            //validate file
-            if (restoreObj.name == null || restoreObj.version == null || restoreObj.date == null || restoreObj.walletConfiguration == null || restoreObj.clientConfiguration == null) {
-               utils.showInfoMessage(logger, `Invalid file format detected attempting to restore the backup file from ${restoreFilename}`, 4000);
-            }
-            else {
-               // clear the wallet object
-               walletObj = [];
-               clientConfigObj = {};
-               
-               // read data from backup file
-               walletObj = restoreObj.walletConfiguration;
-               clientConfigObj = restoreObj.clientConfiguration;
-
-               // write new wallets.json file in config folder.
-               fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
-
-               // write new wallets.json file in config folder.
-               fs.writeFileSync(clientConfigFile, JSON.stringify(clientConfigObj, null, '\t'));
-
-               utils.showInfoMessage(logger, `Successfully restored a version ${restoreObj.version} backup file from ${restoreObj.date} - ${restoreFilename}`, 4000);
-
-               if (walletObj.length != 0)
-               {
-                  $('#show-recoverable-balance').prop('disabled', false);
-                  $('#show-actual-balance').prop('disabled', false);
-                  $('#no-wallets-found').hide();
-               }
-               
-               applyAppSettings();
-               refreshDashboard();
-            }
-         }
-      }
-   });
-
-  // TODO #27 Validate the wallets.json file
-
-   /*
-   if (filePaths != undefined && filePaths.length > 0) {
-      logger.info('Sending async-restore-wallet-config-action event');
-      win.webContents.send('async-restore-wallet-config-action', [filePaths[0]]);      
-   }
-
+ 
    if (arg.length == 1) {
-      let restoreFilename = arg[0].toString();
+      let restoreFilename = arg[0];
 
-      if(fs.existsSync(restoreFilename)) {
+      if (fs.existsSync(restoreFilename)) {
 
          let restoreObj = JSON.parse(fs.readFileSync(restoreFilename, 'utf8'));
 
@@ -1236,8 +1183,8 @@ ipcRenderer.on('async-restore-wallet-config-action', (event, arg) => {
             applyAppSettings();
             refreshDashboard();
          }
-       }      
-   }*/
+      }
+   }
 });
 
 // #endregion
