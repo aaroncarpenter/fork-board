@@ -129,7 +129,6 @@ $('#show-actual-balance').on('click', function () {
       $('#show-recoverable-balance').removeClass('btn-primary');
       $('#show-actual-balance').addClass('btn-primary');
       $('#show-actual-balance').removeClass('btn-secondary');
-      $('#sort-order-label small').text('Sort: ' + clientConfigObj.appSettings.sortField);
       $('#total-balance-type').text(displayMode);
       getWalletBalances();
    }
@@ -143,7 +142,6 @@ $('#show-recoverable-balance').on('click', function () {
          $('#show-actual-balance').removeClass('btn-primary');
          $('#show-recoverable-balance').addClass('btn-primary');
          $('#show-recoverable-balance').removeClass('btn-secondary');
-         $('#sort-order-label small').text(null);
          $('#total-balance-type').text(displayMode);
          getWalletRecoverableBalances();
       }
@@ -268,10 +266,20 @@ function setSortOrder() {
          coinData.sort(utils.applySort('coinDisplayName', 'asc'));   
       }
       else if (clientConfigObj.appSettings.sortField === SortField.Coins) {
-         coinData.sort(utils.applySort('coinBalance', 'desc'));   
+         if (displayMode == DisplayMode.Actual) { 
+            coinData.sort(utils.applySort('coinBalance', 'desc'));   
+         }
+         else { 
+            coinData.sort(utils.applySort('coinRecovBalance', 'desc'));   
+         }
       }
       else if (clientConfigObj.appSettings.sortField === SortField.USD) {
-         coinData.sort(utils.applySort('coinBalanceUSD', 'desc'));  
+         if (displayMode == DisplayMode.Actual) { 
+            coinData.sort(utils.applySort('coinBalanceUSD', 'desc'));   
+         }
+         else { 
+            coinData.sort(utils.applySort('coinRecovBalanceUSD', 'desc'));   
+         }
       }
 
       for (let i = 0; i < coinData.length; i++)
@@ -437,6 +445,7 @@ function loadAndDisplayWallets(loadBalance) {
    }
 
    setDisplayTheme();
+   setSortOrder();
 }
 
 // #region Coin Dataset Operations
@@ -771,6 +780,8 @@ function refreshCardData(cardDataObj) {
       }
       else if (displayMode === DisplayMode.Recoverable) {
          $('#nft-recovery').show();
+
+         setSortOrder();
       }
 
       updateCoinTotalBalance();

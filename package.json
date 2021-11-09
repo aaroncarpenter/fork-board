@@ -1,10 +1,10 @@
 {
   "name": "forkboard",
   "productName": "ForkBoard",
-  "description": "A small dashboard application to show balances of wallets from Chia and Forks.",
+  "description": "An ElecronJS Dashboard App to show wallets balances from Chia and Forks in one convenient location.",
   "keywords": [],
   "main": "./src/main.js",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "author": "Aaron Carpenter",
   "scripts": {
     "start": "electron-forge start",
@@ -15,13 +15,12 @@
   },
   "dependencies": {
     "axios": "^0.24.0",
-    "electron-context-menu": "^3.1.1",
     "electron-installer-windows": "^3.0.0",
+    "electron-log": "^4.4.1",
     "electron-packager": "^15.4.0",
     "electron-prompt": "^1.7.0",
     "electron-squirrel-startup": "^1.0.0",
-    "jquery": "^3.6.0",
-    "electron-log": "^4.4.1"
+    "jquery": "^3.6.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.61",
@@ -41,7 +40,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "fork-board"
+            "name": "forkboard"
           }
         },
         {
@@ -59,8 +58,7 @@
       "electronPackagerConfig": {
         "packageManager": "yarn",
         "icon": "../resources/icons/fork-board-gray",
-        "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter",
-        "afterCopy": "./packaging/forge-hooks"
+        "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter"
       }
     }
   }

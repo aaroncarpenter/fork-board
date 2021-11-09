@@ -102,7 +102,7 @@ let win;
 
 function createWindow() {
    win = new BrowserWindow({
-      width: 1100,
+      width: 1500,
       height: 1200,
       webPreferences: {
          nodeIntegration: true,
@@ -605,7 +605,7 @@ function restoreWalletConfig() {
       title: 'Select a Wallet Backup to Restore',
       buttonLabel: 'Restore',
       message: 'Please select the wallet backup file to Restore',
-      properties: ['openFiles'],
+      properties: ['openFile'],
       filters: [
          { name: 'JSON', extensions: ['json'] },
          { name: 'All Files', extensions: ['*'] }
