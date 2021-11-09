@@ -27,17 +27,17 @@
    const fs = require('fs');
    const path = require('path');
 
-   let configPath = path.resolve(__dirname, '../resources/config/');
-   let walletFile = `${configPath}wallets.json`);
+   let configPath = path.resolve(__dirname, '../resources/config');
+   let walletFile = `${configPath}/wallets.json`;
    let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
-   let clientConfigFile = `${configPath}clientconfig.json`);
+   let clientConfigFile = `${configPath}/clientconfig.json`;
    let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 
    // Create config folder if missing
    if (!fs.existsSync(configPath)) {
       fs.mkdirSync(configPath);
    }
-   
+
    // write empty file if wallets file is missing.
    if (!fs.existsSync(walletFile)) {
       fs.writeFileSync(walletFile, '[]');
