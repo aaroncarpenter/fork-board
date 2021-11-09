@@ -6,6 +6,13 @@
                     <img style="height: 30px; width: 30px" src="{2}" class="card-img">
                     &nbsp;&nbsp;<b>{0}</b>
                 </div>
+                <div>
+                    <small class="text-muted">
+                        <span id="walletCount"></span>
+                        <span id="walletCountLabel"></span>
+                    </small>
+                </div>
+                
             </div>
         </div>
         <div class="card-body">
@@ -37,16 +44,15 @@
         </div>
         <div class="card-footer">
             <div class="d-flex flex-row justify-content-between">
-                <div>
+                <div class="col-md-6">
                     <small class="text-muted" title="The change in balance over the last 24 hours">Chg:&nbsp; 
                         <span class="balanceChange"></span>
                         <span class="balanceChangeSymbol"></span>
                     </small>
                 </div>
-                <div>
-                    <small class="text-muted">
-                        <span id="walletCount"></span>
-                        <span id="walletCountLabel"></span>
+                <div class="d-flex col-md-6 justify-content-end">
+                    <small class="text-muted" title="Price per coin in USD from XCHForks">
+                        <div class="coin-price"></div>
                     </small>
                 </div>
             </div>

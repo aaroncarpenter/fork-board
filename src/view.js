@@ -744,6 +744,10 @@ function refreshCardData(cardDataObj) {
       $('#'+coin+'-card .spinner-border').remove();
       $('#'+coin+'-card .card-balances').show();
 
+      if (cardDataObj.coinPrice != null) {
+         $('#'+coin+'-card .coin-price').text((utils.getAdjustedUSDBalanceLabel(Number(cardDataObj.coinPrice))) + ' each'/*.toLocaleString('en-US', {style: 'currency', currency: 'USD'})*/);
+      }
+
       // Update the balance
       if (balance != null) {
          $('#'+coin+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
