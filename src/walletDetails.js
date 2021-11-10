@@ -16,8 +16,8 @@ let $ = require('jquery');
 let fs = require('fs');
 let path = require('path');
 
-let walletFile = path.resolve(__dirname, '../resources/config/wallets.json');
-let templateFile = path.resolve(__dirname, '../resources/templates/card-template-wallet-detail.html');
+let walletFile = path.resolve(__dirname, '../assets/config/wallets.json');
+let templateFile = path.resolve(__dirname, '../assets/templates/card-template-wallet-detail.html');
 let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 

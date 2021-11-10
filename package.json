@@ -57,7 +57,7 @@
       ],
       "electronPackagerConfig": {
         "packageManager": "yarn",
-        "icon": "../resources/icons/fork-board-gray",
+        "icon": "./assets/icons/fork-board-gray.ico",
         "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter"
       }
     }

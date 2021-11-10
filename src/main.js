@@ -109,7 +109,7 @@ function createWindow() {
          contextIsolation: false,
          enableRemoteModule: true
       },
-      icon: path.resolve(__dirname, '../resources/icons/fork-board-gray.ico')
+      icon: path.resolve(__dirname, '../assets/icons/fork-board-gray.ico')
    });
    win.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),

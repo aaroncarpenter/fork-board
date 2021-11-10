@@ -27,9 +27,9 @@
    const fs = require('fs');
    const path = require('path');
 
-   let configPath = path.resolve(__dirname, '../resources/config');
+   let configPath = path.resolve(__dirname, '../assets/config');
    let walletFile = `${configPath}/wallets.json`;
-   let templateFile = path.resolve(__dirname, '../resources/templates/card-template-dashboard.html');
+   let templateFile = path.resolve(__dirname, '../assets/templates/card-template-dashboard.html');
    let clientConfigFile = `${configPath}/clientconfig.json`;
    let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 
