@@ -11,7 +11,12 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/mac/icon.icns --prune=true --out=/dist",
+    "package-win": "electron-packager . ForkBoard --overwrite --asar --platform=win32 --arch=x64 --icon=assets/icons/win/icon.ico --prune=true --out=/dist",
+    "package-linux": "electron-packager . ForkBoard --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=/dist",
+    "installer-win": "electron-installer-windows --src ./out/ForkBoard-win32-x64 --dest ./dist/installers",
+    "installer-mac": "electron-installer-dmg ./dist/fork-board-darwin-x64/fork-board.app ForkBoard"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -40,14 +45,16 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "forkboard"
+            "name": "forkboard",
+            "setupIcon": "assets/icons/win/icon.ico"
           }
         },
         {
           "name": "@electron-forge/maker-zip",
           "platforms": [
             "darwin",
-            "linux"
+            "linux",
+            "win32"
           ]
         },
         {
@@ -57,9 +64,13 @@
       ],
       "electronPackagerConfig": {
         "packageManager": "yarn",
-        "icon": "./assets/icons/fork-board-gray.ico",
+        "icon": "assets/icons/win/icon.ico",
         "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter"
       }
     }
+  },
+  "build": {
+    "appId": "com.electron.forkboard",
+    "productName": "ForkBoard",
   }
 }
