@@ -16,7 +16,7 @@
     "package-win": "electron-packager . ForkBoard --overwrite --asar --platform=win32 --arch=x64 --icon=assets/icons/win/icon.ico --prune=true --out=/dist",
     "package-linux": "electron-packager . ForkBoard --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=/dist",
     "installer-win": "electron-installer-windows --src ./out/ForkBoard-win32-x64 --dest ./dist/installers",
-    "installer-mac": "electron-installer-dmg ./dist/fork-board-darwin-x64/fork-board.app ForkBoard"
+    "installer-mac": "electron-installer-dmg ./dist/ForkBoard-darwin-x64/fork-board.app ForkBoard"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -71,6 +71,6 @@
   },
   "build": {
     "appId": "com.electron.forkboard",
-    "productName": "ForkBoard",
+    "productName": "ForkBoard"
   }
 }
