@@ -5,7 +5,8 @@ const {
    Menu,
    MenuItem,
    ipcMain,
-   dialog
+   dialog,
+   nativeImage
 } = require('electron');
 const url = require('url');
 const path = require('path');
@@ -101,6 +102,9 @@ function handleSquirrelEvent() {
 let win;
 
 function createWindow() {
+   
+   let appIcon = nativeImage.createFromPath('assets/icons/fork-board-gray.png');
+
    win = new BrowserWindow({
       width: 1500,
       height: 1200,
@@ -109,7 +113,7 @@ function createWindow() {
          contextIsolation: false,
          enableRemoteModule: true
       },
-      icon: path.resolve(__dirname, '/assets/icons/fork-board-gray.ico')
+      icon: appIcon
    });
    win.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
