@@ -34,7 +34,7 @@
 <h3 align="center">ForkBoard</h3>
 
   <p align="center">
-    A small dashboard application to show balances of wallets from Chia and Forks.
+    An ElectronJS Dashboard App to show wallets balances from Chia and Forks in one convenient location.
     <br />
     <a href="https://github.com/aaroncarpenter/fork-board"><strong>Explore the docs »</strong></a>
     <br />
