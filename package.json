@@ -1,7 +1,7 @@
 {
   "name": "forkboard",
   "productName": "ForkBoard",
-  "description": "An ElecronJS Dashboard App to show wallets balances from Chia and Forks in one convenient location.",
+  "description": "An ElectronJS Dashboard App to show wallets balances from Chia and Forks in one convenient location.",
   "keywords": [],
   "main": "./src/main.js",
   "version": "1.0.0",
@@ -12,11 +12,11 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/mac/icon.icns --prune=true --out=/dist",
-    "package-win": "electron-packager . ForkBoard --overwrite --asar --platform=win32 --arch=x64 --icon=assets/icons/win/icon.ico --prune=true --out=/dist",
-    "package-linux": "electron-packager . ForkBoard --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=/dist",
-    "installer-win": "electron-installer-windows --src ./out/ForkBoard-win32-x64 --dest ./dist/installers",
-    "installer-mac": "electron-installer-dmg ./dist/ForkBoard-darwin-x64/fork-board.app ForkBoard"
+    "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-bord-gray.icns --prune=true --out=./out",
+    "package-win": "electron-packager . ForkBoard --overwrite --platform=win32 --arch=x64 --icon=assets/icons/fork-bord-gray.ico --prune=true --out=./out",
+    "package-linux": "electron-packager . ForkBoard --overwrite --platform=linux --arch=x64 --icon=assets/icons/fork-bord-gray.png --prune=true --out=./out",
+    "installer-win": "electron-installer-windows --src ./out/ForkBoard-win32-x64 --dest ./out/installers --icon=assets/icons/fork-bord-gray.ico",
+    "installer-mac": "electron-installer-dmg ./out/ForkBoard-darwin-x64/fork-board.app ForkBoard"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -46,7 +46,8 @@
           "name": "@electron-forge/maker-squirrel",
           "config": {
             "name": "forkboard",
-            "setupIcon": "assets/icons/win/icon.ico"
+            "setupIcon": "assets/icons/fork-board-gray.ico",
+            "iconURL": "assets/icons/fork-board-gray.ico"
           }
         },
         {
@@ -64,13 +65,9 @@
       ],
       "electronPackagerConfig": {
         "packageManager": "yarn",
-        "icon": "assets/icons/win/icon.ico",
+        "icon": "assets/icons/fork-board-gray",
         "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter"
       }
     }
-  },
-  "build": {
-    "appId": "com.electron.forkboard",
-    "productName": "ForkBoard"
   }
 }
