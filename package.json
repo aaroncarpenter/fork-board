@@ -4,7 +4,7 @@
   "description": "An ElectronJS Dashboard App to show wallets balances from Chia and Forks in one convenient location.",
   "keywords": [],
   "main": "./src/main.js",
-  "version": "1.0.0",
+  "version": "0.6.0",
   "author": "Aaron Carpenter",
   "scripts": {
     "start": "electron-forge start",
@@ -12,11 +12,12 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-bord-gray.icns --prune=true --out=./out",
-    "package-win": "electron-packager . ForkBoard --overwrite --platform=win32 --arch=x64 --icon=assets/icons/fork-bord-gray.ico --prune=true --out=./out",
-    "package-linux": "electron-packager . ForkBoard --overwrite --platform=linux --arch=x64 --icon=assets/icons/fork-bord-gray.png --prune=true --out=./out",
-    "installer-win": "electron-installer-windows --src ./out/ForkBoard-win32-x64 --dest ./out/installers --icon=assets/icons/fork-bord-gray.ico",
-    "installer-mac": "electron-installer-dmg ./out/ForkBoard-darwin-x64/fork-board.app ForkBoard"
+    "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-board-gray.icns --prune=true --out=./out",
+    "package-win": "electron-packager . ForkBoard --overwrite --platform=win32 --arch=x64 --icon=assets/icons/fork-board-gray.ico --prune=true --out=./out",
+    "package-linux": "electron-packager . ForkBoard --overwrite --platform=linux --arch=x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./out",
+    "installer-win": "electron-installer-windows --src ./out/ForkBoard-win32-x64 --dest ./out/installers --icon=assets/icons/fork-board-gray.ico",
+    "installer-mac": "electron-installer-dmg ./out/ForkBoard-darwin-x64/fork-board.app ForkBoard",
+    "installer-deb": "electron-installer-debian --src ./out/ForkBoard-linux-x64 --dest ./out/installers/ --arch amd64 --icon=assets/icons/fork-board-gray.png"
   },
   "dependencies": {
     "axios": "^0.24.0",

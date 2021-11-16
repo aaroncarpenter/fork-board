@@ -26,7 +26,7 @@ const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net";
 
 // quit if startup from squirrel installation.
 if (require('electron-squirrel-startup')) return app.quit();
-
+/*
 // #region Squirrel Handlers
 // this should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
@@ -97,7 +97,7 @@ function handleSquirrelEvent() {
 }
 
 // #endregion
-
+*/
 // #region Main Window
 let win;
 
@@ -208,8 +208,8 @@ function createAboutWindow() {
 // #region Web Page Window
 let webPageWin;
 
-function createWebPageWindow(winProtocol, winHost, winPath, winParent, winModal, winWidth = 900, winHeight = 1200) {
-   logger.info(`Creating the Web Page window - Protocol: ${winProtocol}, Host: ${winHost}, Path: ${winPath}, Parent: ${winParent}, Model: ${winModal}, Width: ${winWidth}, Height: ${winHeight}`);
+function createWebPageWindow(winUrl, winParent, winModal, winWidth = 900, winHeight = 1200) {
+   logger.info(`Creating the Web Page window - Url: ${winUrl}, Parent: ${winParent}, Model: ${winModal}, Width: ${winWidth}, Height: ${winHeight}`);
    webPageWin = new BrowserWindow({
       width: winWidth,
       height: winHeight,
@@ -219,11 +219,7 @@ function createWebPageWindow(winProtocol, winHost, winPath, winParent, winModal,
       autoHideMenuBar: true,
    });
 
-   webPageWin.loadURL(url.format({
-      pathname: winPath,
-      protocol: winProtocol,
-      hostname: winHost
-   }));
+   webPageWin.loadURL(winUrl);
 
    webPageWin.once("ready-to-show", function () {
       logger.info('Ready to show - Web Page');
@@ -271,9 +267,15 @@ ipcMain.on("open-wallet-details", function (_event, arg) {
 // ************************
 // Purpose: This function handles the open-nft-recovery-site event from the Renderer.  It opens the NFT Recovery page from ATB.
 // ************************
-ipcMain.on("open-nft-recovery-site", function (_event, _arg) {
+ipcMain.on("open-nft-recovery-site", function (_event, arg) {
    logger.info('Received open-nft-recovery-site event');
-   createWebPageWindow('https', 'alltheblocks.net', '/nft-recovery', win, true, 900, 1200);
+
+   if (arg.length == 1) {
+      createWebPageWindow(`https://alltheblocks.net/nft-recovery?launcherId=${arg[0]}`, win, true, 900, 1200);
+   }
+   else {
+      createWebPageWindow('https://alltheblocks.net/nft-recovery', win, true, 900, 1200);
+   }
 });
 
 // ************************
