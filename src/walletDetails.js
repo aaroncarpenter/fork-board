@@ -183,6 +183,7 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
 
          if (balance != null) {
             $('#'+wallet+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
+            $('#'+wallet+'-card .card-body .balance').prop('title', balance);
          }
          
          if (balanceUSD != null && balance > 0) {

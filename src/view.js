@@ -762,25 +762,7 @@ function getWalletRecoverableBalances() {
 
    initializeCoinDataSet();
 
-   /*if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
-      $('.walletCard').remove();
-
-      loadAndDisplayWallets(false);
-
-      // No Pending Balance to be displayed for Chia
-      coinConfigObj.every(function (cfg) {
-         if (cfg.hidden) {
-            $('#' + cfg.coinPathName + '-card').remove();
-         }
-         return true;
-      });
-
-      logger.info('Sending async-get-recoverable-wallet-balance event')
-      ipcRenderer.send('async-get-recoverable-wallet-balance', [clientConfigObj.launcherId]);
-   }
-   else {
-      utils.showErrorMessage(logger, "Unable to get recoverable balances.  Unable to retrieve your launcher id.", 5000);
-   }*/
+   launcherDropdownSelectionHandler(selectedLauncherId);
 }
 // #endregion
 
@@ -810,12 +792,13 @@ function refreshCardData(cardDataObj) {
       $('#'+coin+'-card .card-balances').show();
 
       if (cardDataObj.coinPrice != null) {
-         $('#'+coin+'-card .coin-price').text((utils.getAdjustedUSDBalanceLabel(Number(cardDataObj.coinPrice))) + ' each'/*.toLocaleString('en-US', {style: 'currency', currency: 'USD'})*/);
+         $('#'+coin+'-card .coin-price').text((utils.getAdjustedUSDBalanceLabel(Number(cardDataObj.coinPrice))) + ' each');
       }
 
       // Update the balance
       if (balance != null) {
          $('#'+coin+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
+         $('#'+coin+'-card .card-body .balance').prop('title', balance);
       }
       
       // Update the balance in USD, set to '-' if price information isn't available
@@ -1099,46 +1082,7 @@ ipcRenderer.on('async-refresh-card-display', (event, arg) => {
    else {
       logger.error('Reply args incorrect');
    }
-})
-
-// ************************
-// Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
-// ************************
-ipcRenderer.on('async-populate-debug-data', (event, arg) => {
-   logger.info('Received async-refresh-card-display event');
-
-   $('.walletCard').remove();
-   
-   coinData = [];
-   coinConfigObj.every(function (cfg) {
-      buildWalletCard(cfg);
-
-      let bal = Math.random() * (cfg.coinPathName === 'chia' ? 100 : 1000);
-      coinData.push({
-         coinPrefix: cfg.coinPrefix,
-         coinPathName: cfg.coinPathName,
-         coinDisplayName: cfg.coinDisplayName,
-         mojoPerCoin: cfg.mojoPerCoin,
-         coinPrice: cfg.coinPrice,
-         coinBalance: bal,
-         coinBalanceUSD: (cfg.coinPrice != null) ? bal * cfg.coinPrice : null,
-         coinChange: 0,
-         coinRecovBalance: 0,
-         coinRecovBalanceUSD: 0,
-         coinWalletCount: 0
-      });
-
-      return true;
-   });
-
-   coinData.every((cfg) => {
-      refreshCardData(cfg);
-   
-      return true;
-   });
-
-   setDisplayTheme();
-})
+});
 
 // ************************
 // Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders

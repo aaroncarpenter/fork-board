@@ -315,7 +315,7 @@ const template = [
       label: 'File',
       submenu: [
          {
-            label: 'Set Launcher Id',
+            label: 'Set Launcher Ids',
             click() {
                logger.info('Sending async-set-launcher event');
                win.webContents.send('async-set-launcher', []);

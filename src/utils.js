@@ -67,9 +67,9 @@ class Utils {
       } else if (balance < 1000000) {
          balanceStr = (balance / 1000).toLocaleString() + "K";
       } else if (balance < 1000000000) {
-         balanceStr = (balance / 1000000).toLocaleString() + "M";
+         balanceStr = (Math.round((balance / 1000000) * 10) / 10).toLocaleString() + "M";
       } else {
-         balanceStr = (balance / 1000000000).toLocaleString() + "B";
+         balanceStr = (Math.round((balance / 1000000000) * 10) / 10).toLocaleString() + "B";
       }
 
       return balanceStr;
