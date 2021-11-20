@@ -9,27 +9,33 @@
    
    <body>
       <div class = "container">
-         <div class="d-flex row justify-content-center">
-            <div>
-               <h2 id="appName">ForkBoard</h2>
+         <div class="d-flex d-row align-items-middle justify-content-center">
+            <div class="col-md-6">
+               <img src="../assets/icons/png/256x256.png"/>
             </div>
-            <div>
-               <small>A small dashboard application to show balances of wallets from Chia and Forks.</small>
-            </div>
-            <div>
-               <h5 id="appVersion"></h5>
-            </div>
-            <div>
-               <small>Copyright<sup>&copy;</sup> 2021 - Aaron Carpenter</small> 
-            </div>
-
-            <div class="d-flex justify-content-start">
-               <small class="text-muted font-italic font-weight-light">Wallet balances provided by AllTheBlocks.NET</small>
-            </div>
-            <div class="d-flex justify-content-start">
-               <small class="text-muted font-italic font-weight-light">Coin prices provided by XCHForks</small>
+            <div class="col-md-6 justify-content-center">
+               <div style="padding-top: 60px;">
+                  <h2 id="appName">ForkBoard</h2>
+               </div>
+               <div>
+                  <h5 id="appVersion"></h5>
+               </div>
+               <div>
+                  <small>Copyright<sup>&copy;</sup> 2021<br />Aaron Carpenter</small> 
+               </div>
             </div>
          </div>
+         <div>
+            <p></p>An ElectronJS Dashboard App to show wallets balances from Chia and Forks in one convenient location.</p>
+         </div>
+         <div class="d-flex justify-content-start">
+            <p class="text-muted font-italic font-weight-light">Wallet balances provided by AllTheBlocks.NET</p>
+         </div>
+         <div class="d-flex justify-content-start">
+            <p class="text-muted font-italic font-weight-light">Coin prices provided by XCHForks</p>
+         </div>
+         
       </div>
+      <script src = "./about.js" ></script>
    </body>
 </html>

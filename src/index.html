@@ -7,6 +7,7 @@
       <link rel = "stylesheet" href = "./css/forkboard.css" />
 
       <script src="https://kit.fontawesome.com/80792d13b7.js" crossorigin="anonymous"></script>
+      
    </head>
    
    <body>
@@ -17,7 +18,9 @@
                <button type="button" id="show-actual-balance" class="btn btn-primary btn-small"><small>Show Actual Balances</small></button>
                <button type="button" id="show-recoverable-balance" class="btn btn-secondary btn-small"><small>Show Recoverable Balances</small></button>
             </div>
-            <div class="d-flex align-items-end flex-column col-md-3"></div>
+            <div class="d-flex align-items-end flex-column col-md-3">
+               
+            </div>
             <div class="d-flex align-items-end flex-column col-md-2">
                <div>
                   <small class="small-caps text-muted"><span id="total-balance-type">Actual</span> Balance Total</small>
@@ -79,8 +82,20 @@
             </form>
          </div>
          
-         <div id="nft-recovery" class="alert alert-info" style="display: none" role="alert">
-            <button class = "btn btn-primary" id = "open-nft-recovery">Open AllTheBlocks.NET NFT Recovery Site</button> <small class="text-muted">Your launcherid will be added to the clipboard to paste into the recovery site.</small>
+         <div id="nft-recovery" style="display: none">
+            <div class="d-flex flex-row">
+               <div class="alert alert-info col-md-6" role="alert">
+                  <div id="launcher-dropdown" style="width: 100%" class="dropdown">
+                     <button id="launcher-dropdown-button" class="btn btn-primary dropbtn" style="width: 100%"><small>Launcher</small></button>
+                     <div class="dropdown-content"></div>
+                  </div>
+               </div>
+               <div class="alert alert-info col-md-6" role="alert">
+                  <div class="d-flex justify-content-center" style="width: 100%">
+                     <button class="btn btn-primary" id="open-nft-recovery" style="width: 75%"><small>Open AllTheBlocks.NET NFT Recovery Site</small></button>
+                  </div>
+               </div>
+            </div>
          </div>
          <p />
          <div id="wallet-cards" class="d-flex row justify-content-center" style="vertical-align:bottom"></div>
@@ -97,6 +112,7 @@
             </div>
         </div>
       </div>   
+      <script src="../bower_components/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
       <script src = "./view.js" ></script>
    </body>
 </html>

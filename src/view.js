@@ -61,6 +61,7 @@
    let refreshTimerLength = 5*60*1000; // 5 minutes
 
    let refreshTimerId;
+   let selectedLauncherId;
 
 $(function () {
    applyAppSettings();
@@ -136,6 +137,7 @@ $('#show-actual-balance').on('click', function () {
       $('#show-actual-balance').addClass('btn-primary');
       $('#show-actual-balance').removeClass('btn-secondary');
       $('#total-balance-type').text(displayMode);
+      $('#launcher-dropdown').hide();
       getWalletBalances();
    }
 });
@@ -149,6 +151,8 @@ $('#show-recoverable-balance').on('click', function () {
          $('#show-recoverable-balance').addClass('btn-primary');
          $('#show-recoverable-balance').removeClass('btn-secondary');
          $('#total-balance-type').text(displayMode);
+         $('#launcher-dropdown').show();
+         setupLauncherDropdown();
          getWalletRecoverableBalances();
       }
       else {
@@ -158,7 +162,7 @@ $('#show-recoverable-balance').on('click', function () {
 });
 
 $('#open-nft-recovery').on('click', function () {
-   $('#nft-recovery').hide();
+   //$('#nft-recovery').hide();
    openNFTRecoverySite();
 });
 // #endregion
@@ -178,6 +182,7 @@ function saveLauncherId() {
    clientConfigObj.launcherId = launcherVal;
    
    storeAppSettings();
+   setupLauncherDropdown();
 
    // Render the Recoverable balances if they are being shown
    if (displayMode === DisplayMode.Recoverable)
@@ -295,6 +300,60 @@ function setSortOrder() {
    }
 }
 
+// ***********************
+// Name: 	setSortOrder
+// Purpose: This function sets up the launcher dropdown selector.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function setupLauncherDropdown() {
+   $('#launcher-dropdown .dropdown-content button').remove();
+   if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
+      let launcherids = clientConfigObj.launcherId.split(',');
+
+      if (launcherids.length > 0) {
+         if (launcherids.length > 1) {
+            launcherids.every(function(launcherid) {
+               $('#launcher-dropdown .dropdown-content').append(`<button  type="button" class="btn btn-small" onclick="launcherDropdownSelectionHandler('${launcherid.trim()}')"><small>${launcherid.trim()}</small></button>`);
+
+               return true;
+            });
+         }
+
+         selectedLauncherId = launcherids[0];
+         launcherDropdownSelectionHandler(launcherids[0]);
+      }
+   }
+}
+
+// ***********************
+// Name: 	launcherDropdownSelectionHandler
+// Purpose: This function sets up the launcher dropdown selector.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function launcherDropdownSelectionHandler(launcherid) {
+   selectedLauncherId = launcherid;
+   if (launcherid != null) {
+      $('#launcher-dropdown-button small').text(`LauncherId: ${launcherid}`);
+      
+      $('.walletCard').remove();
+   
+      loadAndDisplayWallets(false);
+
+      // remove hidden coins   
+      coinConfigObj.every(function (cfg) {
+         if (cfg.hidden) {
+            $('#' + cfg.coinPathName + '-card').remove();
+         }
+         return true;
+      });
+
+      logger.info('Sending async-get-recoverable-wallet-balance event');
+      ipcRenderer.send('async-get-recoverable-wallet-balance', [launcherid]);
+   }
+}
+
 // #endregion
 
 // ***********************
@@ -361,11 +420,11 @@ function loadWalletDetails(coin) {
 // ************************
 function openNFTRecoverySite() {
    // Copy the LauncherId from configuration to the Clipboard
-   clipboard.writeText(clientConfigObj.launcherId);
+   clipboard.writeText(selectedLauncherId);
 
    // Send the event to ipcMain to open the nft recovery page.
    logger.info('Sending open-nft-recovery-site event');
-   ipcRenderer.send('open-nft-recovery-site', [clientConfigObj.launcherId]);
+   ipcRenderer.send('open-nft-recovery-site', [selectedLauncherId]);
 }
 
 // ***********************
@@ -699,11 +758,11 @@ function getWalletBalances() {
 //  Return: N/A
 // ************************
 function getWalletRecoverableBalances() {
-   $('#nft-recovery').hide();
+   $('#nft-recovery').show();
 
    initializeCoinDataSet();
 
-   if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
+   /*if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
       $('.walletCard').remove();
 
       loadAndDisplayWallets(false);
@@ -721,7 +780,7 @@ function getWalletRecoverableBalances() {
    }
    else {
       utils.showErrorMessage(logger, "Unable to get recoverable balances.  Unable to retrieve your launcher id.", 5000);
-   }
+   }*/
 }
 // #endregion
 
@@ -789,8 +848,6 @@ function refreshCardData(cardDataObj) {
          setSortOrder();
       }
       else if (displayMode === DisplayMode.Recoverable) {
-         $('#nft-recovery').show();
-
          setSortOrder();
       }
 
