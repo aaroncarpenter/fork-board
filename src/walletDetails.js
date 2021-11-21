@@ -1,5 +1,6 @@
 // #region Const Definitions
 const {ipcRenderer} = require('electron');
+const remote = require('electron').remote;
 const logger = require('electron-log');
 logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/walletDetails.log');
 const Utils = require('./utils');
@@ -23,6 +24,7 @@ let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 let coinCfg = {};
 let displayTheme;
+let showCloseButton = false;
 // #endregion
 
 $(function () {
@@ -73,6 +75,17 @@ function handleWalletDelete(wallet) {
  
       ipcRenderer.send('async-set-dashboard-refresh-flag', []);
    }
+}
+
+// ***********************
+// Name: 	closeWindow
+// Purpose: This function handles specific close button implementation for MacOS
+//    Args: N/A
+//  Return: N/A
+// *************************
+function closeWindow() {
+   //remote.getCurentWindow().close();
+   ipcRenderer.send('close-wallet-details', [coinCfg]);
 }
 // #endregion
 
@@ -151,15 +164,20 @@ function setDisplayTheme() {
 ipcRenderer.on('load-wallet-details', (event, arg) => {
    logger.info('Received load-wallet-details event');
    
-   if (arg.length == 2) {
+   if (arg.length == 3) {
       coinCfg = arg[0];
       displayTheme = arg[1];
+      showCloseButton = arg[2];
 
       logger.info(`Loading details for ${coinCfg.coinDisplayName}`);
       loadAndDisplayWallets();
 
       //Setting theme
       setDisplayTheme();
+
+      if (!showCloseButton) {
+         $('#close-button-div').hide();
+      }
    }
    else {
       logger.error('Reply args incorrect');

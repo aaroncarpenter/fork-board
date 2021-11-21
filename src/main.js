@@ -32,6 +32,9 @@ let appIcon = nativeImage.createFromPath('assets/icons/fork-board-gray.png');
 // #region Main Window
 let win;
 
+console.log (`Running on Platform ${process.platform}`);
+console.log (`Running on Arch ${process.arch}`);
+
 function createWindow() {
    win = new BrowserWindow({
       width: 1500,
@@ -83,7 +86,7 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
 
    walletDetails.once("show", function () {
       logger.info(`Sending load-wallet-details event: ${coinCfg.coinDisplayName}`);
-      walletDetails.webContents.send("load-wallet-details", [coinCfg, displayTheme]);
+      walletDetails.webContents.send("load-wallet-details", [coinCfg, displayTheme, (process.platform == 'darwin')]);
    });
 
    walletDetails.once("ready-to-show", function () {
@@ -134,8 +137,8 @@ function createAboutWindow() {
    });
 
    aboutPage.once("show", function () {
-      logger.info(`Sending app-version-reply event: ${app.getVersion()}`);
-      aboutPage.webContents.send("app-version-reply", [app.getVersion()]);
+      logger.info(`Sending load-about-page event: ${app.getVersion()}`);
+      aboutPage.webContents.send("load-about-page", [app.getVersion(), (process.platform == 'darwin')]);
    });
 }
 // #endregion
@@ -168,12 +171,18 @@ function createWebPageWindow(winUrl, winParent, winModal, winWidth = 900, winHei
 // ************************
 // Purpose: This function handles the close-wallet-details event from the Renderer.  It closes the Wallet Details page.  This event is used to handle a user hitting "Escape" to close the wallet details.
 // ************************
-ipcMain.on("close-wallet-details", function (_event, _arg) {
+ipcMain.on("close-wallet-details", function (_event, arg) {
    logger.info('Received close-wallet-details Event');
    walletDetails.hide();
 
-   logger.info('Sending async-refresh-wallets Event');
-   win.webContents.send('async-refresh-wallets', []);
+   if (arg.length == 1) {
+      let coinCfg = arg[0];
+
+      if (win && refreshMainCard) {
+         logger.info(`Sending async-refresh-card-display event: ${coinCfg.coinDisplayName}`);
+         win.webContents.send('async-refresh-card-display', [coinCfg]);
+      }
+   }
 });
 
 // ************************
@@ -182,6 +191,14 @@ ipcMain.on("close-wallet-details", function (_event, _arg) {
 ipcMain.on('async-set-dashboard-refresh-flag', function (_event, _arg) {
    logger.info('Received async-set-dashboard-refresh-flag Event');
    refreshMainCard = true;
+});
+
+// ************************
+// Purpose: This function handles setting the card refresh flag when wallets are deleted from the wallet details page.
+// ************************
+ipcMain.on('close-about-page', function (_event, _arg) {
+   logger.info('Received close-about-page Event');
+   aboutPage.hide();
 });
 
 // ************************
@@ -205,11 +222,19 @@ ipcMain.on("open-wallet-details", function (_event, arg) {
 ipcMain.on("open-nft-recovery-site", function (_event, arg) {
    logger.info('Received open-nft-recovery-site event');
 
+   let url = "";
    if (arg.length == 1) {
-      createWebPageWindow(`https://alltheblocks.net/nft-recovery?launcherId=${arg[0]}`, win, true, 900, 1200);
+      url = `https://alltheblocks.net/nft-recovery?launcherId=${arg[0]}`;
    }
    else {
-      createWebPageWindow('https://alltheblocks.net/nft-recovery', win, true, 900, 1200);
+      'https://alltheblocks.net/nft-recovery';
+   }
+
+   if (process.platform == 'darwin') {
+      require('electron').shell.openExternal(url);
+   }
+   else {
+      createWebPageWindow(url, win, true, 900, 1200);
    }
 });
 
