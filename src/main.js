@@ -110,7 +110,7 @@ function createAboutWindow() {
    logger.info('Creating the About window');
    aboutPage = new BrowserWindow({
       width: 500,
-      height: 500,
+      height: 460,
       modal: true,
       show: false,
       parent: win, // Make sure to add parent window here

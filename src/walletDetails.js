@@ -104,6 +104,7 @@ function loadAndDisplayWallets() {
    logger.info(`Loading Wallet Details for ${coinCfg.coinDisplayName}`);
 
    $(document).attr("title", `${coinCfg.coinDisplayName} Wallet Details`);
+   $('#wallet-details-title').text(`${coinCfg.coinDisplayName} Wallet Details`);
 
    walletObj.every(function (w) {
       if (w.wallet.startsWith(coinCfg.coinPrefix)) {
