@@ -37,10 +37,11 @@ function closeWindow() {
 ipcRenderer.on('load-about-page', (event, arg) => {
    logger.info('Received load-about-page event');
    
-   if (arg.length == 3) {
+   if (arg.length == 4) {
       let version = arg[0];
-      let processPlatform = arg[1];
-      let processArch = arg[2];
+      let displayTheme = arg[1];
+      let processPlatform = arg[2];
+      let processArch = arg[3];
       let platform = (processPlatform == 'darwin' ? 'MacOS' : (processPlatform == 'win32' ? "Windows" :  (processPlatform == 'linux' ? "Linux" : processPlatform)));
 
       $('#appName').text(`ForkBoard v${version}`);
@@ -50,6 +51,14 @@ ipcRenderer.on('load-about-page', (event, arg) => {
       if (processPlatform != 'darwin') {
          $('#close-button-div').hide();
       }
+
+      if (displayTheme == DisplayTheme.Dark) {
+         $('body').addClass('dark-mode');
+      }
+      else {
+         $('body').removeClass('dark-mode');
+      }
+
    }
    else {
       logger.error('Reply args incorrect');

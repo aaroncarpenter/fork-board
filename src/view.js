@@ -77,8 +77,6 @@ $(function () {
       $('#show-actual-balance').prop('disabled', true);
       $('#no-wallets-found').show();
    }
-
-   ipcRenderer.send('load-main-dashboard', []);
 });
 
 // #region Page Event Handlers
@@ -290,6 +288,8 @@ function setDisplayTheme() {
    }
 
    storeAppSettings();
+
+   ipcRenderer.send('load-main-dashboard', [clientConfigObj.appSettings.displayTheme]);
 }
 
 // ***********************

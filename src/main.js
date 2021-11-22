@@ -28,6 +28,7 @@ const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net";
 if (require('electron-squirrel-startup')) return app.quit();
 
 let appIcon = nativeImage.createFromPath('assets/icons/fork-board-gray.png');
+let displayTheme;
 
 // #region Main Window
 let win;
@@ -107,7 +108,7 @@ function createAboutWindow() {
    logger.info('Creating the About window');
    aboutPage = new BrowserWindow({
       width: 500,
-      height: 460,
+      height: 410,
       modal: true,
       show: false,
       parent: win, // Make sure to add parent window here
@@ -134,8 +135,8 @@ function createAboutWindow() {
    });
 
    aboutPage.once("show", function () {
-      logger.info(`Sending load-about-page event: ${app.getVersion()}`);
-      aboutPage.webContents.send("load-about-page", [app.getVersion(), process.platform, process.arch]);
+      logger.info(`Sending load-about-page event`);
+      aboutPage.webContents.send("load-about-page", [app.getVersion(), displayTheme, process.platform, process.arch]);
    });
 }
 // #endregion
@@ -332,8 +333,12 @@ ipcMain.on('async-get-fork-prices', function (event, _arg) {
 // ************************
 // Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from XCHForks.com and sends the reply event with the data to the Renderer.
 // ************************
-ipcMain.on('load-main-dashboard', function (event, _arg) {
+ipcMain.on('load-main-dashboard', function (event, arg) {
    logger.info('Received load-main-dashboard event');
+
+   if (arg.length == 1) {
+      displayTheme = arg[0];
+   }
 
    logger.info('Sending load-main-dashboard-reply event');
    event.sender.send('load-main-dashboard-reply', [app.getVersion(), process.platform, process.arch]);
