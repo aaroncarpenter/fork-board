@@ -121,6 +121,30 @@ $('#cancel-add-wallet').on('click', function () {
    $('#wallet-text-box').val(null);
 });
 
+$('#paste-wallet-from-clipboard').on('click', function () {  
+   pasteTextFromClipboard('#wallet-text-box');
+});
+
+$('#paste-launcher-from-clipboard').on('click', function () {  
+   pasteTextFromClipboard('#launcher-text-box');
+});
+
+function pasteTextFromClipboard(elementId)
+{
+    let clipboardText = clipboard.readText();
+   let currWalletVal = $(elementId).val();
+
+   if (currWalletVal == null || currWalletVal == "") {
+      $(elementId).val(clipboardText);
+   }
+   else if (currWalletVal.endsWith(',') || currWalletVal.endsWith(', ')) {
+      $(elementId).val(`${currWalletVal}${clipboardText}`);
+   }
+   else {
+      $(elementId).val(`${currWalletVal}, ${clipboardText}`);
+   }
+}
+
 $('#add-launcher').on('click', function () {
    saveLauncherId();
 });
@@ -177,7 +201,7 @@ $('#open-nft-recovery').on('click', function () {
 function saveLauncherId() {
    $('#set-launcher').hide();
    
-   let launcherVal = $('#Launcher').val();
+   let launcherVal = $('#launcher-text-box').val();
 
    clientConfigObj.launcherId = launcherVal;
    
@@ -1013,7 +1037,7 @@ ipcRenderer.on('async-set-launcher', (event, arg) => {
    logger.info('Received async-set-launcher event');
 
    if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
-      $('#Launcher').val(clientConfigObj.launcherId);
+      $('#launcher-text-box').val(clientConfigObj.launcherId);
    }
 
    $('#set-launcher').show();

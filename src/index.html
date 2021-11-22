@@ -54,12 +54,13 @@
             <form>
                <div class="form-group row d-flex align-items-center">
                   <div class="col-sm-11">
-                     <input type = "text" name = "Wallet" value = "" id = "wallet-text-box" placeholder = "You can enter multiple wallets separated by commas.  Click the checkmark to Save." class = "form-control" required >
+                     <input type="text" name="Wallet" value="" id="wallet-text-box" placeholder="You can enter multiple wallets separated by commas.  Click the clipboard to Paste, the check to Save or the X to cancel." class="form-control" required >
                   </div>
                   <div class="col-sm-1">
                      <nobr>
-                        <i class = "fas fa-check" id = "check-add-wallet"></i>&nbsp;
-                        <i class = "fas fa-times" id = "cancel-add-wallet"></i>
+                        <i class="fas fa-paste" id="paste-wallet-from-clipboard" title="Click to Paste from the Clipboard"></i> &nbsp;
+                        <i class = "fas fa-check" id = "check-add-wallet" title="Click to Save"></i> &nbsp;
+                        <i class = "fas fa-times" id = "cancel-add-wallet" title="Click to Cancel"></i>
                      </nobr>
                   </div>
                </div>
@@ -69,13 +70,14 @@
             <form>
                <div class="form-group row d-flex align-items-center">
                   <div class="col-sm-11">
-                     <input type = "text" name = "Launcher" value = "" id = "Launcher" placeholder = "Enter LauncherId to view Recoverable Balances.  Click the checkmark to Save." class = "form-control" required>
+                     <input type="text" name="Launcher" value="" id="launcher-text-box" placeholder="Enter LauncherId to view Recoverable Balances.  Click the checkmark to Save." class="form-control" required>
                   </div>
 
                   <div class="col-sm-1">
                      <nobr>
-                        <i class = "fas fa-check" id = "add-launcher"></i>&nbsp;
-                        <i class = "fas fa-times" id = "cancel-add-launcher"></i>
+                        <i class="fas fa-paste" id="paste-launcher-from-clipboard" title="Click to Paste from the Clipboard"></i> &nbsp;
+                        <i class="fas fa-check" id="add-launcher" title="Click to Save"></i>&nbsp;
+                        <i class="fas fa-times" id="cancel-add-launcher" title="Click to Cancel"></i>
                      </nobr>
                   </div>
                </div>
