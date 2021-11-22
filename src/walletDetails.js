@@ -84,7 +84,6 @@ function handleWalletDelete(wallet) {
 //  Return: N/A
 // *************************
 function closeWindow() {
-   //remote.getCurentWindow().close();
    ipcRenderer.send('close-wallet-details', [coinCfg]);
 }
 // #endregion
@@ -165,10 +164,11 @@ function setDisplayTheme() {
 ipcRenderer.on('load-wallet-details', (event, arg) => {
    logger.info('Received load-wallet-details event');
    
-   if (arg.length == 3) {
+   if (arg.length == 4) {
       coinCfg = arg[0];
       displayTheme = arg[1];
-      showCloseButton = arg[2];
+      let processPlatform = arg[2];
+      let processArch = arg[3];
 
       logger.info(`Loading details for ${coinCfg.coinDisplayName}`);
       loadAndDisplayWallets();
@@ -176,7 +176,7 @@ ipcRenderer.on('load-wallet-details', (event, arg) => {
       //Setting theme
       setDisplayTheme();
 
-      if (!showCloseButton) {
+      if (processPlatform != 'darwin') {
          $('#close-button-div').hide();
       }
    }

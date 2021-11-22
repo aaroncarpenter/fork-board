@@ -63,6 +63,10 @@
    let refreshTimerId;
    let selectedLauncherId;
 
+   let appVersion = "";
+   let processPlatform = "";
+   let processArch = "";
+
 $(function () {
    applyAppSettings();
    refreshDashboard();
@@ -73,6 +77,8 @@ $(function () {
       $('#show-actual-balance').prop('disabled', true);
       $('#no-wallets-found').show();
    }
+
+   ipcRenderer.send('load-main-dashboard', []);
 });
 
 // #region Page Event Handlers
@@ -1146,7 +1152,7 @@ ipcRenderer.on('async-backup-wallet-config-action', (event, arg) => {
 
          let backFileStr = `{
             "name": "ForkBoard Backup File",
-            "version": "0.5.0",
+            "version": "${appVersion}",
             "date": "${new Date().toLocaleString('en-US')}",
             "walletConfiguration": ${JSON.stringify(walletObj, null, '\t')},
             "clientConfiguration": ${JSON.stringify(clientConfigObj, null, '\t')}
@@ -1205,5 +1211,23 @@ ipcRenderer.on('async-restore-wallet-config-action', (event, arg) => {
       }
    }
 });
+
+// ************************
+// Purpose: This function is a handler for an event from ipcMain, triggered when the the wallet restore is initiated
+// ************************
+ipcRenderer.on('load-main-dashboard-reply', (event, arg) => {
+   logger.info('Received load-main-dashboard-reply');
+
+   if (arg.length == 3) {
+      appVersion = arg[0];
+      processPlatform = arg[1];
+      processArch = arg[2];
+   }
+   else {
+      logger.error('Event args incorrect');
+   }
+
+});
+
 
 // #endregion

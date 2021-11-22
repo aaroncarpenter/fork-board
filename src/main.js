@@ -32,9 +32,6 @@ let appIcon = nativeImage.createFromPath('assets/icons/fork-board-gray.png');
 // #region Main Window
 let win;
 
-console.log (`Running on Platform ${process.platform}`);
-console.log (`Running on Arch ${process.arch}`);
-
 function createWindow() {
    win = new BrowserWindow({
       width: 1500,
@@ -86,7 +83,7 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
 
    walletDetails.once("show", function () {
       logger.info(`Sending load-wallet-details event: ${coinCfg.coinDisplayName}`);
-      walletDetails.webContents.send("load-wallet-details", [coinCfg, displayTheme, (process.platform == 'darwin')]);
+      walletDetails.webContents.send("load-wallet-details", [coinCfg, displayTheme, process.platform, process.arch]);
    });
 
    walletDetails.once("ready-to-show", function () {
@@ -138,7 +135,7 @@ function createAboutWindow() {
 
    aboutPage.once("show", function () {
       logger.info(`Sending load-about-page event: ${app.getVersion()}`);
-      aboutPage.webContents.send("load-about-page", [app.getVersion(), (process.platform == 'darwin')]);
+      aboutPage.webContents.send("load-about-page", [app.getVersion(), process.platform, process.arch]);
    });
 }
 // #endregion
@@ -330,6 +327,16 @@ ipcMain.on('async-get-fork-prices', function (event, _arg) {
    .catch(function (error) {
       logger.error(error);
    });
+});
+
+// ************************
+// Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from XCHForks.com and sends the reply event with the data to the Renderer.
+// ************************
+ipcMain.on('load-main-dashboard', function (event, _arg) {
+   logger.info('Received load-main-dashboard event');
+
+   logger.info('Sending load-main-dashboard-reply event');
+   event.sender.send('load-main-dashboard-reply', [app.getVersion(), process.platform, process.arch]);
 });
 // #endregion
 
