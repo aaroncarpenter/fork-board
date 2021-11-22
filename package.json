@@ -4,15 +4,10 @@
   "description": "An ElectronJS Dashboard App to show wallets balances from Chia and Forks in one convenient location.",
   "keywords": [],
   "main": "./src/main.js",
-  "version": "0.7.1",
+  "version": "1.0.0",
   "author": "Aaron Carpenter",
   "scripts": {
-    "start1": "electron-forge start",
     "start": "electron .",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\"",
     "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-board-gray.icns --prune=true --out=./out --ignore=^/assets/config",
     "package-win": "electron-packager . ForkBoard --overwrite --win32 --x64 --icon=assets/icons/fork-board-gray.ico --prune=true --out=./out --ignore=^/assets/config",
     "package-linux": "electron-packager . ForkBoard --overwrite --linux --x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./out --ignore=^/assets/config",
@@ -30,47 +25,6 @@
     "jquery": "^3.6.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.61",
-    "@electron-forge/maker-deb": "^6.0.0-beta.61",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.61",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
-    "@electron-forge/maker-zip": "^6.0.0-beta.61",
     "electron": "^15.3.0"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "executableName": "ForkBoard",
-        "name": "ForkBoard"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "forkboard",
-            "setupIcon": "assets/icons/fork-board-gray.ico",
-            "iconURL": "assets/icons/fork-board-gray.ico"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin",
-            "linux",
-            "win32"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        }
-      ],
-      "electronPackagerConfig": {
-        "packageManager": "yarn",
-        "icon": "assets/icons/fork-board-gray",
-        "appCopyright": "Copyright 2021(C) RedWolfTek LLC | Aaron Carpenter",
-        "executableName": "ForkBoard"
-      }
-    }
   }
 }
