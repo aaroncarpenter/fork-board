@@ -412,11 +412,11 @@ function addNewWallet() {
                fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
             }
             else {
-               utils.showErrorMessage(logger, `The wallet (${walletStr}) already exists.`, 5000);
+               utils.showWarnMessage(logger, `The wallet (${walletStr}) already exists.`, 5000);
             }
          }
          else {
-            utils.showErrorMessage(logger, `The wallet is currently unsupported.  You entered (${walletStr}).`, 5000);
+            utils.showWarnMessage(logger, `The wallet is currently unsupported.  You entered (${walletStr}).`, 5000);
          }
 
          return true;
@@ -903,10 +903,10 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
    else {
       logger.error('Reply args incorrect');
    }
-})
+});
 
 // ************************
-// Purpose: This function receives the blockchain settings reply from ipcMain and loads the dashboard
+// Purpose: This function receives the fork prices reply from ipcMain and loads the dashboard
 // ************************
 ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
    logger.info('Received async-get-fork-prices-reply event')
@@ -959,7 +959,7 @@ ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
    else {
       logger.error('Reply args incorrect');
    }
-})
+});
 
 // ************************
 // Purpose: This function receives the wallet balance reply from ipcMain, refreshes the coin data set balances and initiates the card refresh.
@@ -982,7 +982,7 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    else {
       logger.error('Reply args incorrect');
    }
-})
+});
 
 // ************************
 // Purpose: This function receives the recoverable wallet balance reply from ipcMain, refreshes the coin data set balances and initiates the card refresh.
@@ -1012,7 +1012,79 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
    else {
       logger.error('Reply args incorrect');
    }
-})
+});
+
+// ************************
+// Purpose: This function receives the recoverable wallet balance error from ipcMain.
+// ************************
+ipcRenderer.on('async-get-recoverable-wallet-balance-error', (event, arg) => {
+   logger.info('Received async-get-recoverable-wallet-balance-error event')
+
+   if (arg.length == 2) {
+      let errMsg = arg[0];
+      let launcherId = arg[1];
+      let message = `There was an error getting recoverable balances for LauncherId: ${launcherId}.  The reported error is "${errMsg}".`;
+      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
+      utils.showErrorMessage(logger, message, instructions);
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+});
+
+
+// ************************
+// Purpose: This function receives the wallet balance error from ipcMain.
+// ************************
+ipcRenderer.on('async-get-wallet-balance-error', (event, arg) => {
+   logger.info('Received async-get-wallet-balance-error event')
+   
+   if (arg.length == 3) { 
+      let errMsg = arg[0];
+      let coin = arg[1];
+      let wallet = arg[2];
+      let message = `There was an error getting wallet balances for ${coin} (${wallet}).  The reported error is "${errMsg}".`;
+      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
+      utils.showErrorMessage(logger, message, instructions);
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+});
+
+// ************************
+// Purpose: This function receives the blockchain settings error from ipcMain.
+// ************************
+ipcRenderer.on('async-get-blockchain-settings-error', (event, arg) => {
+   logger.info('Received async-get-blockchain-settings-error event')
+   
+   if (arg.length = 1) {
+      let errMsg = arg[0];
+      let message = `There was an error getting the blockchain settings from AllTheBlocks.  The reported error is "${errMsg}".`;
+      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
+      utils.showErrorMessage(logger, message, instructions);
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+});
+
+// ************************
+// Purpose: This function receives the fork prices error from ipcMain.
+// ************************
+ipcRenderer.on('async-get-fork-prices-error', (event, arg) => {
+   logger.info('Received async-get-fork-prices-error event')
+   
+   if (arg.length == 1) {
+      let errMsg = arg[0];
+      let message = `There was an error getting fork prices from XCHForks.  The reported error is "${errMsg}".`;
+      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
+      utils.showErrorMessage(logger, message, instructions);
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+});
 
 // ************************
 // Purpose: This function receives the refresh wallets event from ipcMain and refresh the dashboard.
@@ -1021,7 +1093,7 @@ ipcRenderer.on('async-refresh-wallets', (event, arg) => {
    logger.info('Received async-refresh-wallets event');
 
    refreshDashboard();
-})
+});
 
 // ************************
 // Purpose: This function receives the add wallet event from ipcMain and initiates the add wallet process.
@@ -1034,7 +1106,7 @@ ipcRenderer.on('async-add-wallet', (event, arg) => {
    $('#no-wallets-found').hide();
    // Hide Set Launcher
    $('#set-launcher').hide();
-})
+});
 
 // ************************
 // Purpose: This function receives the set launcher id event from ipcMain and initiates the set launcher id process.
@@ -1050,7 +1122,7 @@ ipcRenderer.on('async-set-launcher', (event, arg) => {
 
    // Hide the add wallet panel
    $('#add-wallet').hide();
-})
+});
 
 // ************************
 // Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
@@ -1086,7 +1158,7 @@ ipcRenderer.on('async-refresh-card-display', (event, arg) => {
          coinRecovBalance: 0,
          coinRecovBalanceUSD: 0,
          coinWalletCount: 0
-      })
+      });
 
       // Reset the wallet cache
       walletCache.clear();

@@ -258,7 +258,8 @@ ipcMain.on('async-get-wallet-balance', function (event, arg) {
          event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
       })
       .catch(function (error) {
-         logger.error(error);
+         logger.error(error.message);
+         event.sender.send('async-get-wallet-balance-error', [error.message, coin, wallet]);
       });
    }
 });
@@ -270,9 +271,9 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
    logger.info('Received async-get-recoverable-wallet-balance event');
 
    if (arg.length == 1) {
-      let launcherid = arg[0];
+      let launcherId = arg[0];
 
-      let url = `${baseForkBoardApi}/fork-board/recovery?launcherId=${launcherid}`;
+      let url = `${baseForkBoardApi}/fork-board/recovery?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
       axios.get(url, {
@@ -283,7 +284,8 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
          event.sender.send('async-get-recoverable-wallet-balance-reply', result.data);
       })
       .catch(function (error) {
-         logger.error(error);
+         logger.error(error.message);
+         event.sender.send('async-get-recoverable-wallet-balance-error', [error.message, launcherId]);
       });
    }
 });
@@ -305,7 +307,8 @@ ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
       event.sender.send('async-get-blockchain-settings-reply', result.data);
    })
    .catch(function (error) {
-      logger.error(error);
+      logger.error(error.message);
+      event.sender.send('async-get-blockchain-settings-error', [error.message]);
    });
 });
 
@@ -326,7 +329,8 @@ ipcMain.on('async-get-fork-prices', function (event, _arg) {
       event.sender.send('async-get-fork-prices-reply', result.data);
    })
    .catch(function (error) {
-      logger.error(error);
+      logger.error(error.message);
+      event.sender.send('async-get-fork-prices-error', [error.message]);
    });
 });
 

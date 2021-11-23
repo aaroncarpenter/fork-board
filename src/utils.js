@@ -11,7 +11,31 @@ class Utils {
    //          timeout - 
    //  Return: N/A
    // ************************
-   showErrorMessage(logger, message, timeout) {
+   showErrorMessage(logger, message, instructions, timeout=null) {
+      logger.error(message);
+
+      $('#errorAlertMessage').text(message);
+      $('#errorAlertInstructions').text(instructions);
+      $('#errorAlertBox').show();
+
+      if (timeout != null) {
+         setTimeout(
+            function () {
+               $('#errorAlertBox').hide();
+            }, timeout
+         );
+      }
+   }
+
+   // ***********************
+   // Name: 	showWarnMessage
+   // Purpose: 
+   //    Args: logger - 
+   //          message - 
+   //          timeout - 
+   //  Return: N/A
+   // ************************
+   showWarnMessage(logger, message, timeout) {
       logger.error(message);
 
       $('#warnAlertBox').text(message);
