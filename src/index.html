@@ -33,15 +33,23 @@
             </div>
             <div class="d-flex align-items-end flex-column col-md-1">
                <div>
-                  <div id='theme-selector' style="display: none">
+                  <div id='theme-selector' style="display: none; padding-right: 5px;"">
                      <i id="show-dark-mode" class="fas fa-sun" data-toggle="tooltip" title="Show Dark Mode"></i>
                      <i id="show-light-mode" class="fas fa-moon" data-toggle="tooltip" title="Show Light Mode"></i>
                   </div>
                </div>
                <div>
-                  <div id="sort-order-label" class="d-flex justify-content-end">
-                     <small class="text-muted"></small>
+                  <div id="sort-dropdown" class="dropbtn dropdown" style="width: 100%; padding-right: 5px;"><small id="sort-dropdown-text"></small> 
+                     <div id="sort-dropdown-content" class="dropdown-content">
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateSortOrder('name')"><small>Name</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateSortOrder('coins')"><small>Coins</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateSortOrder('usd')"><small>USD</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateSortOrder('none')"><small>None</small></button>
+                     </div>
                   </div>
+                  <!--<div id="sort-order-label" class="d-flex justify-content-end">
+                     <small class="text-muted"></small>
+                  </div>-->
                </div>
             </div>
          </div>

@@ -299,7 +299,8 @@ function setDisplayTheme() {
 //  Return: N/A
 // ************************
 function setSortOrder() {
-   $('#sort-order-label small').text('Sort: ' + clientConfigObj.appSettings.sortField);
+  // $('#sort-order-label small').text(`Sort: ${clientConfigObj.appSettings.sortField}`);
+   $('#sort-dropdown-text').text(`Sort: ${clientConfigObj.appSettings.sortField}  `);
 
    if (clientConfigObj.appSettings.sortField != SortField.None)
    {
@@ -327,6 +328,29 @@ function setSortOrder() {
       {
          $('#' + coinData[i].coinPathName + '-card').css("order", i);
       }
+   }
+}
+
+// ***********************
+// Name: 	updateSortOrder
+// Purpose: This function changes the sort order.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function updateSortOrder(sort) {
+   let sortFld = sort;
+
+   if (sortFld != clientConfigObj.appSettings.sortField) {
+      clientConfigObj.appSettings.sortField = sortFld;
+
+      if (sortFld === 'none') {
+         refreshWalletView();
+      }
+      else {
+         setSortOrder();
+      }
+      
+      storeAppSettings();  
    }
 }
 
@@ -1183,31 +1207,6 @@ ipcRenderer.on('async-refresh-card-display', (event, arg) => {
    }
    else {
       logger.error('Reply args incorrect');
-   }
-});
-
-// ************************
-// Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
-// ************************
-ipcRenderer.on('async-set-sort-order', (event, arg) => {
-   logger.info('Received async-set-sort-order');
-
-   if (arg.length == 1)
-   {
-      let sortFld = arg[0];
-
-      if (sortFld != clientConfigObj.appSettings.sortField) {
-         clientConfigObj.appSettings.sortField = sortFld;
-
-         if (sortFld === 'none') {
-            refreshWalletView();
-         }
-         else {
-            setSortOrder();
-         }
-         
-         storeAppSettings();
-      }
    }
 });
 

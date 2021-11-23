@@ -404,43 +404,6 @@ const template = [
       ]
    },
    {
-      label: 'Sort',
-      submenu: [
-         {
-            label: 'Name',
-            click() {
-               logger.info('Sending set-sort-order (name) event');
-               win.webContents.send('async-set-sort-order', ['name']);
-            },
-            accelerator: 'Alt+CmdOrCtrl+N'
-         },
-         {
-            label: 'USD',
-            click() {
-               logger.info('Sending set-sort-order (usd) event');
-               win.webContents.send('async-set-sort-order', ['usd']);
-            },
-            accelerator: 'Alt+CmdOrCtrl+U'
-         },
-         {
-            label: 'Coins',
-            click() {
-               logger.info('Sending set-sort-order (coins) event');
-               win.webContents.send('async-set-sort-order', ['coins']);
-            },
-            accelerator: 'Alt+CmdOrCtrl+C'
-         },
-         {
-            label: 'None',
-            click() {
-               logger.info('Sending set-sort-order (none) event');
-               win.webContents.send('async-set-sort-order', ['none']);
-            },
-            accelerator: 'Alt+CmdOrCtrl+X'
-         }
-      ]
-   },
-   {
       label: 'View',
       submenu: [
          {
