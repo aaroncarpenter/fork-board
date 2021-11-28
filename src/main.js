@@ -462,6 +462,13 @@ const template = [
             }
          },
          {
+            label: 'Join us on Discord',
+            click() {
+               logger.info('Opening Discord Invite in Browser');
+               require("electron").shell.openExternal('https://discord.gg/pW9nNDt8');
+            }
+         },
+         {
             type: 'separator'
          },
          {
