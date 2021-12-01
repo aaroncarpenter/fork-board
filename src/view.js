@@ -1048,7 +1048,7 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-error', (event, arg) => {
       let errMsg = arg[0];
       let launcherId = arg[1];
       let message = `There was an error getting recoverable balances for LauncherId: ${launcherId}.  The reported error is "${errMsg}".`;
-      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
+      let instructions = 'Please restart the application or click Reload on the View menu.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }
    else {

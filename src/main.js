@@ -445,6 +445,42 @@ const template = [
       ]
    },
    {
+      label: 'Partners',
+      submenu: [
+         {
+            label: 'AllTheBlock.NET',
+            click() {
+               logger.info('Opening AllTheBlock.NET page in Browser');
+               require("electron").shell.openExternal('https://alltheblocks.net');
+            }
+         },
+         {
+            type: 'separator'
+         },
+         {
+            label: 'Chia Forks Blockchain',
+            click() {
+               logger.info('Opening Chia Forks Blockchain page in Browser');
+               require("electron").shell.openExternal('https://chiaforksblockchain.com');
+            }
+         },
+         {
+            label: 'Forks Chia Exchanger',
+            click() {
+               logger.info('Opening Forks Chia Exchanger page in Browser');
+               require("electron").shell.openExternal('https://forkschiaexchange.com');
+            }
+         },
+         {
+            label: 'Casino Maize',
+            click() {
+               logger.info('Opening Casino Maize page in Browser');
+               require("electron").shell.openExternal('https://casino.maize.farm');
+            }
+         }
+      ]
+   },
+   {
       label: 'About',
       submenu: [
          {
