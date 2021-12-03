@@ -17,9 +17,12 @@ logger.transports.file.resolvePath = function () {
    return path.join(__dirname, 'logs/main.log');
 };
 
-const agent = new https.Agent({
-   rejectUnauthorized: false
+axios.defaults.timeout = 30000;
+axios.defaults.httpsAgent = new https.Agent({ 
+   rejectUnauthorized: false,
+   keepAlive: true 
 });
+
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
 const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net";
 // #endregion
@@ -250,9 +253,7 @@ ipcMain.on('async-get-wallet-balance', function (event, arg) {
       logger.info('Wallet: ' + wallet + ', Coin: ' + coin);
 
       logger.info(`Requesting data from ${url}`);
-      axios.get(url, {
-         httpsAgent: agent
-      })
+      axios.get(url)
       .then(function (result) {
          logger.info('Sending async-get-wallet-balance-reply event');
          event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
@@ -276,9 +277,7 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
       let url = `${baseForkBoardApi}/fork-board/recovery?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
-      axios.get(url, {
-         httpsAgent: agent
-      })
+      axios.get(url)
       .then(function (result) {
          logger.info('Sending async-get-recoverable-wallet-balance-reply event');
          event.sender.send('async-get-recoverable-wallet-balance-reply', result.data);
@@ -299,9 +298,7 @@ ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
    let url = `${baseForkBoardApi}/fork-board/config`;
 
    logger.info(`Requesting data from ${url}`);
-   axios.get(url, {
-      httpsAgent: agent
-   })
+   axios.get(url)
    .then(function (result) {
       logger.info('Sending async-get-blockchain-settings-reply event');
       event.sender.send('async-get-blockchain-settings-reply', result.data);
@@ -321,9 +318,7 @@ ipcMain.on('async-get-fork-prices', function (event, _arg) {
    let url = `${baseForkBoardApi}/fork-board/price`;
 
    logger.info(`Requesting data from ${url}`);
-   axios.get(url, {
-      httpsAgent: agent
-   })
+   axios.get(url)
    .then(function (result) {
       logger.info('Sending async-get-fork-prices-reply event');
       event.sender.send('async-get-fork-prices-reply', result.data);
