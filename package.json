@@ -8,9 +8,9 @@
   "author": "Aaron Carpenter",
   "scripts": {
     "start": "electron .",
-    "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-board-gray.icns --prune=true --out=./out --ignore=^/assets/config",
-    "package-win": "electron-packager . ForkBoard --overwrite --win32 --x64 --icon=assets/icons/fork-board-gray.ico --prune=true --out=./out --ignore=^/assets/config",
-    "package-linux": "electron-packager . ForkBoard --overwrite --linux --x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./out --ignore=^/assets/config",
+    "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-board-gray.icns --prune=true --out=./out --ignore=^/assets/config --ignore=^/logs",
+    "package-win": "electron-packager . ForkBoard --overwrite --win32 --x64 --icon=assets/icons/fork-board-gray.ico --prune=true --out=./out --ignore=^/assets/config --ignore=^/logs",
+    "package-linux": "electron-packager . ForkBoard --overwrite --linux --x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./out --ignore=^/assets/config --ignore=^/logs",
     "installer-win": "electron-installer-windows --src ./out/ForkBoard-win32-x64 --dest ./out/installers --icon=assets/icons/fork-board-gray.ico",
     "installer-mac": "electron-installer-dmg ./out/ForkBoard-darwin-x64/fork-board.app ForkBoard",
     "installer-deb": "electron-installer-debian --src ./out/ForkBoard-linux-x64 --dest ./out/installers/ --arch amd64 --icon=assets/icons/fork-board-gray.png"
