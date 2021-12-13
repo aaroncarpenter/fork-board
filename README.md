@@ -85,14 +85,9 @@ Project Link: [https://github.com/aaroncarpenter/fork-board](https://github.com/
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-## Dontaions
-Chia - xch1vs77adnwhac9ctjzt90tk78fs02yazcnmeu8j648g0v4qdhdq6zsqn73kj
+## Donations
 
-HDD - hdd1wv2sez76p6w4us0s3n7qrkscd87705pzrkg8qecxa00n5v653kvsz9ssh8
-
-Fora - xfl1fh6y43r8p26773urssm75adwv9ld3p2wmv3ry90kxglvhpxnq8rq74csyz
-
-Flax - xfx1wv2sez76p6w4us0s3n7qrkscd87705pzrkg8qecxa00n5v653kvs9z0vnt
+[Click Here](https://github.com/aaroncarpenter/fork-board/wiki/Donations)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
