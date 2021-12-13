@@ -394,6 +394,15 @@ const template = [
             type: 'separator'
          },
          {
+            label: 'Import ForkBoard Wallet Tool Export',
+            click() {
+               importWalletToolFile();
+            }
+         },
+         {
+            type: 'separator'
+         },
+         {
             role: 'close'
          }
       ]
@@ -575,3 +584,20 @@ function restoreWalletConfig() {
       win.webContents.send('async-restore-wallet-config-action', [filePaths[0]]); 
    }
 }  
+
+function importWalletToolFile() {
+   let filePaths = dialog.showOpenDialogSync(win, { 
+      title: 'Select a WalletTool File to Import',
+      buttonLabel: 'Restore',
+      message: 'Please select the wallettool file to Import',
+      properties: ['openFile'],
+      filters: [
+         { name: 'JSON', extensions: ['json'] }
+       ] 
+   });
+
+   if (filePaths != undefined) {
+      logger.info('Sending async-import-wallet-tool-export-action event');
+      win.webContents.send('async-import-wallet-tool-export-action', [filePaths[0]]); 
+   }
+}

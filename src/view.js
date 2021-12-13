@@ -112,7 +112,7 @@ $('#show-light-mode').on('click', function () {
 });
 
 $('#check-add-wallet').on('click', function () {
-   addNewWallet();
+   addNewWallet($('#wallet-text-box').val());
    
    // Clear the value for the next entry
    $('#wallet-text-box').val(null);
@@ -299,8 +299,7 @@ function setDisplayTheme() {
 //  Return: N/A
 // ************************
 function setSortOrder() {
-  // $('#sort-order-label small').text(`Sort: ${clientConfigObj.appSettings.sortField}`);
-   $('#sort-dropdown-text').text(`Sort: ${clientConfigObj.appSettings.sortField}  `);
+  $('#sort-dropdown-text').text(`Sort: ${clientConfigObj.appSettings.sortField}  `);
 
    if (clientConfigObj.appSettings.sortField != SortField.None)
    {
@@ -416,12 +415,11 @@ function launcherDropdownSelectionHandler(launcherid) {
 //    Args: N/A
 //  Return: N/A
 // ************************
-function addNewWallet() {
+function addNewWallet(walletVal) {
    $('#show-recoverable-balance').prop('disabled', false);
    $('#show-actual-balance').prop('disabled', false);
    $('#add-wallet').hide();
    
-   let walletVal = $('#wallet-text-box').val();
    let walletArr = walletVal.split(',');
 
    if (walletVal.length > 0) {
@@ -1278,6 +1276,36 @@ ipcRenderer.on('async-restore-wallet-config-action', (event, arg) => {
             
             applyAppSettings();
             refreshDashboard();
+         }
+      }
+   }
+});
+
+// ************************
+// Purpose: This function is a handler for an event from ipcMain, triggered when the wallet tool import is initiated
+// ************************
+ipcRenderer.on('async-import-wallet-tool-export-action', (event, arg) => {
+   logger.info('Received async-import-wallet-tool-export-action');
+ 
+   if (arg.length == 1) {
+      let importFilename = arg[0];
+
+      if (fs.existsSync(importFilename)) {
+
+         let importObj = JSON.parse(fs.readFileSync(importFilename, 'utf8'));
+
+         //validate file
+         if (importObj.name == null || importObj.coinPath == null || importObj.date == null || importObj.walletConfiguration == null) {
+            utils.showInfoMessage(logger, `Invalid file format detected attempting to import the wallet tool file from ${importFilename}`, 4000);
+         }
+         else {
+
+            importObj.walletConfiguration.every(function (walletCfgObj) {
+               addNewWallet(walletCfgObj.wallet);
+               return true;
+            });
+
+            utils.showInfoMessage(logger, `Successfully imported a ForkBoard Wallet Tool Export file for ${importObj.coinPath} from ${importObj.date} - ${restoreFilename}`, 4000);
          }
       }
    }
