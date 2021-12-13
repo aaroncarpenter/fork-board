@@ -397,7 +397,8 @@ const template = [
             label: 'Import ForkBoard Wallet Tool Export',
             click() {
                importWalletToolFile();
-            }
+            },
+            accelerator: 'Alt+CmdOrCtrl+I'
          },
          {
             type: 'separator'
