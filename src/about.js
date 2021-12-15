@@ -2,7 +2,7 @@
 const {ipcRenderer} = require('electron');
 const logger = require('electron-log');
 const path = require('path');
-logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/about.log');
+logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/about.log');
 let $ = require('jquery');
 const DisplayTheme = {
    Dark: 'Dark',

@@ -2,7 +2,7 @@
 const {ipcRenderer} = require('electron');
 const remote = require('electron').remote;
 const logger = require('electron-log');
-logger.transports.file.resolvePath = () => path.join(__dirname, 'logs/walletDetails.log');
+logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/walletDetails.log');
 const Utils = require('./utils');
 const DisplayTheme = {
    Dark: 'Dark',

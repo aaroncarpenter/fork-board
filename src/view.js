@@ -3,9 +3,8 @@
    const Utils = require('./utils');
    const coinImgPath = 'https://assets.alltheblocks.net/icons/forks_big/{0}.png';
    const logger = require('electron-log');
-   logger.transports.file.resolvePath = function () {
-      return path.join(__dirname, 'logs/view.log');
-   };
+   logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/view.log');
+
    const DisplayMode = {
       Actual: 'Actual',
       Recoverable: 'Recoverable'
@@ -193,6 +192,12 @@ $('#open-nft-recovery').on('click', function () {
    //$('#nft-recovery').hide();
    openNFTRecoverySite();
 });
+
+$('#reload-button').on('click', function () {
+   logger.info('Sending async-reload-application event');
+   ipcRenderer.send('async-reload-application', []);
+});
+
 // #endregion
 
 // #region Client Settings Mgmt

@@ -53,10 +53,17 @@
          <div id="infoAlertBox" class="alert alert-info" style="display: none" role="alert"></div>
          <div id="warnAlertBox" class="alert alert-warning" style="display: none" role="alert"></div>
          <div id="errorAlertBox" class="alert alert-primary" style="display: none" role="alert">
-            <span id="errorAlertMessage"></span> 
-            <br />
-            <br />
-            <span id="errorAlertInstructions"></span>
+            <div class="d-flex justify-content-between row">
+               <div class="d-flex justify-content-center col-sm-8">
+                  <span id="errorAlertMessage"></span> 
+                  <br />
+                  <br />
+                  <span id="errorAlertInstructions"></span>
+               </div>
+               <div class="d-flex justify-content-center align-items-center col-sm-4">
+                  <div id="reload-button" class="btn btn-primary" style="width: 100%"><small>Reload</small></div>
+               </div>
+            </div>
          </div>
          <div id="no-wallets-found" class="alert alert-info" style="display: none" role="alert">
             <small class="text-muted">No wallets found.  Restore a Backup file or Select "Add Wallet" on the File menu to add your first wallet.</small>

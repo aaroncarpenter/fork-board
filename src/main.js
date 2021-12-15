@@ -10,12 +10,18 @@ const {
 } = require('electron');
 const url = require('url');
 const path = require('path');
+const fs = require('fs');
 const axios = require('axios');
 const https = require('https');
 const logger = require('electron-log');
-logger.transports.file.resolvePath = function () {
-   return path.join(__dirname, 'logs/main.log');
-};
+
+let logPath = path.resolve(__dirname, '../logs');
+// Create log folder if missing
+if (!fs.existsSync(logPath)) {
+   fs.mkdirSync(logPath);
+}
+
+logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/main.log');
 
 axios.defaults.timeout = 30000;
 axios.defaults.httpsAgent = new https.Agent({ 
@@ -184,6 +190,15 @@ ipcMain.on("close-wallet-details", function (_event, arg) {
          win.webContents.send('async-refresh-card-display', [coinCfg]);
       }
    }
+});
+
+// ************************
+// Purpose: This function handles the reload-application event from the Renderer.
+// ************************
+ipcMain.on("async-reload-application", function (_event, arg) {
+   logger.info('Received async-reload-application Event');
+
+   win.reload();
 });
 
 // ************************
