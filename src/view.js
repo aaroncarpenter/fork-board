@@ -1300,7 +1300,7 @@ ipcRenderer.on('async-import-wallet-tool-export-action', (event, arg) => {
          let importObj = JSON.parse(fs.readFileSync(importFilename, 'utf8'));
 
          //validate file
-         if (importObj.name == null || importObj.coinPath == null || importObj.date == null || importObj.walletConfiguration == null) {
+         if (importObj.name == null || importObj.forks == null || importObj.date == null || importObj.walletConfiguration == null) {
             utils.showInfoMessage(logger, `Invalid file format detected attempting to import the wallet tool file from ${importFilename}`, 4000);
          }
          else {
@@ -1310,7 +1310,7 @@ ipcRenderer.on('async-import-wallet-tool-export-action', (event, arg) => {
                return true;
             });
 
-            utils.showInfoMessage(logger, `Successfully imported a ForkBoard Wallet Tool Export file for ${importObj.coinPath} from ${importObj.date} - ${restoreFilename}`, 4000);
+            utils.showInfoMessage(logger, `Successfully imported a ForkBoard Wallet Tool Export file for ${importObj.forks} from ${importObj.date} - ${restoreFilename}`, 4000);
          }
       }
    }
