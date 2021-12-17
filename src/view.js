@@ -1129,6 +1129,8 @@ ipcRenderer.on('async-add-wallet', (event, arg) => {
    logger.info('Received async-add-wallet event');
    // Show the add wallet panel
    $('#add-wallet').show();
+   // Set focus on the text box
+   $('#wallet-text-box').focus();
    // Hide No wallets panel
    $('#no-wallets-found').hide();
    // Hide Set Launcher
@@ -1144,8 +1146,11 @@ ipcRenderer.on('async-set-launcher', (event, arg) => {
    if (clientConfigObj != null && clientConfigObj.launcherId != null && clientConfigObj.launcherId.length > 0) {
       $('#launcher-text-box').val(clientConfigObj.launcherId);
    }
-
+   // Show the launcher panel
    $('#set-launcher').show();
+ 
+   // Set focus on the text box
+   $('#launcher-text-box').focus();
 
    // Hide the add wallet panel
    $('#add-wallet').hide();
@@ -1295,7 +1300,7 @@ ipcRenderer.on('async-import-wallet-tool-export-action', (event, arg) => {
    if (arg.length == 1) {
       let importFilename = arg[0];
 
-      if (fs.existsSync(importFilename)) {
+      if (fs.existsSync(importFilename)) {     
 
          let importObj = JSON.parse(fs.readFileSync(importFilename, 'utf8'));
 
