@@ -475,6 +475,13 @@ const template = [
             }
          },
          {
+            label: 'XCHUniverse',
+            click() {
+               logger.info('Opening XCHUniverse page in Browser');
+               require("electron").shell.openExternal('https://xchuniverse.com');
+            }
+         },
+         {
             type: 'separator'
          },
          {
