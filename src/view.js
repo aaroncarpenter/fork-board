@@ -1104,7 +1104,7 @@ ipcRenderer.on('async-get-fork-prices-error', (event, arg) => {
    
    if (arg.length == 1) {
       let errMsg = arg[0];
-      let message = `There was an error getting fork prices from XCHForks.  The reported error is "${errMsg}".`;
+      let message = `There was an error getting fork prices from XCHUniverse.  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }
