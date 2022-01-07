@@ -1225,10 +1225,14 @@ ipcRenderer.on('async-backup-wallet-config-action', (event, arg) => {
    logger.info('Received async-backup-wallet-config-action');
   
       if (arg.length == 1) {
-         let backupDest = arg[0];
-         let backupFilename = path.join(backupDest, 'forkboard-backup.json');
-         // write the walletObj to the backup location
 
+         let currDate = new Date();
+         let currTimestamp = `${currDate.getFullYear()}${(currDate.getMonth()+1 < 10 ? '0' : '')}${currDate.getMonth()+1}${(currDate.getDate()+1 < 10 ? '0' : '')}${currDate.getDate()}${(currDate.getHours()+1 < 10 ? '0' : '')}${currDate.getHours()}${(currDate.getMinutes()+1 < 10 ? '0' : '')}${currDate.getMinutes()}${(currDate.getSeconds()+1 < 10 ? '0' : '')}${currDate.getSeconds()}`;
+
+         // Set the filename
+         let backupDest = arg[0];
+         let backupFilename = path.join(backupDest, `forkboard-backup-${currTimestamp}.json`);
+         
          let backFileStr = `{
             "name": "ForkBoard Backup File",
             "version": "${appVersion}",
