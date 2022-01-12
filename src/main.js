@@ -39,6 +39,9 @@ if (require('electron-squirrel-startup')) return app.quit();
 let appIcon = nativeImage.createFromPath('assets/icons/fork-board-gray.png');
 let displayTheme;
 
+//disable hardware based acceleration
+app.disableHardwareAcceleration();
+
 // #region Main Window
 let win;
 
