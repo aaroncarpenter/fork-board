@@ -520,7 +520,7 @@ function addEntry(wallet, loadBalance) {
 function refreshDashboard() {
    $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(0));
 
-   ipcRenderer.send('async-get-fork-prices', []);
+   ipcRenderer.send('async-get-fork-prices', [clientConfigObj.launcherId.split(',')[0]]);
 }
 
 // ***********************
@@ -954,7 +954,7 @@ ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
 
       // if coin config blank, retrieve the settings.  Else, update the prices in the current coin confog object.
       if (coinConfigObj.length == 0) {
-         ipcRenderer.send('async-get-blockchain-settings', []);   
+         ipcRenderer.send('async-get-blockchain-settings', [clientConfigObj.launcherId.split(',')[0]]);   
       }
       else {
          let updatedCoinConfigObj = [];

@@ -310,41 +310,47 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
 // ************************
 // Purpose: This function handles the async-get-blockchain-settings event from the Renderer.  It retrieves the block chain settings from ATB and sends the reply event with the data to the Renderer.
 // ************************
-ipcMain.on('async-get-blockchain-settings', function (event, _arg) {
+ipcMain.on('async-get-blockchain-settings', function (event, arg) {
    logger.info('Received async-get-blockchain-settings event');
 
-   let url = `${baseForkBoardApi}/fork-board/config`;
+   if (arg.length == 1) {
+      let launcherId = arg[0];
+      let url = `${baseForkBoardApi}/fork-board/config?launcherId=${launcherId}`;
 
-   logger.info(`Requesting data from ${url}`);
-   axios.get(url)
-   .then(function (result) {
-      logger.info('Sending async-get-blockchain-settings-reply event');
-      event.sender.send('async-get-blockchain-settings-reply', result.data);
-   })
-   .catch(function (error) {
-      logger.error(error.message);
-      event.sender.send('async-get-blockchain-settings-error', [error.message]);
-   });
+      logger.info(`Requesting data from ${url}`);
+      axios.get(url)
+      .then(function (result) {
+         logger.info('Sending async-get-blockchain-settings-reply event');
+         event.sender.send('async-get-blockchain-settings-reply', result.data);
+      })
+      .catch(function (error) {
+         logger.error(error.message);
+         event.sender.send('async-get-blockchain-settings-error', [error.message]);
+      });
+   }
 });
 
 // ************************
 // Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from XCHForks.com and sends the reply event with the data to the Renderer.
 // ************************
-ipcMain.on('async-get-fork-prices', function (event, _arg) {
+ipcMain.on('async-get-fork-prices', function (event, arg) {
    logger.info('Received async-get-fork-prices event');
  
-   let url = `${baseForkBoardApi}/fork-board/price`;
+   if (arg.length == 1) {
+      let launcherId = arg[0];
+      let url = `${baseForkBoardApi}/fork-board/price?launcherId=${launcherId}`;
 
-   logger.info(`Requesting data from ${url}`);
-   axios.get(url)
-   .then(function (result) {
-      logger.info('Sending async-get-fork-prices-reply event');
-      event.sender.send('async-get-fork-prices-reply', result.data);
-   })
-   .catch(function (error) {
-      logger.error(error.message);
-      event.sender.send('async-get-fork-prices-error', [error.message]);
-   });
+      logger.info(`Requesting data from ${url}`);
+      axios.get(url)
+      .then(function (result) {
+         logger.info('Sending async-get-fork-prices-reply event');
+         event.sender.send('async-get-fork-prices-reply', result.data);
+      })
+      .catch(function (error) {
+         logger.error(error.message);
+         event.sender.send('async-get-fork-prices-error', [error.message]);
+      });
+   }
 });
 
 // ************************
