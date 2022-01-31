@@ -29,14 +29,14 @@
                             <small class="text-muted">{4}</small>
                         </div>
                     </div>
-                    <div class="col-md-7 flex-fill text-center" style="border-left: 1px solid lightgray" title="Wallet balance in USD.  A '-' indicates that the coin price isn't available.">
+                    <div class="col-md-7 flex-fill text-center" style="border-left: 1px solid lightgray">
                         <div>
                             <h2 class="card-text">
-                                <div class="balance-usd"></div>
+                                <div class="balance-currency"></div>
                             </h2>
                         </div>
                         <div>
-                            <small class="text-muted">usd</small>
+                            <small id="balance-currency-label" class="text-muted"></small>
                         </div>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
                     </small>
                 </div>
                 <div class="d-flex col-md-6 justify-content-end">
-                    <small class="text-muted" title="Price per coin in USD from XCHForks">
+                    <small class="text-muted" title="Price per coin">
                         <div class="coin-price"></div>
                     </small>
                 </div>

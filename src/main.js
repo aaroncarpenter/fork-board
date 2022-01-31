@@ -38,6 +38,7 @@ if (require('electron-squirrel-startup')) return app.quit();
 
 let appIcon = nativeImage.createFromPath('assets/icons/fork-board-gray.png');
 let displayTheme;
+let currency;
 
 //disable hardware based acceleration
 app.disableHardwareAcceleration();
@@ -68,7 +69,7 @@ function createWindow() {
 let walletDetails;
 let refreshMainCard = false;
 
-function createWalletDetailsWindow(coinCfg, displayTheme) {
+function createWalletDetailsWindow(coinCfg, clientCfg, exchangeRates) {
    logger.info(`Creating the Wallet Details window for ${coinCfg.coinDisplayName}`);
    refreshMainCard = false;
    walletDetails = new BrowserWindow({
@@ -96,7 +97,7 @@ function createWalletDetailsWindow(coinCfg, displayTheme) {
 
    walletDetails.once("show", function () {
       logger.info(`Sending load-wallet-details event: ${coinCfg.coinDisplayName}`);
-      walletDetails.webContents.send("load-wallet-details", [coinCfg, displayTheme, process.platform, process.arch]);
+      walletDetails.webContents.send("load-wallet-details", [coinCfg, clientCfg, exchangeRates, process.platform, process.arch]);
    });
 
    walletDetails.once("ready-to-show", function () {
@@ -226,12 +227,13 @@ ipcMain.on('close-about-page', function (_event, _arg) {
 ipcMain.on("open-wallet-details", function (_event, arg) {
    logger.info('Received open-wallet-details Event');
 
-   if (arg.length == 2) {
+   if (arg.length == 3) {
       let coinCfg = arg[0];
-      let displayTheme = arg[1];
+      let clientCfg = arg[1];
+      let exchangeRates = arg[2]; 
 
       logger.info(`Create wallet details window for : ${coinCfg.coinDisplayName}`);
-      createWalletDetailsWindow(coinCfg, displayTheme);
+      createWalletDetailsWindow(coinCfg, clientCfg, exchangeRates);
    }
 });
 
@@ -308,20 +310,33 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
 });
 
 // ************************
-// Purpose: This function handles the async-get-blockchain-settings event from the Renderer.  It retrieves the block chain settings from ATB and sends the reply event with the data to the Renderer.
+// Purpose: This function handles the async-get-blockchain-settings event from the Renderer.  It retrieves the block chain settings from ForkBoard API and sends the reply event with the data to the Renderer.
 // ************************
 ipcMain.on('async-get-blockchain-settings', function (event, arg) {
    logger.info('Received async-get-blockchain-settings event');
 
    if (arg.length == 1) {
       let launcherId = arg[0];
-      let url = `${baseForkBoardApi}/fork-board/config?launcherId=${launcherId}`;
+      let settingsUrl = `${baseForkBoardApi}/fork-board/config?launcherId=${launcherId}`;
 
-      logger.info(`Requesting data from ${url}`);
-      axios.get(url)
-      .then(function (result) {
-         logger.info('Sending async-get-blockchain-settings-reply event');
-         event.sender.send('async-get-blockchain-settings-reply', result.data);
+      logger.info(`Requesting data from ${settingsUrl}`);
+      axios.get(settingsUrl)
+      .then(function (settingsResult) {
+         let exchangeUrl = `${baseForkBoardApi}/fork-board/exchangerates?launcherId=${launcherId}`;
+
+         logger.info(`Requesting data from ${exchangeUrl}`);
+         axios.get(exchangeUrl)
+         .then(function (exchangeResult) {
+            logger.info('Sending async-get-exchange-rates-reply event');
+            event.sender.send('async-get-exchange-rates-reply', exchangeResult.data);
+            
+            logger.info('Sending async-get-blockchain-settings-reply event');
+            event.sender.send('async-get-blockchain-settings-reply', settingsResult.data);
+         })
+         .catch(function (error) {
+            logger.error(error.message);
+            event.sender.send('async-get-exchange-rates-error', [error.message]);
+         });
       })
       .catch(function (error) {
          logger.error(error.message);
@@ -331,7 +346,7 @@ ipcMain.on('async-get-blockchain-settings', function (event, arg) {
 });
 
 // ************************
-// Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from XCHForks.com and sends the reply event with the data to the Renderer.
+// Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from ForkBoard API and sends the reply event with the data to the Renderer.
 // ************************
 ipcMain.on('async-get-fork-prices', function (event, arg) {
    logger.info('Received async-get-fork-prices event');
@@ -352,7 +367,32 @@ ipcMain.on('async-get-fork-prices', function (event, arg) {
       });
    }
 });
+/*
+// ************************
+// Purpose: This function handles the async-get-exchange-rates event from the Renderer.  It retrieves the exchange rates from the ForkBoard API and sends the reply event with the data to the Renderer.
+// ************************
+ipcMain.on('sync-get-exchange-rates', function (event, arg) {
+   logger.info('Received sync-get-exchange-rates event');
+ 
+   if (arg.length == 1) {
+      let launcherId = arg[0];
+      let url = `${baseForkBoardApi}/fork-board/exchangerates?launcherId=${launcherId}`;
 
+      logger.info(`Requesting data from ${url}`);
+      let response = await axios.get(url);
+      .then(function (result) {
+         logger.info('Sending sync-get-exchange-rates-reply event');
+         //event.sender.send('sync-get-exchange-rates-reply', result.data);
+         event.returnValue = result.data;
+      })
+      .catch(function (error) {
+         logger.error(error.message);
+         //event.sender.send('sync-get-exchange-rates-error', [error.message]);
+      });
+      
+   }
+});
+*/
 // ************************
 // Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from XCHForks.com and sends the reply event with the data to the Renderer.
 // ************************

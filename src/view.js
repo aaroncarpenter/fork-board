@@ -19,6 +19,13 @@
       Coins: 'coins',
       None: 'none'
    };
+   const Currency = {
+      USD: 'USD',
+      GBP: 'GBP',
+      EUR: 'EUR',
+      CNY: 'CNY',
+      RUB: 'CNY'
+   };
 // #endregion
 
 // #region Variable Definitions
@@ -45,7 +52,7 @@
 
    // write empty file if wallets file is missing.
    if (!fs.existsSync(clientConfigFile)) {
-      fs.writeFileSync(clientConfigFile, '{"launcherId": "", "appSettings": { "displayTheme": "Light", "sortField": "None", "autoRefreshEnabled": false}}'); 
+      fs.writeFileSync(clientConfigFile, '{"launcherId": "", "appSettings": { "displayTheme": "Light", "sortField": "None", "autoRefreshEnabled": false, "currency": "USD"}}'); 
    }
    let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
@@ -55,6 +62,7 @@
 
    let coinPriceObj = [];
    let coinConfigObj = [];
+   let exchangeRateObj = {};
    let coinData = [];   
    let lastRefreshed = new Date();
    let refreshTimerLength = 5*60*1000; // 5 minutes
@@ -247,6 +255,7 @@ function applyAppSettings() {
 
    setDisplayTheme();
    setSortOrder();
+   setCurrency();
 
    if (clientConfigObj != null && clientConfigObj.appSettings != null && clientConfigObj.appSettings.autoRefreshEnabled != null) {
       $('#autoRefreshCheck').prop("checked", clientConfigObj.appSettings.autoRefreshEnabled);
@@ -359,7 +368,42 @@ function updateSortOrder(sort) {
 }
 
 // ***********************
-// Name: 	setSortOrder
+// Name: 	setCurrency
+// Purpose: This function sets the currency.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function setCurrency() {
+   if (clientConfigObj.appSettings.currency == null)
+   {
+      clientConfigObj.appSettings.currency = "USD";
+   }
+
+   $('#currency-dropdown-text').text(`Curr: ${clientConfigObj.appSettings.currency.toLowerCase()}  `);
+
+   refreshWalletView();
+ }
+ 
+ // ***********************
+ // Name: 	updateCurrency
+ // Purpose: This function changes the currency.
+ //    Args: N/A
+ //  Return: N/A
+ // ************************
+ function updateCurrency(currency) {
+    let currencyFld = currency;
+ 
+    if (currency != clientConfigObj.appSettings.currency || clientConfigObj.appSettings.currency == null) {
+       clientConfigObj.appSettings.currency = currency;
+ 
+       setCurrency();
+       
+       storeAppSettings();  
+    }
+ }
+
+// ***********************
+// Name: 	setupLauncherDropdown
 // Purpose: This function sets up the launcher dropdown selector.
 //    Args: N/A
 //  Return: N/A
@@ -466,7 +510,7 @@ function loadWalletDetails(coin) {
 
    // Send the event to ipcMain to open the details page.
    logger.info('Sending open-wallet-details event');
-   ipcRenderer.send('open-wallet-details', [coinCfg, clientConfigObj.appSettings.displayTheme]);
+   ipcRenderer.send('open-wallet-details', [coinCfg, clientConfigObj, exchangeRateObj]);
 }
 
 // ***********************
@@ -518,7 +562,7 @@ function addEntry(wallet, loadBalance) {
 //  Return: N/A
 // ************************
 function refreshDashboard() {
-   $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(0));
+   $('#overallBalance').text(utils.getAdjustedCurrencyBalanceLabel(0, clientConfigObj.appSettings.currency, exchangeRateObj));
 
    ipcRenderer.send('async-get-fork-prices', [clientConfigObj.launcherId.split(',')[0]]);
 }
@@ -681,7 +725,7 @@ function updateCoinTotalBalance() {
       return true;
    });
 
-   $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(totalBalance));
+   $('#overallBalance').text(utils.getAdjustedCurrencyBalanceLabel(totalBalance, clientConfigObj.appSettings.currency, exchangeRateObj));
 }
 // #endregion
 
@@ -849,7 +893,7 @@ function refreshCardData(cardDataObj) {
       $('#'+coin+'-card .card-balances').show();
 
       if (cardDataObj.coinPrice != null) {
-         $('#'+coin+'-card .coin-price').text((utils.getAdjustedUSDBalanceLabel(Number(cardDataObj.coinPrice))) + ' each');
+         $('#'+coin+'-card .coin-price').text((utils.getAdjustedCurrencyBalanceLabel(Number(cardDataObj.coinPrice), clientConfigObj.appSettings.currency, exchangeRateObj)) + ' each');
       }
 
       // Update the balance
@@ -859,11 +903,14 @@ function refreshCardData(cardDataObj) {
       }
       
       // Update the balance in USD, set to '-' if price information isn't available
+      
+      $('#'+coin+'-card #balance-currency-label').text(clientConfigObj.appSettings.currency.toLowerCase());
+
       if (balanceUSD != null && balance > 0) {
-         $('#'+coin+'-card .card-body .balance-usd').text(utils.getAdjustedUSDBalanceLabel(balanceUSD));
+         $('#'+coin+'-card .card-body .balance-currency').text(utils.getAdjustedCurrencyBalanceLabel(balanceUSD, clientConfigObj.appSettings.currency, exchangeRateObj));
       }
       else {
-         $('#'+coin+'-card .card-body .balance-usd').text('-');
+         $('#'+coin+'-card .card-body .balance-currency').text('-');
       }
 
       if (displayMode === DisplayMode.Actual) {
@@ -952,7 +999,7 @@ ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
          return true;
       });
 
-      // if coin config blank, retrieve the settings.  Else, update the prices in the current coin confog object.
+      // if coin config blank, retrieve the settings.  Else, update the prices in the current coin config object.
       if (coinConfigObj.length == 0) {
          ipcRenderer.send('async-get-blockchain-settings', [clientConfigObj.launcherId.split(',')[0]]);   
       }
@@ -986,6 +1033,16 @@ ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
    else {
       logger.error('Reply args incorrect');
    }
+});
+
+// ************************
+// Purpose: This function receives the exchange rates reply from ipcMain
+// ************************
+ipcRenderer.on('async-get-exchange-rates-reply', (event, arg) => {
+   debugger;
+   logger.info('Received async-get-exchange-rates-reply event')
+
+   exchangeRateObj = arg.data;
 });
 
 // ************************
@@ -1105,6 +1162,23 @@ ipcRenderer.on('async-get-fork-prices-error', (event, arg) => {
    if (arg.length == 1) {
       let errMsg = arg[0];
       let message = `There was an error getting fork prices from XCHUniverse.  The reported error is "${errMsg}".`;
+      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
+      utils.showErrorMessage(logger, message, instructions);
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+});
+
+// ************************
+// Purpose: This function receives the exchange rates error from ipcMain.
+// ************************
+ipcRenderer.on('async-get-exchange-rates-error', (event, arg) => {
+   logger.info('Received async-get-exchange-rates-error event')
+   
+   if (arg.length == 1) {
+      let errMsg = arg[0];
+      let message = `There was an error getting exchange rates from the ForkBoard API.  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }

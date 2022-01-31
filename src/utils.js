@@ -123,6 +123,52 @@ class Utils {
       return balanceStr;
    }
 
+   // ***********************
+   // Name: 	getAdjustedUSDBalanceLabel
+   // Purpose: 
+   //    Args: balance - wallet balance value
+   //  Return: Formatted balance string
+   // ************************
+   getAdjustedCurrencyBalanceLabel(balance, currencyStr, exchangeRates) {
+      let balanceStr = "";
+
+      let exchangeRate = this.getUSDExchangeRate(currencyStr, exchangeRates);
+
+      balance = balance * exchangeRate;
+
+      // Round balance to whole number if higher than 10000.
+      if (balance > 10000) {
+         balance = Math.round(balance);
+      }
+
+      balanceStr = balance.toLocaleString(navigator.languages[0], {style: 'currency', currency: currencyStr});
+
+      // Strip the ending decimals if over 10000 since it was rounded above.
+      if (balance >= 10000) {
+         balanceStr = balanceStr.replace('.00','');
+      }
+
+      return balanceStr;
+   }
+
+   // ***********************
+   // Name: 	getUSDExchangeRate
+   // Purpose: 
+   //    Args: currency - currency to convert
+   //          exchangeRateObj - currency to convert
+   //  Return: exchange rate to USD
+   // ************************
+   getUSDExchangeRate(currency, exchangeRates) {
+      let exchangeRate = 1.0;
+
+      if (currency == 'GBP' || currency == 'EUR' || currency == 'RUB' || currency == 'CNY')
+      {
+         exchangeRate = exchangeRates[currency];
+      }
+
+      return exchangeRate;
+   }
+
   applySort(key, order = 'asc') {
       return function innerSort(a, b) {
         if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {

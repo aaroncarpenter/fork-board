@@ -23,6 +23,8 @@ let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 let coinCfg = {};
+let clientCfg = {};
+let exchangeRates = {};
 let displayTheme;
 let showCloseButton = false;
 // #endregion
@@ -137,7 +139,7 @@ function buildWalletCard(wallet, coinCfg) {
 //  Return: N/A
 // ************************
 function setDisplayTheme() {
-   if (displayTheme === DisplayTheme.Dark) {
+   if (clientCfg.appSettings.displayTheme === DisplayTheme.Dark) {
       $('body').addClass('dark-mode');
       $('div.card-body').addClass('dark-mode');
       $('div.card-header').addClass('dark-mode');
@@ -164,11 +166,12 @@ function setDisplayTheme() {
 ipcRenderer.on('load-wallet-details', (event, arg) => {
    logger.info('Received load-wallet-details event');
    
-   if (arg.length == 4) {
+   if (arg.length == 5) {
       coinCfg = arg[0];
-      displayTheme = arg[1];
-      let processPlatform = arg[2];
-      let processArch = arg[3];
+      clientCfg = arg[1];
+      exchangeRates = arg[2];
+      let processPlatform = arg[3];
+      let processArch = arg[4];
 
       logger.info(`Loading details for ${coinCfg.coinDisplayName}`);
       loadAndDisplayWallets();
@@ -204,12 +207,14 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
             $('#'+wallet+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
             $('#'+wallet+'-card .card-body .balance').prop('title', balance);
          }
-         
+
+         $('#'+wallet+'-card #balance-currency-label').text(clientCfg.appSettings.currency.toLowerCase());
+
          if (balanceUSD != null && balance > 0) {
-            $('#'+wallet+'-card .card-body .balance-usd').text(utils.getAdjustedUSDBalanceLabel(balanceUSD));
+            $('#'+wallet+'-card .card-body .balance-currency').text(utils.getAdjustedCurrencyBalanceLabel(balanceUSD, clientCfg.appSettings.currency, exchangeRates));
          }
          else {
-            $('#'+wallet+'-card .card-body .balance-usd').text('-');
+            $('#'+wallet+'-card .card-body .balance-currency').text('-');
          }
       }
    }
