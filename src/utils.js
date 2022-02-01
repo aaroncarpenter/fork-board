@@ -131,7 +131,7 @@ class Utils {
    // ************************
    getAdjustedCurrencyBalanceLabel(balance, currencyStr, exchangeRates) {
       let balanceStr = "";
-
+      let localeCode = "";
       let exchangeRate = this.getUSDExchangeRate(currencyStr, exchangeRates);
 
       balance = balance * exchangeRate;
@@ -141,11 +141,27 @@ class Utils {
          balance = Math.round(balance);
       }
 
-      balanceStr = balance.toLocaleString(navigator.languages[0], {style: 'currency', currency: currencyStr});
+      if (currencyStr == "USD")
+         localeCode = "en-US";
+      else if (currencyStr == "GBP")
+         localeCode = "en-GB";
+      else if (currencyStr == "EUR")
+         localeCode = navigator.languages[0];
+      else if (currencyStr == "RUB")
+         localeCode = "ru-RU";
+      else if (currencyStr == "CNY")
+         localeCode = "zh-CN";
 
+
+      //balanceStr = balance.toLocaleString(navigator.languages[0], {style: 'currency', currency: currencyStr});
+      balanceStr = balance.toLocaleString(localeCode, {style: 'currency', currency: currencyStr});
+      
       // Strip the ending decimals if over 10000 since it was rounded above.
       if (balance >= 10000) {
          balanceStr = balanceStr.replace('.00','');
+
+         if (currencyStr = 'RUB')
+            balanceStr = balanceStr.replace(',00','');
       }
 
       return balanceStr;
