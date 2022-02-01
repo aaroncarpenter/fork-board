@@ -15,7 +15,7 @@
    };
    const SortField = {
       Name: 'name',
-      USD: 'usd',
+      USD: 'balance',
       Coins: 'coins',
       None: 'none'
    };
@@ -75,6 +75,13 @@
    let processArch = "";
 
 $(function () {
+   // transition USD config value to new balance value
+   if (clientConfigObj.appSettings.sortField == 'usd')
+   {
+      clientConfigObj.appSettings.sortField = 'balance';
+      storeAppSettings();
+   }
+      
    applyAppSettings();
    refreshDashboard();
 
