@@ -161,7 +161,7 @@ class Utils {
    getUSDExchangeRate(currency, exchangeRates) {
       let exchangeRate = 1.0;
 
-      if (currency == 'GBP' || currency == 'EUR' || currency == 'RUB' || currency == 'CNY')
+      if (Object.keys(exchangeRates).length != 0 && (currency == 'GBP' || currency == 'EUR' || currency == 'RUB' || currency == 'CNY'))
       {
          exchangeRate = exchangeRates[currency];
       }

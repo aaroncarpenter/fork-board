@@ -589,7 +589,7 @@ function refreshWalletView() {
 //  Return: N/A
 // ************************
 function loadAndDisplayWallets(loadBalance) {  
-   $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(0));
+   $('#overallBalance').text(utils.getAdjustedCurrencyBalanceLabel(0, clientConfigObj.appSettings.currency, exchangeRateObj));
    //clear the wallet cache
    walletCache.clear();
 
@@ -837,7 +837,7 @@ function buildWalletCard(coinCfg, replaceExistingCard = false) {
 //  Return: N/A
 // ************************
 function getWalletBalances() {
-   $('#overallBalance').text(utils.getAdjustedUSDBalanceLabel(0));
+   $('#overallBalance').text(utils.getAdjustedCurrencyBalanceLabel(0, clientConfigObj.appSettings.currency, exchangeRateObj));
 
    $('#nft-recovery').hide();
 
