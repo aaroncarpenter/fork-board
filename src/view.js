@@ -1139,12 +1139,12 @@ ipcRenderer.on('async-check-latest-app-version-reply', (event, arg) => {
       $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_Ubuntu}" class="btn btn-primary"><small>Ubuntu</small></a></div>`);
 
       $('#infoVersionBox').show();
-      /*
+      
       setTimeout(
          function () {
             $('#infoVersionBox').hide();
          }, 10000
-      );*/
+      );
    }
    else {
       logger.error('Reply args incorrect');
