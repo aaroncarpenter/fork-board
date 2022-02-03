@@ -102,7 +102,7 @@ $(function () {
    {
       $('#show-recoverable-balance').prop('disabled', true);
       $('#show-actual-balance').prop('disabled', true);
-      $('#no-wallets-found').show();
+      $('#no-wallets-found').fadeIn(400, 'swing');
    }
 
 });
@@ -147,7 +147,7 @@ $('#check-add-wallet').on('click', function () {
 });
 
 $('#cancel-add-wallet').on('click', function () {
-   $('#add-wallet').hide();
+   $('#add-wallet').fadeOut(400, 'swing');
 
    // Clear the value for the next entry
    $('#wallet-text-box').val(null);
@@ -182,7 +182,7 @@ $('#add-launcher').on('click', function () {
 });
 
 $('#cancel-add-launcher').on('click', function () {
-   $('#set-launcher').hide();
+   $('#set-launcher').fadeOut(400, 'swing');
 });
 
 $('#show-actual-balance').on('click', function () {
@@ -193,7 +193,7 @@ $('#show-actual-balance').on('click', function () {
       $('#show-actual-balance').addClass('btn-primary');
       $('#show-actual-balance').removeClass('btn-secondary');
       $('#total-balance-type').text(displayMode);
-      $('#launcher-dropdown').hide();
+      $('#launcher-dropdown').fadeOut(400, 'swing');
       getWalletBalances();
    }
 });
@@ -207,12 +207,12 @@ $('#show-recoverable-balance').on('click', function () {
          $('#show-recoverable-balance').addClass('btn-primary');
          $('#show-recoverable-balance').removeClass('btn-secondary');
          $('#total-balance-type').text(displayMode);
-         $('#launcher-dropdown').show();
+         $('#launcher-dropdown').fadeIn(400, 'swing');
          setupLauncherDropdown();
          getWalletRecoverableBalances();
       }
       else {
-         $('#set-launcher').show();
+         $('#set-launcher').fadeIn(400, 'swing');
       }
    }
 });
@@ -237,7 +237,7 @@ $('#reload-button').on('click', function () {
 //  Return: N/A
 // ************************
 function saveLauncherId() {
-   $('#set-launcher').hide();
+   $('#set-launcher').fadeOut(400, 'swing');
    
    let launcherVal = $('#launcher-text-box').val();
 
@@ -488,7 +488,7 @@ function launcherDropdownSelectionHandler(launcherid) {
 function addNewWallet(walletVal) {
    $('#show-recoverable-balance').prop('disabled', false);
    $('#show-actual-balance').prop('disabled', false);
-   $('#add-wallet').hide();
+   $('#add-wallet').fadeOut(400, 'swing');
    
    let walletArr = walletVal.split(',');
 
@@ -880,7 +880,7 @@ function getWalletBalances() {
 //  Return: N/A
 // ************************
 function getWalletRecoverableBalances() {
-   $('#nft-recovery').show();
+   $('#nft-recovery').fadeIn(400, 'swing');
 
    initializeCoinDataSet();
 
@@ -911,7 +911,7 @@ function refreshCardData(cardDataObj) {
    if ($('#'+coin+'-card .card-text').length != 0) {
       // Remove loading spinner if present
       $('#'+coin+'-card .spinner-border').remove();
-      $('#'+coin+'-card .card-balances').show();
+      $('#'+coin+'-card .card-balances').fadeIn(400, 'swing');;
 
       if (cardDataObj.coinPrice != null) {
          $('#'+coin+'-card .coin-price').text((utils.getAdjustedCurrencyBalanceLabel(Number(cardDataObj.coinPrice), clientConfigObj.appSettings.currency, exchangeRateObj)) + ' each');
@@ -1138,11 +1138,11 @@ ipcRenderer.on('async-check-latest-app-version-reply', (event, arg) => {
       $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_MacOS}" class="btn btn-primary"><small>MacOS</small></a></div>`);
       $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_Ubuntu}" class="btn btn-primary"><small>Ubuntu</small></a></div>`);
 
-      $('#infoVersionBox').show();
+      $('#infoVersionBox').fadeIn(400, 'swing');
       
       setTimeout(
          function () {
-            $('#infoVersionBox').hide();
+            $('#infoVersionBox').fadeOut(400, 'swing');
          }, 10000
       );
    }
@@ -1232,8 +1232,8 @@ ipcRenderer.on('async-get-exchange-rates-error', (event, arg) => {
    if (arg.length == 1) {
       let errMsg = arg[0];
       let message = `There was an error getting exchange rates from the ForkBoard API.  The reported error is "${errMsg}".`;
-      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
-      utils.showErrorMessage(logger, message, instructions);
+      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.  This message will auto-hide in 5 seconds.';
+      utils.showErrorMessage(logger, message, instructions, 5000);
    }
    else {
       logger.error('Reply args incorrect');
@@ -1272,7 +1272,7 @@ ipcRenderer.on('async-refresh-wallets', (event, arg) => {
 ipcRenderer.on('async-add-wallet', (event, arg) => {
    logger.info('Received async-add-wallet event');
    // Show the add wallet panel
-   $('#add-wallet').show();
+   $('#add-wallet').fadeIn(400, 'swing');
    // Set focus on the text box
    $('#wallet-text-box').focus();
    // Hide No wallets panel
@@ -1291,7 +1291,7 @@ ipcRenderer.on('async-set-launcher', (event, arg) => {
       $('#launcher-text-box').val(clientConfigObj.launcherId);
    }
    // Show the launcher panel
-   $('#set-launcher').show();
+   $('#set-launcher').fadeIn(400, 'swing');
  
    // Set focus on the text box
    $('#launcher-text-box').focus();

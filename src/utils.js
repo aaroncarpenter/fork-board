@@ -14,14 +14,20 @@ class Utils {
    showErrorMessage(logger, message, instructions, timeout=null) {
       logger.error(message);
 
+      if (timeout != null)
+      {
+         instructions = `${instructions}.  This message will auto-hide in ${timeout/1000} seconds.}`;
+      }
+
       $('#errorAlertMessage').text(message);
       $('#errorAlertInstructions').text(instructions);
-      $('#errorAlertBox').show();
+      $('#errorAlertBox').fadeIn(400, 'swing');
 
       if (timeout != null) {
          setTimeout(
             function () {
-               $('#errorAlertBox').hide();
+               $('#errorAlertBox').fadeOut(400, 'swing');
+               $('#errorAlertBox').text(null);
             }, timeout
          );
       }
@@ -39,10 +45,11 @@ class Utils {
       logger.error(message);
 
       $('#warnAlertBox').text(message);
-      $('#warnAlertBox').show();
+      $('#warnAlertBox').fadeIn(400, 'swing');
       setTimeout(
          function () {
-            $('#warnAlertBox').hide();
+            $('#warnAlertBox').fadeOut(400, 'swing');
+            $('#warnAlertBox').text(null);
          }, timeout
       );
    }
@@ -59,37 +66,14 @@ class Utils {
       logger.info(message);
 
       $('#infoAlertBox').text(message);
-      $('#infoAlertBox').show();
+
+      $('#infoAlertBox').fadeIn(400, 'swing');
       setTimeout(
          function () {
-            $('#infoAlertBox').hide();
+            $('#infoAlertBox').fadeOut(400, 'swing');
             $('#infoAlertBox').text(null);
          }, timeout
       );
-   }
-
-   // ***********************
-   // Name: 	showVersionAlert
-   // Purpose: 
-   //    Args: logger - 
-   //          message - 
-   //          timeout - 
-   //  Return: N/A
-   // ************************
-   showErrorMessage(logger, message, instructions, timeout=null) {
-      logger.info(message);
-
-      $('#infoVersionMessage').text(message);
-      $('#infoVersionNotes').text(instructions);
-      $('#infoVersionBox').show();
-
-      if (timeout != null) {
-         setTimeout(
-            function () {
-               $('#infoVersionBox').hide();
-            }, timeout
-         );
-      }
    }
 
    // ***********************

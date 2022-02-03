@@ -67,15 +67,18 @@ small {
  .dropdown {
    position: relative;
    display: inline-block;
+   transition: display 1s;
  }
  
  /* Dropdown Content (Hidden by Default) */
  .dropdown-content {
-   display: none;
+   visibility: hidden;
+  opacity: 0;
    position: absolute;
    background-color: #f1f1f1;
    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
    z-index: 1;
+   transition: visibility 0s, opacity 0.5s linear;
  }
  
  /* Links inside the dropdown */
@@ -93,7 +96,7 @@ small {
 }
  
  /* Show the dropdown menu on hover */
- .dropdown:hover .dropdown-content {display: block;}
+ .dropdown:hover .dropdown-content {visibility: visible; opacity: 1}
  
  /* Change the background color of the dropdown button when the dropdown content is shown */
  /*.dropdown:hover .dropbtn {background-color: #3e8e41;}*/
