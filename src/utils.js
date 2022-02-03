@@ -67,6 +67,31 @@ class Utils {
          }, timeout
       );
    }
+
+   // ***********************
+   // Name: 	showVersionAlert
+   // Purpose: 
+   //    Args: logger - 
+   //          message - 
+   //          timeout - 
+   //  Return: N/A
+   // ************************
+   showErrorMessage(logger, message, instructions, timeout=null) {
+      logger.info(message);
+
+      $('#infoVersionMessage').text(message);
+      $('#infoVersionNotes').text(instructions);
+      $('#infoVersionBox').show();
+
+      if (timeout != null) {
+         setTimeout(
+            function () {
+               $('#infoVersionBox').hide();
+            }, timeout
+         );
+      }
+   }
+
    // ***********************
    // Name: 	getAdjustedBalanceLabel
    // Purpose: 
@@ -141,12 +166,33 @@ class Utils {
          balance = Math.round(balance);
       }
 
+      /*
+      */
+
       if (currencyStr == "USD")
          localeCode = "en-US";
       else if (currencyStr == "RUB")
          localeCode = "ru-RU";
       else if (currencyStr == "CNY")
          localeCode = "zh-CN";
+      else if (currencyStr == "TWD")
+         localeCode = "zh-TW";
+      else if (currencyStr == "JPY")
+         localeCode = "ja-JP";
+      else if (currencyStr == "KRW")
+         localeCode = "ko-KR";
+      else if (currencyStr == "PLN")
+         localeCode = "pl-PL";
+      else if (currencyStr == "AUD")
+         localeCode = "pl-PL";
+      else if (currencyStr == "CZK")
+         localeCode = "cs-CZ";
+      else if (currencyStr == "INR")
+         localeCode = "en-IN";
+      else if (currencyStr == "KZT")
+         localeCode = "kk-KZ";
+      else if (currencyStr == "UAH")
+         localeCode = "uk-UA";
       else
          localeCode = navigator.languages[0];
 
@@ -174,7 +220,7 @@ class Utils {
    getUSDExchangeRate(currency, exchangeRates) {
       let exchangeRate = 1.0;
 
-      if (Object.keys(exchangeRates).length != 0 && (currency == 'GBP' || currency == 'EUR' || currency == 'RUB' || currency == 'CNY'))
+      if (Object.keys(exchangeRates).length != 0 && currency != 'USD')
       {
          exchangeRate = exchangeRates[currency];
       }

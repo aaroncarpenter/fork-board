@@ -367,32 +367,55 @@ ipcMain.on('async-get-fork-prices', function (event, arg) {
       });
    }
 });
-/*
+
 // ************************
 // Purpose: This function handles the async-get-exchange-rates event from the Renderer.  It retrieves the exchange rates from the ForkBoard API and sends the reply event with the data to the Renderer.
 // ************************
-ipcMain.on('sync-get-exchange-rates', function (event, arg) {
-   logger.info('Received sync-get-exchange-rates event');
+ipcMain.on('async-check-latest-app-version', function (event, arg) {
+   logger.info('Received async-check-latest-app-version event');
  
-   if (arg.length == 1) {
-      let launcherId = arg[0];
-      let url = `${baseForkBoardApi}/fork-board/exchangerates?launcherId=${launcherId}`;
+   let url = 'https://api.github.com/repos/aaroncarpenter/fork-board/releases/latest';
+   
+   logger.info(`Requesting data from ${url}`);
+   axios.get(url)
+   .then(function (result) {
+      let latestVersion = result.data.tag_name.replace('v', '');
+   
+      if (versionCompare(app.getVersion(), latestVersion) != 0)
+      {
+         let data = {
+            "currentVersion" : app.getVersion(),
+            "latestVersion" : latestVersion,
+            "publishedDate" : result.data.published_at,
+            "releaseNotes" : result.data.body
+         };
 
-      logger.info(`Requesting data from ${url}`);
-      let response = await axios.get(url);
-      .then(function (result) {
-         logger.info('Sending sync-get-exchange-rates-reply event');
-         //event.sender.send('sync-get-exchange-rates-reply', result.data);
-         event.returnValue = result.data;
-      })
-      .catch(function (error) {
-         logger.error(error.message);
-         //event.sender.send('sync-get-exchange-rates-error', [error.message]);
-      });
-      
-   }
+         result.data.assets.every((asset) => {
+            if (asset.browser_download_url.includes(".exe"))
+            {
+               data.downloadURL_Windows = asset.browser_download_url;
+            }
+            else if (asset.browser_download_url.includes(".dmg"))
+            {
+               data.downloadURL_MacOS = asset.browser_download_url;
+            }
+            else if (asset.browser_download_url.includes(".deb"))
+            {
+               data.downloadURL_Ubuntu = asset.browser_download_url;
+            }
+            return true;
+         });
+
+         logger.info('Sending async-check-latest-app-version-reply event');
+         event.sender.send('async-check-latest-app-version-reply', [data]);
+      }  
+   })
+   .catch(function (error) {
+      logger.error(error.message);
+      event.sender.send('async-check-latest-app-version-error', [error.message]);
+   });
 });
-*/
+
 // ************************
 // Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from XCHForks.com and sends the reply event with the data to the Renderer.
 // ************************
@@ -672,4 +695,51 @@ function importWalletToolFile() {
       logger.info('Sending async-import-wallet-tool-export-action event');
       win.webContents.send('async-import-wallet-tool-export-action', [filePaths[0]]); 
    }
+}
+
+function versionCompare(v1, v2, options) {
+   var lexicographical = options && options.lexicographical,
+       zeroExtend = options && options.zeroExtend,
+       v1parts = v1.split('.'),
+       v2parts = v2.split('.');
+
+   function isValidPart(x) {
+       return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
+   }
+
+   if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
+       return NaN;
+   }
+
+   if (zeroExtend) {
+       while (v1parts.length < v2parts.length) v1parts.push("0");
+       while (v2parts.length < v1parts.length) v2parts.push("0");
+   }
+
+   if (!lexicographical) {
+       v1parts = v1parts.map(Number);
+       v2parts = v2parts.map(Number);
+   }
+
+   for (var i = 0; i < v1parts.length; ++i) {
+       if (v2parts.length == i) {
+           return 1;
+       }
+
+       if (v1parts[i] == v2parts[i]) {
+           continue;
+       }
+       else if (v1parts[i] > v2parts[i]) {
+           return 1;
+       }
+       else {
+           return -1;
+       }
+   }
+
+   if (v1parts.length != v2parts.length) {
+       return -1;
+   }
+
+   return 0;
 }

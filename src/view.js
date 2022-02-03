@@ -20,11 +20,21 @@
       None: 'none'
    };
    const Currency = {
-      USD: 'USD',
-      GBP: 'GBP',
-      EUR: 'EUR',
-      CNY: 'CNY',
-      RUB: 'CNY'
+      USD: 'USD', // US Dollars
+      GBP: 'GBP', // British Pound
+      EUR: 'EUR', // Euro
+      CNY: 'CNY', // China
+      RUB: 'RUB', // Russia
+      KRW: 'KRW', // South Korea
+      JPY: 'JPY', // Japan
+      AUD: 'AUD', // Australia
+      CZK: 'CZK', // Czechia
+      UAH: 'UAH', // Ukraine
+      TWD: 'TWD', // Taiwan
+      PLN: 'PLN', // Poland
+      XPF: 'XPF', // New Caledonia
+      KZT: 'KZT', // Kazakhstan
+      INR: 'INR'  // India
    };
 // #endregion
 
@@ -75,6 +85,9 @@
    let processArch = "";
 
 $(function () {
+   logger.info('Sending async-check-latest-app-version event');
+   ipcRenderer.send('async-check-latest-app-version', []);
+
    // transition USD config value to new balance value
    if (clientConfigObj.appSettings.sortField == 'usd')
    {
@@ -91,6 +104,7 @@ $(function () {
       $('#show-actual-balance').prop('disabled', true);
       $('#no-wallets-found').show();
    }
+
 });
 
 // #region Page Event Handlers
@@ -914,7 +928,7 @@ function refreshCardData(cardDataObj) {
       $('#'+coin+'-card #balance-currency-label').text(clientConfigObj.appSettings.currency.toLowerCase());
 
       if (balanceUSD != null && balance > 0) {
-         $('#'+coin+'-card .card-body .balance-currency').text(utils.getAdjustedCurrencyBalanceLabel(balanceUSD, clientConfigObj.appSettings.currency, exchangeRateObj));
+         $('#'+coin+'-card .card-body .balance-currency').text(utils.getAdjustedCurrencyBalanceLabel(balanceUSD, clientConfigObj.appSettings.currency, exchangeRateObj).replace(clientConfigObj.appSettings.currency, '').trim());
       }
       else {
          $('#'+coin+'-card .card-body .balance-currency').text('-');
@@ -1106,6 +1120,38 @@ ipcRenderer.on('async-get-recoverable-wallet-balance-reply', (event, arg) => {
 });
 
 // ************************
+// Purpose: This function receives the version information reply from ipcMain, checks latest version against current version.
+// ************************
+ipcRenderer.on('async-check-latest-app-version-reply', (event, arg) => {
+   logger.info('Received async-check-latest-app-version-reply event')
+
+   if (arg.length == 1) {
+      let replyData = arg[0];
+      let message = `You are currently running ForkBoard v${replyData.currentVersion}.  An updated version (<i><b>v${replyData.latestVersion}</b></i>) was released on ${new Date(replyData.publishedDate).toLocaleString('en-US')}.  Click to the right to download the latest versions.`;
+      let instructions = replyData.releaseNotes;
+
+      $('#infoVersionMessage').html(message);
+      $('#infoVersionNotes').html(`<br><u><b>ForkBoard v${replyData.latestVersion} Release Notes</b></u><br>${instructions}`);
+
+      //$('#version-download-buttons').append(`<small class="text-muted">Downloads</small>`);
+      $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_Windows}" class="btn btn-primary"><small>Windows</small></a></div>`);
+      $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_MacOS}" class="btn btn-primary"><small>MacOS</small></a></div>`);
+      $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_Ubuntu}" class="btn btn-primary"><small>Ubuntu</small></a></div>`);
+
+      $('#infoVersionBox').show();
+      /*
+      setTimeout(
+         function () {
+            $('#infoVersionBox').hide();
+         }, 10000
+      );*/
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+});
+
+// ************************
 // Purpose: This function receives the recoverable wallet balance error from ipcMain.
 // ************************
 ipcRenderer.on('async-get-recoverable-wallet-balance-error', (event, arg) => {
@@ -1186,6 +1232,23 @@ ipcRenderer.on('async-get-exchange-rates-error', (event, arg) => {
    if (arg.length == 1) {
       let errMsg = arg[0];
       let message = `There was an error getting exchange rates from the ForkBoard API.  The reported error is "${errMsg}".`;
+      let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
+      utils.showErrorMessage(logger, message, instructions);
+   }
+   else {
+      logger.error('Reply args incorrect');
+   }
+});
+
+// ************************
+// Purpose: This function receives the exchange rates error from ipcMain.
+// ************************
+ipcRenderer.on('async-check-latest-app-version-error', (event, arg) => {
+   logger.info('Received async-check-latest-app-version-error event')
+   
+   if (arg.length == 1) {
+      let errMsg = arg[0];
+      let message = `There was an error getting version information from Github.  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }

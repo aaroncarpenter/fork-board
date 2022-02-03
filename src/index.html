@@ -52,10 +52,20 @@
                   <div id="currency-dropdown" class="dropbtn dropdown" style="width: 100%; padding-right: 5px;"><small id="currency-dropdown-text"></small> 
                      <div id="currency-dropdown-content" class="dropdown-content">
                         <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('USD')"><small>USD</small></button>
-                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('GBP')"><small>GBP</small></button>
-                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('EUR')"><small>EUR</small></button>
-                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('RUB')"><small>RUB</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('AUD')"><small>AUD</small></button>
                         <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('CNY')"><small>CNY</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('CZK')"><small>CZK</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('EUR')"><small>EUR</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('GBP')"><small>GBP</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('INR')"><small>INR</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('KRW')"><small>KRW</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('KZT')"><small>KZT</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('JPY')"><small>JPY</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('PLN')"><small>PLN</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('RUB')"><small>RUB</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('TWD')"><small>TWD</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('UAH')"><small>UAH</small></button>
+                        <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateCurrency('XPF')"><small>XPF</small></button>
                      </div>
                   </div>
                </div>
@@ -73,6 +83,22 @@
                </div>
                <div class="d-flex justify-content-center align-items-center col-sm-4">
                   <div id="reload-button" class="btn btn-primary" style="width: 100%"><small>Reload</small></div>
+               </div>
+            </div>
+         </div>
+         <div id="infoVersionBox" class="alert alert-info alert-dismissible fade show" style="display: none" role="alert">
+            <div class="d-flex justify-content-between row">
+               <div class="d-flex justify-content-center col-sm-11">
+                  <div class="d-flex row">
+                     <div><small class="text-muted" id="infoVersionMessage"></small></div>
+
+                     <div><small class="text-muted" id="infoVersionNotes"></small></div>
+                     
+                     <div><br /><small class="text-muted"><b>REMEMBER to backup your configuration before installing!!</b></small></div>
+                  </div>
+               </div>
+               <div class="d-flex col-sm-1">
+                  <div class="d-flex row" id="version-download-buttons"></div>
                </div>
             </div>
          </div>
