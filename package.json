@@ -13,7 +13,7 @@
     "package-mac": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-board-gray.icns --prune=true --out=./out --ignore=^/assets/config --ignore=^/logs",
     "installer-mac": "electron-installer-dmg ./out/ForkBoard-darwin-x64/fork-board.app ForkBoard",
     "package-linux": "electron-packager . ForkBoard --overwrite --linux --x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./out --ignore=^/assets/config --ignore=^/logs",
-    "installer-deb": "electron-installer-debian --src ./out/ForkBoard-linux-x64 --dest ./out/installers/ --arch amd64 --icon=assets/icons/fork-board-gray.png"
+    "installer-deb": "electron-installer-debian --src ./out/ForkBoard-linux-x64 --dest ./out/installers/ --arch amd64 --icon=assets/icons/fork-board-gray.png  --overwrite=true"
   },
   "dependencies": {
     "axios": "^0.24.0",
