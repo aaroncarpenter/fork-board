@@ -31,6 +31,9 @@ axios.defaults.httpsAgent = new https.Agent({
 
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
 const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net";
+
+//TEST
+//const baseForkBoardApi = "https://localhost:44393";
 // #endregion
 
 // quit if startup from squirrel installation.
@@ -353,7 +356,7 @@ ipcMain.on('async-get-fork-prices', function (event, arg) {
  
    if (arg.length == 1) {
       let launcherId = arg[0];
-      let url = `${baseForkBoardApi}/fork-board/price?launcherId=${launcherId}`;
+      let url = `${baseForkBoardApi}/fork-board/price-test?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
       axios.get(url)
@@ -381,7 +384,7 @@ ipcMain.on('async-check-latest-app-version', function (event, arg) {
    .then(function (result) {
       let latestVersion = result.data.tag_name.replace('v', '');
    
-      if (versionCompare(app.getVersion(), latestVersion) != 0)
+      if (versionCompare(app.getVersion(), latestVersion) < 0)
       {
          let data = {
             "currentVersion" : app.getVersion(),

@@ -27,7 +27,6 @@ class Utils {
          setTimeout(
             function () {
                $('#errorAlertBox').fadeOut(400, 'swing');
-               $('#errorAlertBox').text(null);
             }, timeout
          );
       }
@@ -49,7 +48,6 @@ class Utils {
       setTimeout(
          function () {
             $('#warnAlertBox').fadeOut(400, 'swing');
-            $('#warnAlertBox').text(null);
          }, timeout
       );
    }
@@ -71,7 +69,6 @@ class Utils {
       setTimeout(
          function () {
             $('#infoAlertBox').fadeOut(400, 'swing');
-            $('#infoAlertBox').text(null);
          }, timeout
       );
    }
