@@ -1180,7 +1180,7 @@ ipcRenderer.on('async-get-wallet-balance-error', (event, arg) => {
       let errMsg = arg[0];
       let coin = arg[1];
       let wallet = arg[2];
-      let message = `There was an error getting wallet balances for ${coin} (${wallet}).  The reported error is "${errMsg}".`;
+      let message = `There was an error getting Wallet Balance for ${coin} (${wallet}).  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }
@@ -1197,7 +1197,7 @@ ipcRenderer.on('async-get-blockchain-settings-error', (event, arg) => {
    
    if (arg.length = 1) {
       let errMsg = arg[0];
-      let message = `There was an error getting the blockchain settings from AllTheBlocks.  The reported error is "${errMsg}".`;
+      let message = `There was an error getting the Blockchain Settings Information.  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }
@@ -1214,7 +1214,7 @@ ipcRenderer.on('async-get-fork-prices-error', (event, arg) => {
    
    if (arg.length == 1) {
       let errMsg = arg[0];
-      let message = `There was an error getting fork prices from XCHUniverse.  The reported error is "${errMsg}".`;
+      let message = `There was an error getting the Fork Price Information.  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }
@@ -1231,7 +1231,7 @@ ipcRenderer.on('async-get-exchange-rates-error', (event, arg) => {
    
    if (arg.length == 1) {
       let errMsg = arg[0];
-      let message = `There was an error getting exchange rates from the ForkBoard API.  The reported error is "${errMsg}".`;
+      let message = `There was an error getting the Exchange Rate Information.  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.  This message will auto-hide in 5 seconds.';
       utils.showErrorMessage(logger, message, instructions, 5000);
    }
@@ -1248,7 +1248,7 @@ ipcRenderer.on('async-check-latest-app-version-error', (event, arg) => {
    
    if (arg.length == 1) {
       let errMsg = arg[0];
-      let message = `There was an error getting version information from Github.  The reported error is "${errMsg}".`;
+      let message = `There was an error getting the latest App Version Information.  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }
