@@ -1248,7 +1248,7 @@ ipcRenderer.on('async-check-latest-app-version-error', (event, arg) => {
    
    if (arg.length == 1) {
       let errMsg = arg[0];
-      let message = `There was an error getting the latest App Version Information.  The reported error is "${errMsg}".`;
+      let message = `There was an error getting the latest App Version Information from Github.  The reported error is "${errMsg}".`;
       let instructions = 'Please restart the application.  Reach out to us on Discord or log an issue in Github if the issue continue.';
       utils.showErrorMessage(logger, message, instructions);
    }

@@ -30,7 +30,7 @@ axios.defaults.httpsAgent = new https.Agent({
 });
 
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
-const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net";
+const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net/fork-board";
 
 //TEST
 //const baseForkBoardApi = "https://localhost:44393";
@@ -297,7 +297,7 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
    if (arg.length == 1) {
       let launcherId = arg[0];
 
-      let url = `${baseForkBoardApi}/fork-board/recovery?launcherId=${launcherId}`;
+      let url = `${baseForkBoardApi}/recovery?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
       axios.get(url)
@@ -320,12 +320,12 @@ ipcMain.on('async-get-blockchain-settings', function (event, arg) {
 
    if (arg.length == 1) {
       let launcherId = arg[0];
-      let settingsUrl = `${baseForkBoardApi}/fork-board/config?launcherId=${launcherId}`;
+      let settingsUrl = `${baseForkBoardApi}/config?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${settingsUrl}`);
       axios.get(settingsUrl)
       .then(function (settingsResult) {
-         let exchangeUrl = `${baseForkBoardApi}/fork-board/exchangerates?launcherId=${launcherId}`;
+         let exchangeUrl = `${baseForkBoardApi}/exchangerates?launcherId=${launcherId}`;
 
          logger.info(`Requesting data from ${exchangeUrl}`);
          axios.get(exchangeUrl)
@@ -356,13 +356,18 @@ ipcMain.on('async-get-fork-prices', function (event, arg) {
  
    if (arg.length == 1) {
       let launcherId = arg[0];
-      let url = `${baseForkBoardApi}/fork-board/price-test?launcherId=${launcherId}`;
+      let url = `${baseForkBoardApi}/price?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
       axios.get(url)
       .then(function (result) {
-         logger.info('Sending async-get-fork-prices-reply event');
-         event.sender.send('async-get-fork-prices-reply', result.data);
+         if (Array.isArray(result.data)) {
+            logger.info('Sending async-get-fork-prices-reply event');
+            event.sender.send('async-get-fork-prices-reply', result.data);
+         }
+         else {
+            throw "Response data not in correct format.";
+         }
       })
       .catch(function (error) {
          logger.error(error.message);
