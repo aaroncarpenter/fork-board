@@ -86,7 +86,7 @@
 
 $(function () {
    logger.info('Sending async-check-latest-app-version event');
-   ipcRenderer.send('async-check-latest-app-version', []);
+   ipcRenderer.send('async-check-latest-app-version', [clientConfigObj.launcherId.split(',')[0]]);
 
    // transition USD config value to new balance value
    if (clientConfigObj.appSettings.sortField == 'usd')

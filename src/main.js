@@ -382,46 +382,49 @@ ipcMain.on('async-get-fork-prices', function (event, arg) {
 ipcMain.on('async-check-latest-app-version', function (event, arg) {
    logger.info('Received async-check-latest-app-version event');
  
-   let url = 'https://api.github.com/repos/aaroncarpenter/fork-board/releases/latest';
-   
-   logger.info(`Requesting data from ${url}`);
-   axios.get(url)
-   .then(function (result) {
-      let latestVersion = result.data.tag_name.replace('v', '');
-   
-      if (versionCompare(app.getVersion(), latestVersion) < 0)
-      {
-         let data = {
-            "currentVersion" : app.getVersion(),
-            "latestVersion" : latestVersion,
-            "publishedDate" : result.data.published_at,
-            "releaseNotes" : result.data.body
-         };
+   if (arg.length == 1) {
+      let launcherId = arg[0];
+      let url = `${baseForkBoardApi}/version-check?launcherId=${launcherId}`;
 
-         result.data.assets.every((asset) => {
-            if (asset.browser_download_url.includes(".exe"))
-            {
-               data.downloadURL_Windows = asset.browser_download_url;
-            }
-            else if (asset.browser_download_url.includes(".dmg"))
-            {
-               data.downloadURL_MacOS = asset.browser_download_url;
-            }
-            else if (asset.browser_download_url.includes(".deb"))
-            {
-               data.downloadURL_Ubuntu = asset.browser_download_url;
-            }
-            return true;
-         });
+      logger.info(`Requesting data from ${url}`);
+      axios.get(url)
+      .then(function (result) {
+         let latestVersion = result.data.tag_name.replace('v', '');
 
-         logger.info('Sending async-check-latest-app-version-reply event');
-         event.sender.send('async-check-latest-app-version-reply', [data]);
-      }  
-   })
-   .catch(function (error) {
-      logger.error(error.message);
-      event.sender.send('async-check-latest-app-version-error', [error.message]);
-   });
+         if (versionCompare(app.getVersion(), latestVersion) < 0)
+         {
+            let data = {
+               "currentVersion" : app.getVersion(),
+               "latestVersion" : latestVersion,
+               "publishedDate" : result.data.published_at,
+               "releaseNotes" : result.data.body
+            };
+
+            result.data.assets.every((asset) => {
+               if (asset.browser_download_url.includes(".exe"))
+               {
+                  data.downloadURL_Windows = asset.browser_download_url;
+               }
+               else if (asset.browser_download_url.includes(".dmg"))
+               {
+                  data.downloadURL_MacOS = asset.browser_download_url;
+               }
+               else if (asset.browser_download_url.includes(".deb"))
+               {
+                  data.downloadURL_Ubuntu = asset.browser_download_url;
+               }
+               return true;
+            });
+
+            logger.info('Sending async-check-latest-app-version-reply event');
+            event.sender.send('async-check-latest-app-version-reply', [data]);
+         }  
+      })
+      .catch(function (error) {
+         logger.error(error.message);
+         event.sender.send('async-check-latest-app-version-error', [error.message]);
+      });
+   }
 });
 
 // ************************
