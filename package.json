@@ -4,7 +4,7 @@
   "description": "An ElectronJS Dashboard App to show wallets balances from Chia and Forks in one convenient location.",
   "keywords": [],
   "main": "./src/main.js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Aaron Carpenter",
   "scripts": {
     "start": "electron .",
