@@ -165,7 +165,7 @@ class Utils {
       else if (currencyStr == "PLN")
          localeCode = "pl-PL";
       else if (currencyStr == "AUD")
-         localeCode = "pl-PL";
+         localeCode = "en-AU";
       else if (currencyStr == "CZK")
          localeCode = "cs-CZ";
       else if (currencyStr == "INR")

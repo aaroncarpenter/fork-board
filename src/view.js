@@ -919,7 +919,34 @@ function refreshCardData(cardDataObj) {
 
       // Update the balance
       if (balance != null) {
-         $('#'+coin+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
+         let balanceText = utils.getAdjustedBalanceLabel(balance);
+         
+         if (balanceText.length > 7) {
+            $('#'+coin+'-card .card-body .balance').parent().replaceWith(function() {
+               return $("<h4>", {
+                 class: this.className,
+                 html: $(this).html()
+               });
+             });
+         }
+         else if (balanceText.length > 5) {
+            $('#'+coin+'-card .card-body .balance').parent().replaceWith(function() {
+               return $("<h3>", {
+                 class: this.className,
+                 html: $(this).html()
+               });
+             });
+         }
+         else {
+             $('#'+coin+'-card .card-body .balance').parent().replaceWith(function() {
+               return $("<h2>", {
+                 class: this.className,
+                 html: $(this).html()
+               });
+             });
+         }
+
+         $('#'+coin+'-card .card-body .balance').text(balanceText);
          $('#'+coin+'-card .card-body .balance').prop('title', balance);
       }
       
@@ -928,7 +955,34 @@ function refreshCardData(cardDataObj) {
       $('#'+coin+'-card #balance-currency-label').text(clientConfigObj.appSettings.currency.toLowerCase());
 
       if (balanceUSD != null && balance > 0) {
-         $('#'+coin+'-card .card-body .balance-currency').text(utils.getAdjustedCurrencyBalanceLabel(balanceUSD, clientConfigObj.appSettings.currency, exchangeRateObj).replace(clientConfigObj.appSettings.currency, '').trim());
+         let balanceText = utils.getAdjustedCurrencyBalanceLabel(balanceUSD, clientConfigObj.appSettings.currency, exchangeRateObj).replace(clientConfigObj.appSettings.currency, '').trim();
+
+         if (balanceText.length > 10) {
+            $('#'+coin+'-card .card-body .balance-currency').parent().replaceWith(function() {
+               return $("<h4>", {
+                 class: this.className,
+                 html: $(this).html()
+               });
+             });
+         }
+         else if (balanceText.length > 7) {
+            $('#'+coin+'-card .card-body .balance-currency').parent().replaceWith(function() {
+               return $("<h3>", {
+                 class: this.className,
+                 html: $(this).html()
+               });
+             });
+         }
+         else {
+             $('#'+coin+'-card .card-body .balance-currency').parent().replaceWith(function() {
+               return $("<h2>", {
+                 class: this.className,
+                 html: $(this).html()
+               });
+             });
+         }
+
+         $('#'+coin+'-card .card-body .balance-currency').text(balanceText);
       }
       else {
          $('#'+coin+'-card .card-body .balance-currency').text('-');
@@ -1074,8 +1128,8 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    
    if (arg.length == 4) {
       let coin = arg[0];
-      let balance = arg[2];
-      let balanceBefore = arg[3];
+      let balance = arg[2]*100;
+      let balanceBefore = arg[3]*100;
       let change = balance - balanceBefore;
 
       logger.info(`Coin: ${coin}, Balance: ${balance}, Change: ${change}`);
