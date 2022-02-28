@@ -1128,8 +1128,8 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
    
    if (arg.length == 4) {
       let coin = arg[0];
-      let balance = arg[2]*100;
-      let balanceBefore = arg[3]*100;
+      let balance = arg[2];
+      let balanceBefore = arg[3];
       let change = balance - balanceBefore;
 
       logger.info(`Coin: ${coin}, Balance: ${balance}, Change: ${change}`);
