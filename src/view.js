@@ -276,7 +276,7 @@ function applyAppSettings() {
 
    setDisplayTheme();
    setSortOrder();
-   setCurrency();
+   setCurrency(false);
 
    if (clientConfigObj != null && clientConfigObj.appSettings != null && clientConfigObj.appSettings.autoRefreshEnabled != null) {
       $('#autoRefreshCheck').prop("checked", clientConfigObj.appSettings.autoRefreshEnabled);
@@ -324,7 +324,7 @@ function setDisplayTheme() {
 
    storeAppSettings();
 
-   ipcRenderer.send('load-main-dashboard', [clientConfigObj.appSettings.displayTheme]);
+   ipcRenderer.send('load-platform-info', [clientConfigObj.appSettings.displayTheme]);
 }
 
 // ***********************
@@ -394,7 +394,7 @@ function updateSortOrder(sort) {
 //    Args: N/A
 //  Return: N/A
 // ************************
-function setCurrency() {
+function setCurrency(refreshDashboard = true) {
    if (clientConfigObj.appSettings.currency == null)
    {
       clientConfigObj.appSettings.currency = "USD";
@@ -402,7 +402,9 @@ function setCurrency() {
 
    $('#currency-dropdown-text').text(`Curr: ${clientConfigObj.appSettings.currency.toLowerCase()}  `);
 
-   refreshWalletView();
+   if (refreshDashboard) {
+      refreshWalletView();
+   }
  }
  
  // ***********************
@@ -1524,10 +1526,10 @@ ipcRenderer.on('async-import-wallet-tool-export-action', (event, arg) => {
 });
 
 // ************************
-// Purpose: This function is a handler for an event from ipcMain, triggered when the the wallet restore is initiated
+// Purpose: This function is a handler for an event from ipcMain, triggered when load platform information is returned
 // ************************
-ipcRenderer.on('load-main-dashboard-reply', (event, arg) => {
-   logger.info('Received load-main-dashboard-reply');
+ipcRenderer.on('async-load-platform-info-reply', (event, arg) => {
+   logger.info('Received async-load-platform-info-reply');
 
    if (arg.length == 3) {
       appVersion = arg[0];

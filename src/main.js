@@ -428,17 +428,17 @@ ipcMain.on('async-check-latest-app-version', function (event, arg) {
 });
 
 // ************************
-// Purpose: This function handles the async-get-fork-prices event from the Renderer.  It retrieves the fork prices from XCHForks.com and sends the reply event with the data to the Renderer.
+// Purpose: This function handles the async-load-platform-info event from the Renderer.  The renderer sends the display theme information and main responsds with the version and platform information.
 // ************************
-ipcMain.on('load-main-dashboard', function (event, arg) {
-   logger.info('Received load-main-dashboard event');
+ipcMain.on('async-load-platform-info', function (event, arg) {
+   logger.info('Received async-load-platform-info event');
 
    if (arg.length == 1) {
       displayTheme = arg[0];
    }
 
-   logger.info('Sending load-main-dashboard-reply event');
-   event.sender.send('load-main-dashboard-reply', [app.getVersion(), process.platform, process.arch]);
+   logger.info('Sending async-load-platform-info-reply event');
+   event.sender.send('async-load-platform-info-reply', [app.getVersion(), process.platform, process.arch]);
 });
 // #endregion
 
