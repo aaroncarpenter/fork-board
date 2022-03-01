@@ -89,8 +89,7 @@ $(function () {
    ipcRenderer.send('async-check-latest-app-version', [clientConfigObj.launcherId.split(',')[0]]);
 
    // transition USD config value to new balance value
-   if (clientConfigObj.appSettings.sortField == 'usd')
-   {
+   if (clientConfigObj.appSettings.sortField == 'usd') {
       clientConfigObj.appSettings.sortField = 'balance';
       storeAppSettings();
    }
@@ -98,13 +97,11 @@ $(function () {
    applyAppSettings();
    refreshDashboard();
 
-   if (walletObj.length == 0)
-   {
+   if (walletObj.length == 0) {
       $('#show-recoverable-balance').prop('disabled', true);
       $('#show-actual-balance').prop('disabled', true);
       $('#no-wallets-found').fadeIn(400, 'swing');
    }
-
 });
 
 // #region Page Event Handlers
