@@ -33,7 +33,7 @@ const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
 const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net/fork-board";
 
 //TEST
-//const baseForkBoardApi = "https://localhost:44393";
+//const baseForkBoardApi = "https://localhost:44393/fork-board";
 // #endregion
 
 // quit if startup from squirrel installation.

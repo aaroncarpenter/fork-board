@@ -177,8 +177,7 @@ class Utils {
       else
          localeCode = navigator.languages[0];
 
-      //balanceStr = balance.toLocaleString('de-DE', {style: 'currency', currency: currencyStr});
-      balanceStr = balance.toLocaleString(localeCode, {style: 'currency', currency: currencyStr});
+       balanceStr = balance.toLocaleString(localeCode, {style: 'currency', currency: currencyStr});
       
       // Strip the ending decimals if over 10000 since it was rounded above.
       if (balance >= 10000) {
