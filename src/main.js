@@ -76,7 +76,7 @@ function createWalletDetailsWindow(coinCfg, clientCfg, exchangeRates) {
    logger.info(`Creating the Wallet Details window for ${coinCfg.coinDisplayName}`);
    refreshMainCard = false;
    walletDetails = new BrowserWindow({
-      width: 600,
+      width: 660,
       height: 600,
       modal: true,
       show: false,
