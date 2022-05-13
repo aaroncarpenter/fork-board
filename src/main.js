@@ -597,7 +597,7 @@ const template = [
             label: 'ForkBoard Wiki',
             click() {
                logger.info('Opening ForkBoard Wiki in Browser');
-               require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board/wiki/1.--Home');
+               require("electron").shell.openExternal('https://github.com/aaroncarpenter/fork-board/wiki');
             }
          },
          {
@@ -611,7 +611,7 @@ const template = [
             label: 'Join us on Discord',
             click() {
                logger.info('Opening Discord Invite in Browser');
-               require("electron").shell.openExternal('https://discord.gg/pW9nNDt8');
+               require("electron").shell.openExternal('https://discord.gg/c6MXDR9TQD');
             }
          },
          {
