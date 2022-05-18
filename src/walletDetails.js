@@ -1,5 +1,5 @@
 // #region Const Definitions
-const {ipcRenderer} = require('electron');
+const {ipcRenderer, clipboard} = require('electron');
 const remote = require('electron').remote;
 const logger = require('electron-log');
 logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/walletDetails.log');
@@ -110,7 +110,7 @@ function loadAndDisplayWallets() {
    walletObj.every(function (w) {
       if (w.wallet.startsWith(coinCfg.coinPrefix)) {
          logger.info(`Loading Wallet Details for wallet: ${w.wallet}`);
-         buildWalletCard(w.wallet, coinCfg);
+         buildWalletCard(w.wallet, w.label, coinCfg);
 
          ipcRenderer.send('async-get-wallet-balance', [w.wallet, coinCfg.coinPathName]);
       }
@@ -126,9 +126,15 @@ function loadAndDisplayWallets() {
 //          coinCfg - The coin configuration object.
 //  Return: N/A
 // *************************
-function buildWalletCard(wallet, coinCfg) {
-      let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', wallet).replace('{2}', wallet).replace('{3}', coinCfg.coinPrefix);
-      
+function buildWalletCard(wallet, label, coinCfg) {
+      if (label == null)
+         label = wallet;
+
+      let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', label).replace('{2}', wallet).replace('{3}', coinCfg.coinPrefix).replace('{4}', wallet);
+      updateString = updateString.replace('{5}', wallet).replace('{6}', wallet).replace('{7}', wallet).replace('{8}', wallet).replace('{9}', wallet).replace('{10}', wallet);
+      updateString = updateString.replace('{11}', wallet).replace('{12}', wallet).replace('{13}', wallet).replace('{14}', wallet);
+
+
       $('#wallet-cards').append(updateString);
 }
 
@@ -156,6 +162,84 @@ function setDisplayTheme() {
       $('div.card').removeClass('dark-mode');
    }
 }
+
+function displayEditBox(wallet)
+{
+   let existingWalletLabel = '';
+
+   walletObj.every(function (w) {
+      if (w.wallet == wallet && w.label != null) {
+         existingWalletLabel = w.label;
+      }
+
+      return true;
+   });
+
+   if (existingWalletLabel.length == 0) {
+      existingWalletLabel = wallet;
+   }
+
+   $('#'+wallet+'-card-label-edit-text-box').val(existingWalletLabel);
+
+   if ($('#'+wallet+'-card-label').length != 0) {
+      $('#'+wallet+'-card-label').hide();
+      $('#'+wallet+'-card-action').hide();
+      $('#'+wallet+'-card-label-edit').show();
+      $('#'+wallet+'-card-label-action').show();
+   }
+}
+
+function hideEditBox(wallet)
+{
+   if ($('#'+wallet+'-card-label').length != 0) {
+      $('#'+wallet+'-card-label').show();
+      $('#'+wallet+'-card-action').show();
+      $('#'+wallet+'-card-label-edit').hide();
+      $('#'+wallet+'-card-label-action').hide();
+   }
+}
+
+function saveLabelUpdate(wallet)
+{
+   logger.info(`Saving label for Wallet: ${wallet}`);
+   if ($('#'+wallet+'-card-label-edit-text-box').length != 0) {
+      let updatedLabel = $('#'+wallet+'-card-label-edit-text-box').val();
+
+      if (updatedLabel.length > 0)
+      {
+         walletObj.every(function (w) {
+            if (w.wallet == wallet) {
+               w.label = updatedLabel;
+            }
+      
+            return true;
+         });
+
+         // Update the existing statis field.
+         $('#'+wallet+'-card-label').html(`<small>${updatedLabel}&nbsp;&nbsp;&nbsp;&nbsp;</small>`);
+
+         //hid ethe Edit controls.
+         hideEditBox(wallet);         
+      }
+      storeWalletSettings();
+   }
+}
+
+function copyWalletAddress(wallet)
+{
+   clipboard.writeText(wallet);
+}
+
+// ***********************
+// Name: 	storeWalletSettings
+// Purpose: 
+//    Args: N/A
+//  Return: N/A
+// ************************
+function storeWalletSettings() {
+   fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
+}
+
 // #endregion
 
 // #region Electron Event Handlers

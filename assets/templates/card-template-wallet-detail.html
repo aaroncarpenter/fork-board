@@ -2,9 +2,22 @@
     <div class="card">
         <div class="card-header">
             <div class="d-flex flex-row justify-content-between">
-                <div><small>{1}&nbsp;&nbsp;&nbsp;&nbsp;</small></div>
-                <div><button type="button" onclick="handleWalletDelete('{2}')" class="btn-close" title="Delete this wallet"
-                        aria-label="Close"></button></div>
+                <div id="{4}-card-label" class="col-sm-10"><small>{1}&nbsp;&nbsp;&nbsp;&nbsp;</small></div>
+                <div id="{5}-card-label-edit" style="display: none" class="col-sm-10">
+                    <input type="text" style="width: 500px; height: 25px" name="Label" value="" id="{6}-card-label-edit-text-box" placeholder="Enter new label." class="form-control" required>
+                 </div>
+
+                 <div id="{7}-card-label-action" style="display: none" class="justify-content-end">
+                    <nobr>
+                       <i class="fas fa-check" onclick="saveLabelUpdate('{8}');" title="Click to Save"></i>&nbsp;
+                       <i class="fas fa-times" onclick="hideEditBox('{9}');" title="Click to Cancel"></i>
+                    </nobr>
+                 </div>
+                <div id="{14}-card-action" class="justify-content-end">
+                    <i class="fa fa-pencil" onclick="displayEditBox('{10}');" title="Update the Name"></i> &nbsp;
+                    <i class="fas fa-paste" onclick="copyWalletAddress('{11}');" title="Copy Address to the Clipboard"></i> &nbsp;
+                    <i class="fas fa-times" onclick="handleWalletDelete('{12}');" title="Delete this Wallet"></i>
+                </div>
             </div>
         </div>
         <div class="card-body">
