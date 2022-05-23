@@ -75,7 +75,7 @@ function handleWalletDelete(wallet) {
       // remove the card from the display
       $('#'+wallet+'-card').remove();
  
-      ipcRenderer.send('async-set-dashboard-refresh-flag', []);
+      ipcRenderer.send('async-set-dashboard-maincard-refresh-flag', []);
    }
 }
 
@@ -130,17 +130,18 @@ function buildWalletCard(wallet, label, coinCfg) {
       if (label == null)
          label = wallet;
 
+      // Replace all of the placeholder text in the template
       let updateString = cardTemplate.replace('{0}', wallet).replace('{1}', label).replace('{2}', wallet).replace('{3}', coinCfg.coinPrefix).replace('{4}', wallet);
       updateString = updateString.replace('{5}', wallet).replace('{6}', wallet).replace('{7}', wallet).replace('{8}', wallet).replace('{9}', wallet).replace('{10}', wallet);
       updateString = updateString.replace('{11}', wallet).replace('{12}', wallet).replace('{13}', wallet).replace('{14}', wallet);
 
-
+      // Append the element HTML
       $('#wallet-cards').append(updateString);
 }
 
 // ***********************
 // Name: 	setDisplayTheme
-// Purpose: This function stores the configuration file
+// Purpose: This function sets the display theme
 //    Args: N/A
 //  Return: N/A
 // ************************
@@ -163,10 +164,17 @@ function setDisplayTheme() {
    }
 }
 
+// ***********************
+// Name: 	displayEditBox
+// Purpose: This function displays the edit box for the specified wallet card.
+//    Args: wallet - The address of the wallet
+//  Return: N/A
+// ************************
 function displayEditBox(wallet)
 {
    let existingWalletLabel = '';
 
+   // Iterate through to set the textbox initial value to the existing label
    walletObj.every(function (w) {
       if (w.wallet == wallet && w.label != null) {
          existingWalletLabel = w.label;
@@ -175,30 +183,53 @@ function displayEditBox(wallet)
       return true;
    });
 
+   // Use wallet address if a label attrobute isn't found.
    if (existingWalletLabel.length == 0) {
       existingWalletLabel = wallet;
    }
 
+   // Set the value
    $('#'+wallet+'-card-label-edit-text-box').val(existingWalletLabel);
 
-   if ($('#'+wallet+'-card-label').length != 0) {
-      $('#'+wallet+'-card-label').hide();
-      $('#'+wallet+'-card-action').hide();
-      $('#'+wallet+'-card-label-edit').show();
-      $('#'+wallet+'-card-label-action').show();
-   }
+   // Show the edit fields
+   toggleEditBox(wallet, true);
+   
 }
 
-function hideEditBox(wallet)
+// ***********************
+// Name: 	toggleEditBox
+// Purpose: This function toggles the edit box after save or cancel.
+//    Args: wallet - The address of the wallet
+//          show - boolean indicating whether to show/hide the edit box
+//  Return: N/A
+// ************************
+function toggleEditBox(wallet, show)
 {
    if ($('#'+wallet+'-card-label').length != 0) {
-      $('#'+wallet+'-card-label').show();
-      $('#'+wallet+'-card-action').show();
-      $('#'+wallet+'-card-label-edit').hide();
-      $('#'+wallet+'-card-label-action').hide();
+
+      if (show)
+      {
+         $('#'+wallet+'-card-label').hide();
+         $('#'+wallet+'-card-action').hide();
+         $('#'+wallet+'-card-label-edit').show();
+         $('#'+wallet+'-card-label-action').show();
+      }
+      else
+      {
+         $('#'+wallet+'-card-label').show();
+         $('#'+wallet+'-card-action').show();
+         $('#'+wallet+'-card-label-edit').hide();
+         $('#'+wallet+'-card-label-action').hide();
+      }
    }
 }
 
+// ***********************
+// Name: 	saveLabelUpdate
+// Purpose: This function saves the updated label into the configuration file.
+//    Args: wallet - The address of the wallet
+//  Return: N/A
+// ************************
 function saveLabelUpdate(wallet)
 {
    logger.info(`Saving label for Wallet: ${wallet}`);
@@ -215,16 +246,23 @@ function saveLabelUpdate(wallet)
             return true;
          });
 
-         // Update the existing statis field.
+         // Update the existing static field.
          $('#'+wallet+'-card-label').html(`<small>${updatedLabel}&nbsp;&nbsp;&nbsp;&nbsp;</small>`);
 
-         //hid ethe Edit controls.
-         hideEditBox(wallet);         
+         //hide the Edit controls.
+         toggleEditBox(wallet, false);         
       }
+      
       storeWalletSettings();
    }
 }
 
+// ***********************
+// Name: 	copyWalletAddress
+// Purpose: This function copies the wallet address to the clipboard
+//    Args: wallet - The address of the wallet
+//  Return: N/A
+// ************************
 function copyWalletAddress(wallet)
 {
    clipboard.writeText(wallet);
@@ -288,7 +326,7 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
          $('#'+wallet+'-card .card-balances').show();
 
          if (balance != null) {
-            $('#'+wallet+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance));
+            $('#'+wallet+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance, clientCfg.appSettings.decimalPlaces));
             $('#'+wallet+'-card .card-body .balance').prop('title', balance);
          }
 

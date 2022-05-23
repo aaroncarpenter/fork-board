@@ -48,6 +48,8 @@ app.disableHardwareAcceleration();
 
 // #region Main Window
 let win;
+let refreshMainCard = false;
+let refreshDashboard = false;
 
 function createWindow() {
    win = new BrowserWindow({
@@ -70,7 +72,6 @@ function createWindow() {
 
 // #region Wallet Details Window
 let walletDetails;
-let refreshMainCard = false;
 
 function createWalletDetailsWindow(coinCfg, clientCfg, exchangeRates) {
    logger.info(`Creating the Wallet Details window for ${coinCfg.coinDisplayName}`);
@@ -157,6 +158,53 @@ function createAboutWindow() {
 }
 // #endregion
 
+// #region User Settings
+let userSettings;
+
+function createUserSettingsWindow(clientCfg) {
+   logger.info(`Creating the User Settings window`);
+   userSettings = new BrowserWindow({
+      width: 500,
+      height: 375,
+      modal: true,
+      show: false,
+      parent: win, // Make sure to add parent window here
+      autoHideMenuBar: true,
+
+      // Make sure to add webPreferences with below configuration
+      webPreferences: {
+         nodeIntegration: true,
+         contextIsolation: false,
+         enableRemoteModule: true
+      },
+      icon: appIcon
+   });
+
+   userSettings.loadURL(url.format({
+      pathname: path.join(__dirname, 'userSettings.html'),
+      protocol: 'file:',
+      slashes: true
+   }));
+
+   userSettings.once("show", function () {
+      logger.info(`Sending load-user-settings event`);
+      userSettings.webContents.send("load-user-settings", [process.platform, process.arch]);
+   });
+
+   userSettings.once("ready-to-show", function () {
+      logger.info('Ready to show - User Settings');
+      userSettings.show();
+   });
+
+   userSettings.on('close', function () {
+      if (win && refreshDashboard) {
+         logger.info(`Sending async-refresh-wallets event`);
+         win.webContents.send('async-refresh-wallets', []);
+      }
+   });
+}
+// #endregion
+
 // #region Web Page Window
 let webPageWin;
 
@@ -200,6 +248,28 @@ ipcMain.on("close-wallet-details", function (_event, arg) {
 });
 
 // ************************
+// Purpose: This function handles the close-user-settings event from the Renderer.  It closes the User Settings page.  This event is used to handle a user hitting "Escape" to close the user settings.
+// ************************
+ipcMain.on("close-user-settings", function (_event, arg) {
+   logger.info('Received close-user-settings Event');
+   userSettings.hide();
+
+   if (win && refreshDashboard) {
+      logger.info(`Sending async-refresh-wallets event`);
+      win.webContents.send('async-refresh-wallets', []);
+   }
+});
+
+// ************************
+// Purpose: This function handles the open-user-settings event from the Renderer.  It opens the User Settings page.
+// ************************
+ipcMain.on("show-user-settings", function (_event, arg) {
+   logger.info('Received open-user-settings Event');
+   logger.info(`Create user settings window`);
+   createUserSettingsWindow();
+});
+
+// ************************
 // Purpose: This function handles the reload-application event from the Renderer.
 // ************************
 ipcMain.on("async-reload-application", function (_event, arg) {
@@ -209,15 +279,23 @@ ipcMain.on("async-reload-application", function (_event, arg) {
 });
 
 // ************************
-// Purpose: This function handles setting the card refresh flag when wallets are deleted from the wallet details page.
+// Purpose: This function handles setting the main card refresh flag when wallets are deleted from the wallet details page.
 // ************************
-ipcMain.on('async-set-dashboard-refresh-flag', function (_event, _arg) {
-   logger.info('Received async-set-dashboard-refresh-flag Event');
+ipcMain.on('async-set-dashboard-maincard-refresh-flag', function (_event, _arg) {
+   logger.info('Received async-set-dashboard-maincard-refresh-flag Event');
    refreshMainCard = true;
 });
 
 // ************************
-// Purpose: This function handles setting the card refresh flag when wallets are deleted from the wallet details page.
+// Purpose: This function handles setting the dashboard refresh flag.
+// ************************
+ipcMain.on('async-set-dashboard-refresh-flag', function (_event, _arg) {
+   logger.info('Received async-set-dashboard-refresh-flag Event');
+   refreshDashboard = true;
+});
+
+// ************************
+// Purpose: This function handles the about page close
 // ************************
 ipcMain.on('close-about-page', function (_event, _arg) {
    logger.info('Received close-about-page Event');
@@ -631,6 +709,12 @@ const template = [
             label: 'About ForkBoard',
             click() {
                createAboutWindow();
+            }
+         } ,
+         {
+            label: 'Show User Settings',
+            click() {
+               createUserSettingsWindow();
             }
          }  
       ]

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset = "UTF-8">
+      <title>User Settings</title>
+      <link rel = "stylesheet" href = "../bower_components/bootstrap/dist/css/bootstrap.min.css" />
+      <link rel = "stylesheet" href = "./css/forkboard.css" />
+      <script src="https://kit.fontawesome.com/80792d13b7.js" crossorigin="anonymous"></script>
+      <style type = "text/css">
+         #wallet-list {
+            overflow-y: auto;
+         }
+
+         .card-footer {
+            padding-top: 1px;
+            padding-bottom: 0.1rem;
+            margin-bottom: 0.5rem;
+         }
+
+         .card-header {
+            padding-top: 0.1rem;
+            padding-bottom: 0.1rem;
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+         }
+
+         .container {
+            margin-left: 25px !important;
+            margin-right: 25px !important;
+            width: 500px;
+         }
+
+         .form-control {
+            font-size: 14px;
+            font-variant: small-caps;
+            margin-left: 0px;
+         }
+
+         small {
+            font-variant: small-caps;
+         }
+
+         .form-group1 {
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+         }
+
+         h2 {
+            margin-left: 10px;
+         }
+
+         .card {
+            width: 98%;
+            margin: 5px;
+         }
+      </style>
+
+   
+   </head>
+   
+   <body>
+      <div id="container">
+         <div id="close-button-div" class="card-header">
+            <div class="d-flex flex-row justify-content-between">
+               <div><small id="user-settings-title"></small></button></div>
+               <div><button type="button" onclick="closeWindow()" class="btn-close" aria-label="Close" title="Close this window"></button></div>
+            </div>
+         </div>
+
+         <div class="card">
+            <div class="card-header">
+               <div style="margin-left: 5px;">
+                  Refresh Interval
+               </div>
+            </div>
+            <div class="card-body">
+               <div class="form-group">
+                  <div id="refresh-interval" style="width: 100%" class="btn-group btn-group-sm btn-group-justified" role="group">
+                     <div class="btn-group" style="width: 25%">
+                        <button type="button" id="refresh-interval-5" onclick="setRefreshInterval(5);" class="btn btn-primary btn-small"><small>5 minutes</small></button>
+                     </div>
+                     <div class="btn-group" style="width: 25%">
+                        <button type="button" id="refresh-interval-15" onclick="setRefreshInterval(15);" class="btn btn-secondary btn-small"><small>15 minutes</small></button>
+                     </div>
+                     <div class="btn-group" style="width: 25%">
+                        <button type="button" id="refresh-interval-30" onclick="setRefreshInterval(30);" class="btn btn-secondary btn-small"><small>30 minutes</small></button>
+                     </div>
+                     <div class="btn-group" style="width: 25%">
+                        <button type="button" id="refresh-interval-60" onclick="setRefreshInterval(60);" class="btn btn-secondary btn-small"><small>1 hour</small></button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="card">
+            <div class="card-header">
+               <div style="margin-left: 5px;">
+                  Decimal Places
+               </div>
+            </div>
+            <div class="card-body">
+               <div class="form-group">
+                  <div id="decimal-places" style="width: 100%" class="btn-group btn-group-sm btn-group-justified" role="group">
+                     <div class="btn-group" style="width: 25%">
+                        <button type="button" id="decimal-places-0" style="width: 25%" onclick="setDecimalPlaces(0);" class="btn btn-primary btn-small"><small>0</small></button>
+                     </div>
+                     <div class="btn-group" style="width: 25%">
+                        <button type="button" id="decimal-places-1" onclick="setDecimalPlaces(1);" class="btn btn-secondary btn-small"><small>1</small></button>
+                     </div>
+                     <div class="btn-group" style="width: 25%">
+                        <button type="button" id="decimal-places-2" onclick="setDecimalPlaces(2);" class="btn btn-secondary btn-small"><small>2</small></button>
+                     </div>
+                     <div class="btn-group" style="width: 25%">
+                        <button type="button" id="decimal-places-3" onclick="setDecimalPlaces(3);" class="btn btn-secondary btn-small"><small>3</small></button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="card">
+            <div class="card-header">
+               <div style="margin-left: 5px;">
+                  Display Theme
+               </div>
+            </div>
+            <div class="card-body">
+               <div class="form-group">
+                  <div id="display-theme" style="width: 100%" class="btn-group btn-group-sm btn-group-justified" role="group">
+                     <div class="btn-group" style="width: 50%">
+                        <button type="button" id="display-theme-Light" onclick="setDisplayTheme('Light');" class="btn btn-primary btn-small"><small><i class="fas fa-sun"></i></small></button>
+                     </div>
+                     <div class="btn-group" style="width: 50%">
+                        <button type="button" id="display-theme-Dark" onclick="setDisplayTheme('Dark');" class="btn btn-secondary btn-small"><small><i class="fas fa-moon"></i></small></button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         
+         <div class="form-group">
+            <div style="width: 98%; margin: 5px; margin-top: 10px;" class="btn-group btn-group-sm btn-group-justified" role="group">
+               <div class="btn-group" style="width: 100%">
+                  <button type="button" id="close-window" onclick="closeUserSettings();" class="btn btn-primary"><small>Save</small></button>
+               </div>
+            </div>
+         </div>
+      <script src = "./userSettings.js" ></script>
+      </div>
+   </body>
+</html>

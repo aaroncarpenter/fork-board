@@ -114,8 +114,12 @@ $(function () {
 function autoRefreshHandler() {
    clientConfigObj.appSettings.autoRefreshEnabled = $('#autoRefreshCheck')[0].checked;
 
+   // Get the refresh interval in milliseconds
+   let autoRefreshInterval = ((clientConfigObj.appSettings.autoRefreshInterval != null) ? clientConfigObj.appSettings.autoRefreshInterval : 5);
+
    if ($('#autoRefreshCheck')[0].checked) {
-      refreshTimerId = setInterval(function() {refreshDashboard();}, refreshTimerLength);
+      logger.info(`Setting the refresh interval to ${autoRefreshInterval} minutes.`);
+      refreshTimerId = setInterval(function() {refreshDashboard();}, autoRefreshInterval * 60 * 1000);
    }
    else {
       clearInterval(refreshTimerId);
@@ -134,6 +138,11 @@ $('#show-dark-mode').on('click', function () {
 $('#show-light-mode').on('click', function () {
    clientConfigObj.appSettings.displayTheme = DisplayTheme.Light;
    setDisplayTheme();
+});
+
+$('#show-user-settings').on('click', function () {
+   logger.info('Sending show-user-settings event');
+   ipcRenderer.send('show-user-settings', []);
 });
 
 $('#check-add-wallet').on('click', function () {
@@ -918,8 +927,11 @@ function refreshCardData(cardDataObj) {
 
       // Update the balance
       if (balance != null) {
-         let balanceText = utils.getAdjustedBalanceLabel(balance);
-         
+         debugger;
+         let balanceText = utils.getAdjustedBalanceLabel(balance, clientConfigObj.appSettings.decimalPlaces);
+
+         logger.info(`Balance text is ${balanceText}`);
+              
          if (balanceText.length > 7) {
             $('#'+coin+'-card .card-body .balance').parent().replaceWith(function() {
                return $("<h4>", {
@@ -1023,7 +1035,7 @@ function refreshCardData(cardDataObj) {
 // Purpose: This function receives the blockchain settings reply from ipcMain and loads the dashboard
 // ************************
 ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
-   logger.info('Received async-get-blockchain-settings-reply event')
+   logger.info('Received async-get-blockchain-settings-reply event');
    
    if (arg.length > 0) {
       coinConfigObj = [];
@@ -1113,7 +1125,6 @@ ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
 // Purpose: This function receives the exchange rates reply from ipcMain
 // ************************
 ipcRenderer.on('async-get-exchange-rates-reply', (event, arg) => {
-   debugger;
    logger.info('Received async-get-exchange-rates-reply event')
 
    exchangeRateObj = arg.data;
@@ -1315,6 +1326,8 @@ ipcRenderer.on('async-check-latest-app-version-error', (event, arg) => {
 // ************************
 ipcRenderer.on('async-refresh-wallets', (event, arg) => {
    logger.info('Received async-refresh-wallets event');
+
+   clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
    refreshDashboard();
 });

@@ -79,8 +79,12 @@ class Utils {
    //    Args: balance - wallet balance value
    //  Return: Formatted balance string
    // ************************
-   getAdjustedBalanceLabel(balance) {
+   getAdjustedBalanceLabel(balance, decimalPlaces) {
       let balanceStr = "";
+
+      if (decimalPlaces == null) {
+         decimalPlaces = 2;
+      }
 
       if (balance < 1000 && balance >= 1) {
          balance = Math.round(balance*100)/100;
@@ -93,13 +97,13 @@ class Utils {
       }
 
       if (balance < 100000) {
-         balanceStr = balance.toLocaleString();
+         balanceStr = roundToPreferredDecimalPlaces(balance, decimalPlaces).toLocaleString();
       } else if (balance < 1000000) {
-         balanceStr = (balance / 1000).toLocaleString() + "K";
+         balanceStr = roundToPreferredDecimalPlaces(balance / 1000, decimalPlaces).toLocaleString() + "K";
       } else if (balance < 1000000000) {
-         balanceStr = (Math.round((balance / 1000000) * 10) / 10).toLocaleString() + "M";
+         balanceStr = roundToPreferredDecimalPlaces(balance / 1000000, decimalPlaces).toLocaleString() + "M";
       } else {
-         balanceStr = (Math.round((balance / 1000000000) * 10) / 10).toLocaleString() + "B";
+         balanceStr = roundToPreferredDecimalPlaces(balance / 1000000000, decimalPlaces).toLocaleString() + "B";
       }
 
       return balanceStr;
@@ -231,4 +235,16 @@ class Utils {
     }
 }
 
+
 module.exports = Utils;
+
+// ***********************
+// Name: 	roundToPreferredDecimalPlaces
+// Purpose: 
+//    Args: value - value to round
+//          places - number of decimal places 
+//  Return: Rounded value
+// ************************
+function roundToPreferredDecimalPlaces(value, places) {
+   return Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
+}
