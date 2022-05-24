@@ -25,12 +25,12 @@
          }
 
          .container {
-            margin-left: 25px !important;
-            margin-right: 25px !important;
+            margin-left: 10px !important;
+            margin-right: 10px !important;
          }
 
          .walletCard {
-            min-width: 650px;
+            min-width: 680px;
          }
 
          .form-control {
@@ -48,13 +48,13 @@
    </head>
    
    <body>
-      <div class = "container">
-         <div id="close-button-div" class="card-header">
-            <div class="d-flex flex-row justify-content-between">
-               <div><small id="wallet-details-title"></small></button></div>
-               <div><button type="button" onclick="closeWindow()" class="btn-close" aria-label="Close" title="Close this window"></button></div>
-            </div>
+      <div id="close-button-div" class="card-header">
+         <div class="d-flex flex-row justify-content-between">
+            <div><small id="wallet-details-title"></small></button></div>
+            <div><i class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i></div>
          </div>
+      </div>
+      <div class = "container">
          <h2 id="coinDisplayName"></h2>
          <p></p>
          <div id="wallet-cards" class="row" style="vertical-align:bottom"></div>
