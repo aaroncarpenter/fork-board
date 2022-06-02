@@ -302,7 +302,7 @@ ipcRenderer.on('load-wallet-details', (event, arg) => {
       setDisplayTheme();
 
       if (processPlatform != 'darwin') {
-        // $('#close-button-div').hide();
+         $('#close-button-div').hide();
       }
    }
    else {
