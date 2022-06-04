@@ -86,16 +86,6 @@ class Utils {
          decimalPlaces = 2;
       }
 
-      if (balance < 1000 && balance >= 1) {
-         balance = Math.round(balance*100)/100;
-      }
-      else if (balance < 1) {
-         balance = Math.round(balance*1000)/1000;
-      }
-      else {
-         balance = Math.round(balance);
-      }
-
       if (balance < 100000) {
          balanceStr = roundToPreferredDecimalPlaces(balance, decimalPlaces).toLocaleString();
       } else if (balance < 1000000) {
