@@ -165,7 +165,7 @@ function createUserSettingsWindow(clientCfg) {
    logger.info(`Creating the User Settings window`);
    userSettings = new BrowserWindow({
       width: 550,
-      height: 400,
+      height: 500,
       modal: true,
       show: false,
       parent: win, // Make sure to add parent window here

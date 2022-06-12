@@ -112,12 +112,10 @@ $(function () {
 //  Return: N/A
 // ************************
 function autoRefreshHandler() {
-   clientConfigObj.appSettings.autoRefreshEnabled = $('#autoRefreshCheck')[0].checked;
-
    // Get the refresh interval in milliseconds
    let autoRefreshInterval = ((clientConfigObj.appSettings.autoRefreshInterval != null) ? clientConfigObj.appSettings.autoRefreshInterval : 5);
 
-   if ($('#autoRefreshCheck')[0].checked) {
+   if (clientConfigObj.appSettings.autoRefreshEnabled) {
       logger.info(`Setting the refresh interval to ${autoRefreshInterval} minutes.`);
       refreshTimerId = setInterval(function() {refreshDashboard();}, autoRefreshInterval * 60 * 1000);
    }
@@ -126,8 +124,6 @@ function autoRefreshHandler() {
       // release our intervalID from the variable
       refreshTimerId = null; 
    }
-
-   storeAppSettings();
 }
 
 $('#show-dark-mode').on('click', function () {
@@ -1329,6 +1325,7 @@ ipcRenderer.on('async-refresh-wallets', (event, arg) => {
 
    clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
+   autoRefreshHandler();
    refreshDashboard();
 });
 

@@ -88,6 +88,34 @@ function setRefreshInterval(interval) {
 }
 
 // ***********************
+// Name: 	setAutoRefresh
+// Purpose: This functions handles the set refresh event.
+//    Args: status
+//  Return: N/A
+// *************************
+function setAutoRefresh(active) {
+   logger.info(`In Auto Refresh handler, with status = ${active}`);
+   if (clientCfg.appSettings.autoRefreshEnabled == null || clientCfg.appSettings.autoRefreshEnabled != active)
+   {
+      settingsUpdated = true;
+
+      clientCfg.appSettings.autoRefreshEnabled = active;
+
+      $('#auto-refresh button').removeClass('btn-primary');
+      $('#auto-refresh button').removeClass('btn-secondary');
+      if (active)
+      {
+         $('#auto-refresh-off').addClass('btn-secondary');
+         $('#auto-refresh-on').addClass('btn-primary');
+      }
+      else {
+         $('#auto-refresh-on').addClass('btn-secondary');
+         $('#auto-refresh-off').addClass('btn-primary');
+      }
+   }
+}
+
+// ***********************
 // Name: 	setDisplayTheme
 // Purpose: This functions send the set display theme event
 //    Args: theme
@@ -151,9 +179,11 @@ function loadSettings() {
    logger.info(`Loading User Settings`);
 
    let refreshInterval = clientCfg.appSettings.autoRefreshInterval;
+   let refreshEnabled = clientCfg.appSettings.autoRefreshEnabled;
    let decimalPlaces = clientCfg.appSettings.decimalPlaces;
    let displayTheme = clientCfg.appSettings.displayTheme;
 
+   logger.info(`Loading Auto Refresh  - ${refreshEnabled}`);
    logger.info(`Loading Refresh Interval - ${refreshInterval}`);
    logger.info(`Loading Decimal Places - ${decimalPlaces}`);
    logger.info(`Loading Display Theme - ${displayTheme}`);
@@ -169,6 +199,10 @@ function loadSettings() {
 
    if (displayTheme == null) {
       displayTheme = DisplayTheme.Light;
+   }
+
+   if (refreshEnabled == null) {
+      refreshEnabled = true;
    }
       
    // clear all buttons
@@ -186,6 +220,18 @@ function loadSettings() {
    $('#display-theme .btn').addClass('btn-secondary');
    $(`#display-theme-${displayTheme}`).removeClass('btn-secondary');
    $(`#display-theme-${displayTheme}`).addClass('btn-primary');
+
+   $('#auto-refresh button').removeClass('btn-primary');
+   $('#auto-refresh button').removeClass('btn-secondary');
+   if (refreshEnabled)
+   {
+      $('#auto-refresh-off').addClass('btn-secondary');
+      $('#auto-refresh-on').addClass('btn-primary');
+   }
+   else {
+      $('#auto-refresh-on').addClass('btn-secondary');
+      $('#auto-refresh-off').addClass('btn-primary');
+   }
 }
 
 // ***********************
