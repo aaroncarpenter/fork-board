@@ -918,7 +918,7 @@ function refreshCardData(cardDataObj) {
       $('#'+coin+'-card .card-balances').fadeIn(400, 'swing');;
 
       if (cardDataObj.coinPrice != null) {
-         $('#'+coin+'-card .coin-price').text((utils.getAdjustedCurrencyBalanceLabel(Number(cardDataObj.coinPrice), clientConfigObj.appSettings.currency, exchangeRateObj)) + ' each');
+         $('#'+coin+'-card .coin-price').text((utils.getAdjustedCurrencyBalanceLabel(Number(cardDataObj.coinPrice), clientConfigObj.appSettings.currency, exchangeRateObj, true)) + ' each');
       }
 
       // Update the balance

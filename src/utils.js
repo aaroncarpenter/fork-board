@@ -129,7 +129,7 @@ class Utils {
    //    Args: balance - wallet balance value
    //  Return: Formatted balance string
    // ************************
-   getAdjustedCurrencyBalanceLabel(balance, currencyStr, exchangeRates) {
+   getAdjustedCurrencyBalanceLabel(balance, currencyStr, exchangeRates, extendedDigits = false) {
       let balanceStr = "";
       let localeCode = "";
       let exchangeRate = this.getUSDExchangeRate(currencyStr, exchangeRates);
@@ -170,9 +170,14 @@ class Utils {
          localeCode = "uk-UA";
       else
          localeCode = navigator.languages[0];
-
-       balanceStr = balance.toLocaleString(localeCode, {style: 'currency', currency: currencyStr});
       
+      if (!extendedDigits) {
+         balanceStr = balance.toLocaleString(localeCode, {style: 'currency', currency: currencyStr});
+      }
+      else {
+         balanceStr = balance.toLocaleString(localeCode, {style: 'currency', currency: currencyStr, minimumFractionDigits: 2, maximumFractionDigits: 6});
+      }
+
       // Strip the ending decimals if over 10000 since it was rounded above.
       if (balance >= 10000) {
          balanceStr = balanceStr.replace('.00','');
