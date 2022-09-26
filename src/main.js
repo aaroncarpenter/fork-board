@@ -504,9 +504,12 @@ ipcMain.on('async-check-latest-app-version', function (event, arg) {
                {
                   data.downloadURL_Windows = asset.browser_download_url;
                }
-               else if (asset.browser_download_url.includes(".dmg"))
+               else if (asset.browser_download_url.includes(".dmg") && asset.browser_download_url.includes("arm64"))
                {
-                  data.downloadURL_MacOS = asset.browser_download_url;
+                  data.downloadURL_MacOS_arm64 = asset.browser_download_url;
+               }else if (asset.browser_download_url.includes(".dmg") && asset.browser_download_url.includes("x64"))
+               {
+                  data.downloadURL_MacOS_x64 = asset.browser_download_url;
                }
                else if (asset.browser_download_url.includes(".deb"))
                {
