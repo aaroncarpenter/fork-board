@@ -29,11 +29,13 @@ axios.defaults.httpsAgent = new https.Agent({
    keepAlive: true 
 });
 
+const controller = new AbortController();
+
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
-const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net/fork-board";
+//const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net/fork-board";
 
 //TEST
-//const baseForkBoardApi = "https://localhost:44393/fork-board";
+const baseForkBoardApi = "https://localhost:44393/fork-board";
 // #endregion
 
 // quit if startup from squirrel installation.
@@ -67,6 +69,13 @@ function createWindow() {
       protocol: 'file:',
       slashes: true
    }));
+
+   // when all windows are closed, cancel any pending requests in MacOs to prevent timeout errors.
+   win.on('window-all-closed', () => {
+      if (process.platform == 'darwin') {
+         controller.abort();
+      }
+    })
 }
 // #endregion
 
@@ -354,7 +363,9 @@ ipcMain.on('async-get-wallet-balance', function (event, arg) {
       logger.info('Wallet: ' + wallet + ', Coin: ' + coin);
 
       logger.info(`Requesting data from ${url}`);
-      axios.get(url)
+      axios.get(url, {
+         signal: controller.signal
+      })
       .then(function (result) {
          logger.info('Sending async-get-wallet-balance-reply event');
          event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
@@ -378,7 +389,9 @@ ipcMain.on('async-get-recoverable-wallet-balance', function (event, arg) {
       let url = `${baseForkBoardApi}/recovery?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
-      axios.get(url)
+      axios.get(url, {
+         signal: controller.signal
+      })
       .then(function (result) {
          logger.info('Sending async-get-recoverable-wallet-balance-reply event');
          event.sender.send('async-get-recoverable-wallet-balance-reply', result.data);
@@ -398,15 +411,19 @@ ipcMain.on('async-get-blockchain-settings', function (event, arg) {
 
    if (arg.length == 1) {
       let launcherId = arg[0];
-      let settingsUrl = `${baseForkBoardApi}/config?launcherId=${launcherId}`;
+      let settingsUrl = `${baseForkBoardApi}/config-test?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${settingsUrl}`);
-      axios.get(settingsUrl)
+      axios.get(settingsUrl, {
+         signal: controller.signal
+      })
       .then(function (settingsResult) {
          let exchangeUrl = `${baseForkBoardApi}/exchangerates?launcherId=${launcherId}`;
 
          logger.info(`Requesting data from ${exchangeUrl}`);
-         axios.get(exchangeUrl)
+         axios.get(exchangeUrl, {
+            signal: controller.signal
+         })
          .then(function (exchangeResult) {
             logger.info('Sending async-get-exchange-rates-reply event');
             event.sender.send('async-get-exchange-rates-reply', exchangeResult.data);
@@ -434,10 +451,12 @@ ipcMain.on('async-get-fork-prices', function (event, arg) {
  
    if (arg.length == 1) {
       let launcherId = arg[0];
-      let url = `${baseForkBoardApi}/price?launcherId=${launcherId}`;
+      let url = `${baseForkBoardApi}/price-test?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
-      axios.get(url)
+      axios.get(url, {
+         signal: controller.signal
+      })
       .then(function (result) {
          if (Array.isArray(result.data)) {
             logger.info('Sending async-get-fork-prices-reply event');
@@ -465,7 +484,9 @@ ipcMain.on('async-check-latest-app-version', function (event, arg) {
       let url = `${baseForkBoardApi}/version-check?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
-      axios.get(url)
+      axios.get(url, {
+         signal: controller.signal
+      })
       .then(function (result) {
          let latestVersion = result.data.tag_name.replace('v', '');
 

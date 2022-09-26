@@ -84,6 +84,12 @@
    let processPlatform = "";
    let processArch = "";
 
+   const fork_status_icon_ok = '<span style="color: green" title="{0}"><i class="fa-solid fa-circle"></i></span>';
+   const fork_status_icon_warn = '<span style="color: yellow" title="{0}"><i class="fa-solid fa-circle"></i></span>';
+   const fork_status_icon_error = '<span style="color: red" title="{0}"><i class="fa-solid fa-circle"></i></span>';
+   const pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
+   const neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
+
 $(function () {
    logger.info('Sending async-check-latest-app-version event');
    ipcRenderer.send('async-check-latest-app-version', [clientConfigObj.launcherId.split(',')[0]]);
@@ -663,7 +669,9 @@ function initializeCoinDataSet() {
          coinRecovBalance: 0,
          coinRecovBalanceUSD: 0,
          coinWalletCount: 0,
-         hidden: cfg.hidden
+         hidden: cfg.hidden,
+         peakAgeSeconds: cfg.peakAgeSeconds,
+         syncStatus: cfg.syncStatus
       });
 
       return true;
@@ -819,10 +827,10 @@ function getCoinConfigForCoin(coin) {
 //  Return: N/A
 // ************************
 function getPriceForCoinPrefix(coinPrefix) {
-   let price;
+   let priceObj;
    coinPriceObj.every(function (cp) {
       if (coinPrefix == cp.symbol.toLowerCase()) {
-         price = cp.price;
+         priceObj = cp;
          return false;
       }
       else {
@@ -830,7 +838,7 @@ function getPriceForCoinPrefix(coinPrefix) {
       }
    });
 
-   return price;
+   return priceObj;
 }
 // #endregion
 
@@ -844,14 +852,39 @@ function getPriceForCoinPrefix(coinPrefix) {
 // ************************
 function buildWalletCard(coinCfg, replaceExistingCard = false) {
    let imgPath = coinImgPath.replace('{0}', coinCfg.coinPathName);
-   
-   let updateString = cardTemplate.replace('{0}', coinCfg.coinDisplayName).replace('{1}', coinCfg.coinPathName).replace('{2}', imgPath).replace('{3}', coinCfg.coinPathName).replace('{4}', coinCfg.coinPrefix).replace('{5}', coinCfg.coinPathName);
+/*
+   let forkStatusIcon = "";
+   if (coinCfg.syncStatus == 'good')
+   {
+      forkStatusIcon = fork_status_icon_ok;
+   }
+   else if (coinCfg.syncStatus == 'warning')
+   {
+      forkStatusIcon = fork_status_icon_warn;
+   }
+   else
+   {
+      forkStatusIcon = fork_status_icon_error;
+   }
+  */ 
+   let updateString = cardTemplate;
+   updateString = updateString.replace('{0}', coinCfg.coinDisplayName);
+   updateString = updateString.replace('{1}', coinCfg.coinPathName);
+   updateString = updateString.replace('{2}', imgPath);
+   updateString = updateString.replace('{3}', coinCfg.coinPathName);
+   updateString = updateString.replace('{4}', coinCfg.coinPrefix);
+   updateString = updateString.replace('{5}', ((coinCfg.syncStatus == 'good' ? fork_status_icon_ok : (coinCfg.syncStatus == 'warning' ? fork_status_icon_warn : fork_status_icon_error)).replace('{0}', coinCfg.syncStatusMsg)));
+   updateString = updateString.replace('{6}', coinCfg.coinPriceSource);
 
    if (!replaceExistingCard && $('#'+coinCfg.coinPathName+'-card').length == 0) {
       $('#wallet-cards').append(updateString);
    }
    else if (replaceExistingCard && $('#'+coinCfg.coinPathName+'-card').length > 0) {
       $('#'+coinCfg.coinPathName+'-card').replaceWith(updateString);
+   }
+
+   if (coinCfg.coinPrice != null) {
+      $('#'+coinCfg.coinPathName+'-card .coin-price').text((utils.getAdjustedCurrencyBalanceLabel(Number(coinCfg.coinPrice), clientConfigObj.appSettings.currency, exchangeRateObj, true)) + ' each');
    }
 }
 
@@ -908,9 +941,6 @@ function refreshCardData(cardDataObj) {
    let walletCount = cardDataObj.coinWalletCount;
 
    logger.info(`Coin: ${coin}, Balance: ${balance}, Balance USD: ${balanceUSD}, Change: ${change}, Wallet Count: ${walletCount}`);
-
-   const pos_chg_icon = '<span style="color: green"><i class="fas fa-caret-up"></i></span>';
-   const neg_chg_icon = '<span style="color: red"><i class="fas fa-caret-down"></i></span>';
 
    if ($('#'+coin+'-card .card-text').length != 0) {
       // Remove loading spinner if present
@@ -1038,12 +1068,18 @@ ipcRenderer.on('async-get-blockchain-settings-reply', (event, arg) => {
 
       // Push data from args into the coinConfigObj
       arg.every(function (blockSettings) {
+         var priceObj = getPriceForCoinPrefix(blockSettings.coinPrefix);
+
          coinConfigObj.push({
             coinPrefix: blockSettings.coinPrefix,
             coinPathName: blockSettings.pathName,
             coinDisplayName: blockSettings.displayName,
             mojoPerCoin: blockSettings.mojoPerCoin,
-            coinPrice: getPriceForCoinPrefix(blockSettings.coinPrefix),
+            peakAgeSeconds: blockSettings.peakAgeSeconds,
+            syncStatus: blockSettings.syncStatus,
+            syncStatusMsg: blockSettings.syncStatusMsg,
+            coinPrice: (priceObj != null ? priceObj.price : null),
+            coinPriceSource: (priceObj != null ? priceObj.source : null),
             hidden: blockSettings.hidden
          });
 
@@ -1075,7 +1111,8 @@ ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
          coinPriceObj.push({
             name: coinPrice.name,
             symbol: coinPrice.symbol,
-            price: coinPrice.price
+            price: coinPrice.price,
+            source: coinPrice.source
          });
 
          return true;
@@ -1090,12 +1127,18 @@ ipcRenderer.on('async-get-fork-prices-reply', (event, arg) => {
 
          // Push data from args into the coinConfigObj
          coinConfigObj.every(function (coinCfgSetting) {
+            var priceObj = getPriceForCoinPrefix(coinCfgSetting.coinPrefix);
+
             updatedCoinConfigObj.push({
                coinPrefix: coinCfgSetting.coinPrefix,
                coinPathName: coinCfgSetting.coinPathName,
                coinDisplayName: coinCfgSetting.coinDisplayName,
                mojoPerCoin: coinCfgSetting.mojoPerCoin,
-               coinPrice: getPriceForCoinPrefix(coinCfgSetting.coinPrefix),
+               peakAgeSeconds: coinCfgSetting.peakAgeSeconds,
+               syncStatus: coinCfgSetting.syncStatus,
+               syncStatusMsg: coinCfgSetting.syncStatusMsg,
+               coinPrice: (priceObj != null ? priceObj.price : null),
+               coinPriceSource: (priceObj != null ? priceObj.source : null),
                hidden: coinCfgSetting.hidden
             });
 
