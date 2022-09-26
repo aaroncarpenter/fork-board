@@ -1238,7 +1238,8 @@ ipcRenderer.on('async-check-latest-app-version-reply', (event, arg) => {
 
       //$('#version-download-buttons').append(`<small class="text-muted">Downloads</small>`);
       $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_Windows}" class="btn btn-primary"><small>Windows</small></a></div>`);
-      $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_MacOS}" class="btn btn-primary"><small>MacOS</small></a></div>`);
+      $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_MacOS_arm64}" class="btn btn-primary"><small>MacOS (M1)</small></a></div>`);
+      $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_MacOS_x64}" class="btn btn-primary"><small>MacOS (Intel)</small></a></div>`);
       $('#version-download-buttons').append(`<div><a href="${replyData.downloadURL_Ubuntu}" class="btn btn-primary"><small>Ubuntu</small></a></div>`);
 
       $('#infoVersionBox').fadeIn(400, 'swing');
