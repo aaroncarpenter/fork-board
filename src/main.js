@@ -30,13 +30,19 @@ axios.defaults.httpsAgent = new https.Agent({
 });
 
 const controller = new AbortController();
+const isTest = false;
 
 const baseAllTheBlocksApiUrl = "https://api.alltheblocks.net";
-const baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net/fork-board";
+let baseForkBoardApi = "";
 
-//TEST
-//const baseForkBoardApi = "https://localhost:44393/fork-board";
-// #endregion
+if (!isTest)
+{
+   baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net/fork-board";
+}
+else
+{
+   baseForkBoardApi = "https://localhost:44393/fork-board";
+}
 
 // quit if startup from squirrel installation.
 if (require('electron-squirrel-startup')) return app.quit();
@@ -237,6 +243,47 @@ function createWebPageWindow(winUrl, winParent, winModal, winWidth = 900, winHei
 }
 // #endregion
 
+// #region Line Graph Window
+let lineGraph;
+
+function createLineGraphWindow(coinCfg, clientCfg, exchangeRates) {
+   logger.info(`Creating the Line Graph window for ${coinCfg.coinDisplayName}`);
+   refreshMainCard = false;
+   lineGraph = new BrowserWindow({
+      width: 710,
+      height: 600,
+      modal: true,
+      show: false,
+      parent: win, // Make sure to add parent window here
+      autoHideMenuBar: true,
+
+      // Make sure to add webPreferences with below configuration
+      webPreferences: {
+         nodeIntegration: true,
+         contextIsolation: false,
+         enableRemoteModule: true
+      },
+      icon: appIcon
+   });
+
+   lineGraph.loadURL(url.format({
+      pathname: path.join(__dirname, 'lineGraph.html'),
+      protocol: 'file:',
+      slashes: true
+   }));
+
+   lineGraph.once("show", function () {
+      logger.info(`Sending load-line-graph event: ${coinCfg.coinDisplayName}`);
+      lineGraph.webContents.send("load-line-graph", [coinCfg, clientCfg, exchangeRates, process.platform, process.arch]);
+   });
+
+   lineGraph.once("ready-to-show", function () {
+      logger.info('Ready to show - Line Graph');
+      lineGraph.show();
+   });
+}
+// #endregion
+
 // #region Electron Event Handlers
 
 // ************************
@@ -276,6 +323,28 @@ ipcMain.on("show-user-settings", function (_event, arg) {
    logger.info('Received open-user-settings Event');
    logger.info(`Create user settings window`);
    createUserSettingsWindow();
+});
+
+// ************************
+// Purpose: This function handles the open-user-settings event from the Renderer.  It opens the User Settings page.
+// ************************
+ipcMain.on("show-line-graph", function (_event, arg) {
+   logger.info('Received open-line-graph Event');
+   logger.info(`Create line graph window`);
+   createLineGraphWindow();
+});
+
+// ************************
+// Purpose: This function handles the close-user-settings event from the Renderer.  It closes the User Settings page.  This event is used to handle a user hitting "Escape" to close the user settings.
+// ************************
+ipcMain.on("close-line-graph", function (_event, arg) {
+   logger.info('Received close-user-settings Event');
+   userSettings.hide();
+
+   if (win && refreshDashboard) {
+      logger.info(`Sending async-refresh-wallets event`);
+      win.webContents.send('async-refresh-wallets', []);
+   }
 });
 
 // ************************
@@ -369,6 +438,19 @@ ipcMain.on('async-get-wallet-balance', function (event, arg) {
       .then(function (result) {
          logger.info('Sending async-get-wallet-balance-reply event');
          event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
+
+         logger.info(`Storing wallet balance for ${result.data.address} to DB`);
+         axios.post(`${baseForkBoardApi}/wallet`, {
+            address: result.data.address,
+            balance: result.data.balance,
+            timestampBalance: result.data.timestampBalance
+         })
+         .then(function (response) {
+            logger.info(`SUCCESS - Storing wallet balance for ${result.data.address} to DB`);
+          })
+          .catch(function (error) {
+            logger.info(`FAILED - Storing wallet balance for ${result.data.address} to DB`);
+          });
       })
       .catch(function (error) {
          logger.error(error.message);
@@ -411,7 +493,7 @@ ipcMain.on('async-get-blockchain-settings', function (event, arg) {
 
    if (arg.length == 1) {
       let launcherId = arg[0];
-      let settingsUrl = `${baseForkBoardApi}/config-test?launcherId=${launcherId}`;
+      let settingsUrl = `${baseForkBoardApi}/config?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${settingsUrl}`);
       axios.get(settingsUrl, {
@@ -451,7 +533,7 @@ ipcMain.on('async-get-fork-prices', function (event, arg) {
  
    if (arg.length == 1) {
       let launcherId = arg[0];
-      let url = `${baseForkBoardApi}/price-test?launcherId=${launcherId}`;
+      let url = `${baseForkBoardApi}/price?launcherId=${launcherId}`;
 
       logger.info(`Requesting data from ${url}`);
       axios.get(url, {
