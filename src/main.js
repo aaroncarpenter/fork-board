@@ -23,7 +23,7 @@ if (!fs.existsSync(logPath)) {
 
 logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/main.log');
 
-axios.defaults.timeout = 30000;
+axios.defaults.timeout = 60000;
 axios.defaults.httpsAgent = new https.Agent({ 
    rejectUnauthorized: false,
    keepAlive: true 
@@ -424,9 +424,10 @@ ipcMain.on("open-nft-recovery-site", function (_event, arg) {
 ipcMain.on('async-get-wallet-balance', function (event, arg) {
    logger.info('Received async-get-wallet-balance event');
 
-   if (arg.length == 2) {
+   if (arg.length == 3) {
       let wallet = arg[0];
       let coin = arg[1];
+      let launcherId = arg[2];
       let url = baseAllTheBlocksApiUrl + "/" + coin + "/address/" + wallet;
 
       logger.info('Wallet: ' + wallet + ', Coin: ' + coin);
@@ -440,8 +441,9 @@ ipcMain.on('async-get-wallet-balance', function (event, arg) {
          event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
 
          logger.info(`Storing wallet balance for ${result.data.address} to DB`);
-         axios.post(`${baseForkBoardApi}/wallet`, {
+         axios.post(`${baseForkBoardApi}/wallet?launcherId=${launcherId}`, {
             address: result.data.address,
+            launcherId: launcherId,
             balance: result.data.balance,
             timestampBalance: result.data.timestampBalance
          })

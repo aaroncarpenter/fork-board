@@ -577,7 +577,7 @@ function addEntry(wallet, loadBalance) {
 
          if (loadBalance) {
             logger.info('Sending async-get-wallet-balance event');
-            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinPathName]);
+            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinPathName, clientConfigObj.launcherId.split(',')[0]]);
          }
       }
       else {
