@@ -235,6 +235,55 @@ $('#reload-button').on('click', function () {
    ipcRenderer.send('async-reload-application', []);
 });
 
+// ***********************
+// Name: 	openGraphWindow
+// Purpose: This event runs when a user clicks the graph button.  It sends an event to ipcMain to display and render the graph display page.
+//    Args: coinPrefix - the prefix of the coin to use
+//  Return: N/A
+// ************************
+function openGraphWindow(coin)
+{
+   let addressList = [];
+   let coinCfg = {};
+   let aggregationLevel = '';
+   let graphCfg = {};
+   if (coin == 'all')
+   {
+      walletObj.every(function (w) {
+         addressList.push({ 'address': w.wallet });
+         return true;
+      });
+
+      graphCfg.addressList = addressList;
+      graphCfg.aggregationLevel = 'launcher';
+      graphCfg.windowTitle = 'Balance';
+      graphCfg.dataDisplayName = 'All';
+   }
+   else {
+      // Get configuration for the specified coin
+      coinCfg = getCoinConfigForCoin(coin);
+      walletObj.every(function (w) {
+         if (w.wallet.startsWith(coinCfg.coinPrefix)) {
+            addressList.push({ 'address': w.wallet });
+         }
+
+         return true;
+      });
+
+      graphCfg.addressList = addressList;
+      graphCfg.aggregationLevel = 'coin';
+      graphCfg.dataDisplayName = coinCfg.coinDisplayName;
+      graphCfg.windowTitle = coinCfg.coinDisplayName;
+
+   }
+
+   graphCfg.daysFilter = 30;
+
+   // Send the event to ipcMain to open the details page.
+   logger.info('Sending open-line-graph event');
+   ipcRenderer.send('open-line-graph', [graphCfg, clientConfigObj]);
+}
+
 // #endregion
 
 // #region Client Settings Mgmt
@@ -577,7 +626,7 @@ function addEntry(wallet, loadBalance) {
 
          if (loadBalance) {
             logger.info('Sending async-get-wallet-balance event');
-            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg.coinPathName, clientConfigObj.launcherId.split(',')[0]]);
+            ipcRenderer.send('async-get-wallet-balance', [wallet, coinCfg, clientConfigObj.launcherId.split(',')[0]]);
          }
       }
       else {
@@ -773,8 +822,10 @@ function updateCoinTotalBalance() {
 function getCoinConfigForWallet(wallet) {
    let coinCfg;
    let coinCfgFound = false;
+   let walletPrefix = wallet.split('1')[0];
+   //logger.error(`Wallet Prefix ${walletPrefix}`);
    coinConfigObj.every(function (cfg) {
-      if (wallet.startsWith(cfg.coinPrefix)) {
+      if (walletPrefix == cfg.coinPrefix) {
          coinCfg = cfg;
          coinCfgFound = true;
          return false;
@@ -852,29 +903,17 @@ function getPriceForCoinPrefix(coinPrefix) {
 // ************************
 function buildWalletCard(coinCfg, replaceExistingCard = false) {
    let imgPath = coinImgPath.replace('{0}', coinCfg.coinPathName);
-/*
-   let forkStatusIcon = "";
-   if (coinCfg.syncStatus == 'good')
-   {
-      forkStatusIcon = fork_status_icon_ok;
-   }
-   else if (coinCfg.syncStatus == 'warning')
-   {
-      forkStatusIcon = fork_status_icon_warn;
-   }
-   else
-   {
-      forkStatusIcon = fork_status_icon_error;
-   }
-  */ 
+
    let updateString = cardTemplate;
    updateString = updateString.replace('{0}', coinCfg.coinDisplayName);
+   updateString = updateString.replace('{1}', coinCfg.coinPathName);
    updateString = updateString.replace('{1}', coinCfg.coinPathName);
    updateString = updateString.replace('{2}', imgPath);
    updateString = updateString.replace('{3}', coinCfg.coinPathName);
    updateString = updateString.replace('{4}', coinCfg.coinPrefix);
    updateString = updateString.replace('{5}', ((coinCfg.syncStatus == 'good' ? fork_status_icon_ok : (coinCfg.syncStatus == 'warning' ? fork_status_icon_warn : fork_status_icon_error)).replace('{0}', coinCfg.syncStatusMsg)));
    updateString = updateString.replace('{6}', coinCfg.coinPriceSource);
+   updateString = updateString.replace('{7}', coinCfg.coinPathName);
 
    if (!replaceExistingCard && $('#'+coinCfg.coinPathName+'-card').length == 0) {
       $('#wallet-cards').append(updateString);

@@ -2,7 +2,8 @@
 const {ipcRenderer, clipboard} = require('electron');
 const remote = require('electron').remote;
 const logger = require('electron-log');
-logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/lineGraph.log');
+const { chart } = require('chart.js');
+logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/lineChart.log');
 const Utils = require('./utils');
 const DisplayTheme = {
    Dark: 'Dark',
@@ -17,14 +18,8 @@ let $ = require('jquery');
 let fs = require('fs');
 let path = require('path');
 
-let walletFile = path.resolve(__dirname, '../assets/config/wallets.json');
-let templateFile = path.resolve(__dirname, '../assets/templates/card-template-wallet-detail.html');
-let cardTemplate = fs.readFileSync(templateFile, 'utf8');
-let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
-
-let coinCfg = {};
+let graphCfg = {};
 let clientCfg = {};
-let exchangeRates = {};
 let displayTheme;
 let showCloseButton = false;
 // #endregion
@@ -55,50 +50,21 @@ function handleKeyPress(event) {
 //  Return: N/A
 // *************************
 function closeWindow() {
-   ipcRenderer.send('close-line-graph', [coinCfg]);
+   ipcRenderer.send('close-line-graph', []);
 }
 // #endregion
 
-// #region Wallet Functions
+// #region Graph Functions
 
 // ***********************
-// Name: 	loadAndDisplayWallets
+// Name: 	loadLineGraph
 // Purpose: This function is handles clearing and re-adding the wallet cards.
 //    Args: N/A
 //  Return: N/A
 // *************************
 function loadLineGraph() {  
-   // clearing any existing wallets
-   const labels = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-    ];
-  
-    const data = {
-      labels: labels,
-      datasets: [{
-        label: 'My First dataset',
-        backgroundColor: 'rgb(255, 99, 132)',
-        borderColor: 'rgb(255, 99, 132)',
-        data: [0, 10, 5, 2, 20, 30, 45],
-      }]
-    };
-  
-    const config = {
-      type: 'line',
-      data: data,
-      options: {}
-    };
-
-    const myChart = new Chart(
-      document.getElementById('myChart'),
-      config
-    );
-
+   logger.info('Sending async-get-line-graph-data event');
+   ipcRenderer.send('async-get-line-graph-data', [clientCfg.launcherId.split(',')[0], graphCfg]);
 }
 
 // ***********************
@@ -110,19 +76,9 @@ function loadLineGraph() {
 function setDisplayTheme() {
    if (clientCfg.appSettings.displayTheme === DisplayTheme.Dark) {
       $('body').addClass('dark-mode');
-      $('div.card-body').addClass('dark-mode');
-      $('div.card-header').addClass('dark-mode');
-      $('div.card-footer').addClass('dark-mode');
-      $('div.alert.alert-info').addClass('dark-mode');
-      $('div.card').addClass('dark-mode');
    }
    else {
       $('body').removeClass('dark-mode');
-      $('div.card-body').removeClass('dark-mode');
-      $('div.card-header').removeClass('dark-mode');
-      $('div.card-footer').removeClass('dark-mode');
-      $('div.alert.alert-info').removeClass('dark-mode');
-      $('div.card').removeClass('dark-mode');
    }
 }
 
@@ -131,19 +87,17 @@ function setDisplayTheme() {
 // #region Electron Event Handlers
 
 // ************************
-// Purpose: This function is a handler for an event from ipcMain, triggered when the wallet detail page renders
+// Purpose: This function is a handler for an event from ipcMain, triggered when the line graph page renders
 // ************************
 ipcRenderer.on('load-line-graph', (event, arg) => {
    logger.info('Received load-line-graph event');
    
-   if (arg.length == 5) {
-      coinCfg = arg[0];
+   if (arg.length == 3) {
+      graphCfg = arg[0];
       clientCfg = arg[1];
-      exchangeRates = arg[2];
-      let processPlatform = arg[3];
-      let processArch = arg[4];
+      let processPlatform = arg[2];
 
-      logger.info(`Loading details for ${coinCfg.coinDisplayName}`);
+      logger.info(`Loading details for ${graphCfg.dataDisplayName}`);
       loadLineGraph();
 
       //Setting theme
@@ -163,31 +117,102 @@ ipcRenderer.on('load-line-graph', (event, arg) => {
 // ************************
 ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
    logger.info('Received async-get-line-graph-data-reply event');
+
+   $(document).attr("title", `${graphCfg.windowTitle} History`);
    
-   if (arg.length == 4) {
-      let wallet = arg[1];
-      let balance = (arg[2] / coinCfg.mojoPerCoin);
-      let balanceUSD = (coinCfg.coinPrice != null) ? balance * coinCfg.coinPrice : null;
-    /*
-      if ($('#'+wallet+'-card .card-text').length != 0) {
-         $('#'+wallet+'-card .spinner-border').remove();
-         $('#'+wallet+'-card .card-balances').show();
+   if (arg.length == 1) {
+      let graphData = arg[0];
 
-         if (balance != null) {
-            $('#'+wallet+'-card .card-body .balance').text(utils.getAdjustedBalanceLabel(balance, clientCfg.appSettings.decimalPlaces));
-            $('#'+wallet+'-card .card-body .balance').prop('title', balance);
-         }
+      logger.info(`Received ${graphData.length} rows`);
 
-         $('#'+wallet+'-card #balance-currency-label').text(clientCfg.appSettings.currency.toLowerCase());
+      let groupDateLbls = [];
+      let groupCoinCountVals = [];
+      let groupCoinValueVals = [];
 
-         if (balanceUSD != null && balance > 0) {
-            $('#'+wallet+'-card .card-body .balance-currency').text(utils.getAdjustedCurrencyBalanceLabel(balanceUSD, clientCfg.appSettings.currency, exchangeRates));
-         }
-         else {
-            $('#'+wallet+'-card .card-body .balance-currency').text('-');
-         }
+      graphData.every(function (dataGrp) {
+         groupDateLbls.push(new Date(dataGrp.date).toLocaleDateString());
+         groupCoinCountVals.push(dataGrp.balance);
+         groupCoinValueVals.push(dataGrp.balanceUSD);
+         return true;
+      });
+     
+      let groupDatasets = [];
+      let scales = {};
+      if (graphData[0].group.toUpperCase() != 'ACTUAL')
+      {
+         groupDatasets.push({
+            label: `Coins`,
+            backgroundColor: 'rgb(229, 232, 232)',
+            borderColor: 'rgb(229, 232, 232)',
+            data: groupCoinCountVals,
+            yAxisID: 'y1',
+            borderDash: [5, 5],
+            fill: false,
+            tension: 0.2
+         });
+
+         scales.y1 = {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            title: {
+               display: true,
+               text: 'Coins'
+            },
+      
+            // grid line settings
+            grid: {
+               drawOnChartArea: false, // only want the grid lines for one axis to show up
+            },
+         };
       }
-      */
+
+      groupDatasets.push({
+         label: `Balance`,
+         backgroundColor: 'rgb(0, 128, 0)',
+         borderColor: 'rgb(0, 128, 0)',
+         data: groupCoinValueVals,
+         yAxisID: 'y',
+         tension: 0.2
+       });
+
+      scales.y = {
+         type: 'linear',
+         display: true,
+         position: 'left',
+         title: {
+            display: true,
+            text: 'Balance'
+         }
+      };
+
+       const data = {
+         labels: groupDateLbls,
+         datasets: groupDatasets
+       };
+
+       let delayed;
+       const config = {
+         type: 'line',
+         data: data,
+         options: {
+            aspectRatio: 1,
+            maintainAspectRatio: false,
+            responsive: true,
+            fill: false,
+            interaction: {
+               intersect: false
+            },
+            radius: 0,
+            scales: scales
+         }
+       };
+   
+       const myChart = new Chart(
+         document.getElementById('forkboardChart'),
+         config
+       );
+   
    }
    else {
       logger.error('Reply args incorrect');

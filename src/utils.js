@@ -227,7 +227,7 @@ class Utils {
           (order === 'desc') ? (comparison * -1) : comparison
         );
       };
-    }
+  }
 }
 
 

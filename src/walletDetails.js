@@ -112,7 +112,7 @@ function loadAndDisplayWallets() {
          logger.info(`Loading Wallet Details for wallet: ${w.wallet}`);
          buildWalletCard(w.wallet, w.label, coinCfg);
 
-         ipcRenderer.send('async-get-wallet-balance', [w.wallet, coinCfg.coinPathName]);
+         ipcRenderer.send('async-get-wallet-balance', [w.wallet, coinCfg, '-1']);
       }
 
       return true;

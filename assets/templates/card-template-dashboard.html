@@ -1,6 +1,6 @@
-<div id="{3}-card" class="walletCard" onclick="loadWalletDetails('{1}')" title="Click here to open the wallet details.">
+<div id="{3}-card" class="walletCard" >
     <div class="card">
-        <div class="card-header">
+        <div class="card-header" onclick="loadWalletDetails('{1}')" title="Click here to open the wallet details." >
             <div class="d-flex flex-row justify-content-between">
                 <div>
                     <img style="height: 30px; width: 30px" src="{2}" class="card-img">
@@ -17,7 +17,7 @@
         </div>
         <div class="card-body">
             <div class="d-flex justify-content-center col-md-12"><div class="spinner-border" role="status"></div></div>
-            <div class="card-balances"  style="display: none;">
+            <div class="card-balances" onclick="openGraphWindow('{7}');"  style="display: none;">
                 <div class="d-flex flex-row align-items-center">
                     <div class="col-md-5 flex-fill text-center" title="Wallet balance in coins.">
                         <div>
@@ -42,15 +42,18 @@
                 </div>
             </div>
         </div>
-        <div class="card-footer">
+        <div class="card-footer" onclick="loadWalletDetails('{1}')" title="Click here to open the wallet details.">
             <div class="d-flex flex-row justify-content-between">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <small class="text-muted" title="The change in balance over the last 24 hours">Chg:&nbsp; 
                         <span class="balanceChange"></span>
                         <span class="balanceChangeSymbol"></span>
                     </small>
                 </div>
-                <div class="d-flex col-md-6 justify-content-end">
+                <!--<div class="col-md-2 text-center" title="Graph">
+                    <i id="show-line-graph" onclick="openGraphWindow('{7}');" class="fas fa-chart-line" title="Click to show"></i>
+                </div>-->
+                <div class="d-flex col-md-4 justify-content-end">
                     <small class="text-muted" title="Price per coin from {6}">
                         <div class="coin-price"></div>
                     </small>

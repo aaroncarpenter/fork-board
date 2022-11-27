@@ -37,7 +37,7 @@ let baseForkBoardApi = "";
 
 if (!isTest)
 {
-   baseForkBoardApi = "https://fork-board-api-mgmt.azure-api.net/fork-board";
+   baseForkBoardApi = "https://fork-board-api1.azurewebsites.net/fork-board";
 }
 else
 {
@@ -246,12 +246,12 @@ function createWebPageWindow(winUrl, winParent, winModal, winWidth = 900, winHei
 // #region Line Graph Window
 let lineGraph;
 
-function createLineGraphWindow(coinCfg, clientCfg, exchangeRates) {
-   logger.info(`Creating the Line Graph window for ${coinCfg.coinDisplayName}`);
+function createLineGraphWindow(graphCfg, clientCfg) {
+   logger.info(`Creating the Line Graph window for ${graphCfg.dataDisplayName}`);
    refreshMainCard = false;
    lineGraph = new BrowserWindow({
-      width: 710,
-      height: 600,
+      width: 1000,
+      height: 650,
       modal: true,
       show: false,
       parent: win, // Make sure to add parent window here
@@ -267,14 +267,14 @@ function createLineGraphWindow(coinCfg, clientCfg, exchangeRates) {
    });
 
    lineGraph.loadURL(url.format({
-      pathname: path.join(__dirname, 'lineGraph.html'),
+      pathname: path.join(__dirname, 'lineChart.html'),
       protocol: 'file:',
       slashes: true
    }));
 
    lineGraph.once("show", function () {
-      logger.info(`Sending load-line-graph event: ${coinCfg.coinDisplayName}`);
-      lineGraph.webContents.send("load-line-graph", [coinCfg, clientCfg, exchangeRates, process.platform, process.arch]);
+      logger.info(`Sending load-line-graph event: ${graphCfg.addressList.length} addresses`);
+      lineGraph.webContents.send("load-line-graph", [graphCfg, clientCfg, process.platform]);
    });
 
    lineGraph.once("ready-to-show", function () {
@@ -328,23 +328,25 @@ ipcMain.on("show-user-settings", function (_event, arg) {
 // ************************
 // Purpose: This function handles the open-user-settings event from the Renderer.  It opens the User Settings page.
 // ************************
-ipcMain.on("show-line-graph", function (_event, arg) {
+ipcMain.on("open-line-graph", function (_event, arg) {
    logger.info('Received open-line-graph Event');
    logger.info(`Create line graph window`);
-   createLineGraphWindow();
+
+   if (arg.length == 2) {
+      let graphCfg = arg[0];
+      let clientCfg = arg[1];
+
+      logger.info(`Create line graph window for : ${graphCfg.dataDisplayName}`);
+      createLineGraphWindow(graphCfg, clientCfg);
+   }
 });
 
 // ************************
 // Purpose: This function handles the close-user-settings event from the Renderer.  It closes the User Settings page.  This event is used to handle a user hitting "Escape" to close the user settings.
 // ************************
 ipcMain.on("close-line-graph", function (_event, arg) {
-   logger.info('Received close-user-settings Event');
-   userSettings.hide();
-
-   if (win && refreshDashboard) {
-      logger.info(`Sending async-refresh-wallets event`);
-      win.webContents.send('async-refresh-wallets', []);
-   }
+   logger.info('Received close-line-graph Event');
+   lineGraph.hide();
 });
 
 // ************************
@@ -426,11 +428,11 @@ ipcMain.on('async-get-wallet-balance', function (event, arg) {
 
    if (arg.length == 3) {
       let wallet = arg[0];
-      let coin = arg[1];
+      let coinCfg = arg[1];
       let launcherId = arg[2];
-      let url = baseAllTheBlocksApiUrl + "/" + coin + "/address/" + wallet;
+      let url = baseAllTheBlocksApiUrl + "/" + coinCfg.coinPathName + "/address/" + wallet;
 
-      logger.info('Wallet: ' + wallet + ', Coin: ' + coin);
+      logger.info('Wallet: ' + wallet + ', Coin: ' + coinCfg.coinPathName);
 
       logger.info(`Requesting data from ${url}`);
       axios.get(url, {
@@ -438,25 +440,56 @@ ipcMain.on('async-get-wallet-balance', function (event, arg) {
       })
       .then(function (result) {
          logger.info('Sending async-get-wallet-balance-reply event');
-         event.sender.send('async-get-wallet-balance-reply', [coin, wallet, result.data.balance, result.data.balanceBefore]);
+         event.sender.send('async-get-wallet-balance-reply', [coinCfg.coinPathName, wallet, result.data.balance, result.data.balanceBefore]);
 
-         logger.info(`Storing wallet balance for ${result.data.address} to DB`);
-         axios.post(`${baseForkBoardApi}/wallet?launcherId=${launcherId}`, {
-            address: result.data.address,
-            launcherId: launcherId,
-            balance: result.data.balance,
-            timestampBalance: result.data.timestampBalance
-         })
-         .then(function (response) {
-            logger.info(`SUCCESS - Storing wallet balance for ${result.data.address} to DB`);
-          })
-          .catch(function (error) {
-            logger.info(`FAILED - Storing wallet balance for ${result.data.address} to DB`);
-          });
+         // If balance request is coming from Wallet Details page, then this parameter will be "-1" so that we can skip the balance store procedure.
+         if (launcherId != '-1' && result.data.balance != undefined)
+         {
+            logger.info(`Storing wallet balance for ${result.data.address} to DB`);
+            axios.post(`${baseForkBoardApi}/wallet?launcherId=${launcherId}`, {
+               address: result.data.address,
+               launcherId: launcherId,
+               coinPrefix: coinCfg.coinPrefix,
+               balance: result.data.balance / coinCfg.mojoPerCoin,
+               timestampBalance: result.data.timestampBalance
+            })
+            .catch(function (error) {
+               logger.error(`FAILED - Storing wallet balance for ${result.data.address} to DB. ${error}`);
+               logger.info(`Storing wallet balance for {"address": "${result.data.address}","launcherId": "${launcherId}","coinPrefix": "${coinCfg.coinPrefix}","balance": "${result.data.balance}","timestampBalance": "${result.data.timestampBalance}"}`);
+            });
+         }
       })
       .catch(function (error) {
          logger.error(error.message);
          event.sender.send('async-get-wallet-balance-error', [error.message, coin, wallet]);
+      });
+   }
+});
+
+// ************************
+// Purpose: This function handles the async-get-wallet-balance event from the Renderer.  It retrieves the wallet balance from ATB and sends the reply event with the data to the Renderer.
+// ************************
+ipcMain.on('async-get-line-graph-data', function (event, arg) {
+   logger.info('Received async-get-line-graph-data');
+
+   if (arg.length == 2) {
+      let launcherId = arg[0];
+      let graphCfg = arg[1];
+      let url = `${baseForkBoardApi}/graph?launcherId=${launcherId}`;
+
+      logger.info(`Requesting graph data from ${url}`);
+      axios.post(url, {
+         addressList:graphCfg.addressList,
+         numberOfDays: graphCfg.daysFilter,
+         aggregationLevel: graphCfg.aggregationLevel
+      })
+      .then(function (result)
+      {
+         logger.info('Sending async-get-line-graph-data-reply event');
+         event.sender.send('async-get-line-graph-data-reply', [result.data]);
+      })
+      .catch(function (error) {
+         logger.error(`FAILED - Graph Data for ${launcherid}`);
       });
    }
 });
@@ -945,4 +978,15 @@ function versionCompare(v1, v2, options) {
    }
 
    return 0;
+}
+
+// ***********************
+// Name: 	roundToPreferredDecimalPlaces
+// Purpose: 
+//    Args: value - value to round
+//          places - number of decimal places 
+//  Return: Rounded value
+// ************************
+function roundToPreferredDecimalPlaces(value, places) {
+   return Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
 }

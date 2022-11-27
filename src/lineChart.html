@@ -7,83 +7,29 @@
       <link rel = "stylesheet" href = "./css/forkboard.css" />
       <script src="https://kit.fontawesome.com/80792d13b7.js" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src = "./lineChart.js" ></script>
       <style type = "text/css">
-         #wallet-list {
-            overflow-y: auto;
-         }
-
-         .card-footer {
-            padding-top: 1px;
-            padding-bottom: 0.1rem;
-            margin-bottom: 0.5rem;
-         }
-
-         .card-header {
-            padding-top: 0.1rem;
-            padding-bottom: 0.1rem;
-            padding-left: 0.25rem;
-            padding-right: 0.25rem;
-         }
-
-         .container {
-            margin-left: 10px !important;
-            margin-right: 10px !important;
-         }
-
-         .walletCard {
-            min-width: 680px;
-         }
-
-         .form-control {
-            font-size: 14px;
-            font-variant: small-caps;
-            margin-left: 0px;
-         }
 
          small {
             font-variant: small-caps;
          }
+
+         body {
+            height: 100%; 
+            width: 100%;
+         }
       </style>
 
-<script>
-   const labels = [
-     'January',
-     'February',
-     'March',
-     'April',
-     'May',
-     'June',
-   ];
- 
-   const data = {
-     labels: labels,
-     datasets: [{
-       label: 'My First dataset',
-       backgroundColor: 'rgb(255, 99, 132)',
-       borderColor: 'rgb(255, 99, 132)',
-       data: [0, 10, 5, 2, 20, 30, 45],
-     }]
-   };
- 
-   const config = {
-     type: 'line',
-     data: data,
-     options: {}
-   };
- </script>
 
-<script>
-   const myChart = new Chart(
-     document.getElementById('myChart'),
-     config
-   );
- </script>
-   
-   </head>
-   
    <body>
-      <div>
-         <canvas id="myChart"></canvas>
+      <div id="close-button-div" class="card-header">
+         <div class="d-flex flex-row justify-content-between">
+            <div><small id="line-graph-title"></small></button></div>
+            <div><i class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i></div>
+         </div>
+      </div>
+      <div class="chart-container" style="position: relative; height: 600px; width:100%">
+         <canvas id="forkboardChart"></canvas>
        </div>
    </body>
 </html>
