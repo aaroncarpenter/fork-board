@@ -246,7 +246,7 @@ function createWebPageWindow(winUrl, winParent, winModal, winWidth = 900, winHei
 // #region Line Graph Window
 let lineGraph;
 
-function createLineGraphWindow(graphCfg, clientCfg) {
+function createLineGraphWindow(graphCfg, clientCfg, exchangeRateObj) {
    logger.info(`Creating the Line Graph window for ${graphCfg.dataDisplayName}`);
    refreshMainCard = false;
    lineGraph = new BrowserWindow({
@@ -274,7 +274,7 @@ function createLineGraphWindow(graphCfg, clientCfg) {
 
    lineGraph.once("show", function () {
       logger.info(`Sending load-line-graph event: ${graphCfg.addressList.length} addresses`);
-      lineGraph.webContents.send("load-line-graph", [graphCfg, clientCfg, process.platform]);
+      lineGraph.webContents.send("load-line-graph", [graphCfg, clientCfg, exchangeRateObj, process.platform]);
    });
 
    lineGraph.once("ready-to-show", function () {
@@ -332,12 +332,13 @@ ipcMain.on("open-line-graph", function (_event, arg) {
    logger.info('Received open-line-graph Event');
    logger.info(`Create line graph window`);
 
-   if (arg.length == 2) {
+   if (arg.length == 3) {
       let graphCfg = arg[0];
       let clientCfg = arg[1];
+      let exchangeRateObj= arg[2];
 
       logger.info(`Create line graph window for : ${graphCfg.dataDisplayName}`);
-      createLineGraphWindow(graphCfg, clientCfg);
+      createLineGraphWindow(graphCfg, clientCfg, exchangeRateObj);
    }
 });
 

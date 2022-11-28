@@ -274,14 +274,14 @@ function openGraphWindow(coin)
       graphCfg.aggregationLevel = 'coin';
       graphCfg.dataDisplayName = coinCfg.coinDisplayName;
       graphCfg.windowTitle = coinCfg.coinDisplayName;
-
+      //graphCfg.exchangeRate = Utils.getUSDExchangeRate(currencyStr, exchangeRates);
    }
 
    graphCfg.daysFilter = 30;
 
    // Send the event to ipcMain to open the details page.
    logger.info('Sending open-line-graph event');
-   ipcRenderer.send('open-line-graph', [graphCfg, clientConfigObj]);
+   ipcRenderer.send('open-line-graph', [graphCfg, clientConfigObj, exchangeRateObj]);
 }
 
 // #endregion

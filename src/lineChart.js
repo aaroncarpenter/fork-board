@@ -20,6 +20,7 @@ let path = require('path');
 
 let graphCfg = {};
 let clientCfg = {};
+let exchangeRateObj = {};
 let displayTheme;
 let showCloseButton = false;
 // #endregion
@@ -92,10 +93,11 @@ function setDisplayTheme() {
 ipcRenderer.on('load-line-graph', (event, arg) => {
    logger.info('Received load-line-graph event');
    
-   if (arg.length == 3) {
+   if (arg.length == 4) {
       graphCfg = arg[0];
       clientCfg = arg[1];
-      let processPlatform = arg[2];
+      exchangeRateObj = arg[2];
+      let processPlatform = arg[3];
 
       logger.info(`Loading details for ${graphCfg.dataDisplayName}`);
       loadLineGraph();
@@ -119,6 +121,9 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
    logger.info('Received async-get-line-graph-data-reply event');
 
    $(document).attr("title", `${graphCfg.windowTitle} History`);
+
+   let exchangeRate = utils.getUSDExchangeRate(clientCfg.appSettings.currency, exchangeRateObj);
+   logger.info(`Exchange rate is ${exchangeRate}`);
    
    if (arg.length == 1) {
       let graphData = arg[0];
@@ -132,12 +137,32 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
       graphData.every(function (dataGrp) {
          groupDateLbls.push(new Date(dataGrp.date).toLocaleDateString());
          groupCoinCountVals.push(dataGrp.balance);
-         groupCoinValueVals.push(dataGrp.balanceUSD);
+         groupCoinValueVals.push(dataGrp.balanceUSD * exchangeRate);
          return true;
       });
      
       let groupDatasets = [];
       let scales = {};
+
+      groupDatasets.push({
+         label: `Balance (${clientCfg.appSettings.currency})`,
+         backgroundColor: 'rgb(0, 128, 0)',
+         borderColor: 'rgb(0, 128, 0)',
+         data: groupCoinValueVals,
+         yAxisID: 'y',
+         tension: 0.2
+       });
+
+      scales.y = {
+         type: 'linear',
+         display: true,
+         position: 'left',
+         title: {
+            display: true,
+            text: `Balance (${clientCfg.appSettings.currency})`
+         }
+      };
+
       if (graphData[0].group.toUpperCase() != 'ACTUAL')
       {
          groupDatasets.push({
@@ -167,24 +192,7 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
          };
       }
 
-      groupDatasets.push({
-         label: `Balance`,
-         backgroundColor: 'rgb(0, 128, 0)',
-         borderColor: 'rgb(0, 128, 0)',
-         data: groupCoinValueVals,
-         yAxisID: 'y',
-         tension: 0.2
-       });
-
-      scales.y = {
-         type: 'linear',
-         display: true,
-         position: 'left',
-         title: {
-            display: true,
-            text: 'Balance'
-         }
-      };
+      
 
        const data = {
          labels: groupDateLbls,
