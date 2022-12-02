@@ -62,7 +62,7 @@
 
    // write empty file if wallets file is missing.
    if (!fs.existsSync(clientConfigFile)) {
-      fs.writeFileSync(clientConfigFile, '{"launcherId": "", "appSettings": { "displayTheme": "Light", "sortField": "None", "autoRefreshEnabled": false, "currency": "USD"}}'); 
+      fs.writeFileSync(clientConfigFile, '{"launcherId": "", "appSettings": { "displayTheme": "Light", "sortField": "None", "autoRefreshEnabled": false, "currency": "USD", "graphDaysFilter": "30"}}'); 
    }
    let clientConfigObj = JSON.parse(fs.readFileSync(clientConfigFile, 'utf8'));
 
@@ -98,6 +98,11 @@ $(function () {
    if (clientConfigObj.appSettings.sortField == 'usd') {
       clientConfigObj.appSettings.sortField = 'balance';
       storeAppSettings();
+   }
+
+   if (clientConfigObj.appSettings.graphDaysFilter == null)
+   {
+      clientConfigObj.appSettings.graphDaysFilter = "30";
    }
       
    applyAppSettings();
@@ -236,18 +241,17 @@ $('#reload-button').on('click', function () {
 });
 
 // ***********************
-// Name: 	openGraphWindow
+// Name: 	openLineChart
 // Purpose: This event runs when a user clicks the graph button.  It sends an event to ipcMain to display and render the graph display page.
 //    Args: coinPrefix - the prefix of the coin to use
 //  Return: N/A
 // ************************
-function openGraphWindow(coin)
+function openLineChart(coin)
 {
    let addressList = [];
    let coinCfg = {};
-   let aggregationLevel = '';
    let graphCfg = {};
-   if (coin == 'all')
+   if (coin == null)
    {
       walletObj.every(function (w) {
          addressList.push({ 'address': w.wallet });
@@ -256,8 +260,19 @@ function openGraphWindow(coin)
 
       graphCfg.addressList = addressList;
       graphCfg.aggregationLevel = 'launcher';
-      graphCfg.windowTitle = 'Balance';
+      graphCfg.windowTitle = 'Balance History';
       graphCfg.dataDisplayName = 'All';
+      graphCfg.showCoinCountLine = false;
+      graphCfg.primaryYAxisLabel = 'Balance';
+   }
+   else if (coin.endsWith('price'))
+   {
+      coinCfg = getCoinConfigForCoin(coin.replace('-price', ''));
+      graphCfg.coinPrefix = coinCfg.coinPrefix;
+      graphCfg.dataDisplayName = `${coinCfg.coinDisplayName} Price`;
+      graphCfg.windowTitle = `${coinCfg.coinDisplayName} Price History`;
+      graphCfg.showCoinCountLine = false;
+      graphCfg.primaryYAxisLabel = 'Price';
    }
    else {
       // Get configuration for the specified coin
@@ -273,8 +288,9 @@ function openGraphWindow(coin)
       graphCfg.addressList = addressList;
       graphCfg.aggregationLevel = 'coin';
       graphCfg.dataDisplayName = coinCfg.coinDisplayName;
-      graphCfg.windowTitle = coinCfg.coinDisplayName;
-      //graphCfg.exchangeRate = Utils.getUSDExchangeRate(currencyStr, exchangeRates);
+      graphCfg.windowTitle = `${coinCfg.coinDisplayName} Balance History`;
+      graphCfg.showCoinCountLine = true;
+      graphCfg.primaryYAxisLabel = 'Balance';
    }
 
    graphCfg.daysFilter = 30;
@@ -905,15 +921,12 @@ function buildWalletCard(coinCfg, replaceExistingCard = false) {
    let imgPath = coinImgPath.replace('{0}', coinCfg.coinPathName);
 
    let updateString = cardTemplate;
-   updateString = updateString.replace('{0}', coinCfg.coinDisplayName);
-   updateString = updateString.replace('{1}', coinCfg.coinPathName);
-   updateString = updateString.replace('{1}', coinCfg.coinPathName);
-   updateString = updateString.replace('{2}', imgPath);
-   updateString = updateString.replace('{3}', coinCfg.coinPathName);
-   updateString = updateString.replace('{4}', coinCfg.coinPrefix);
-   updateString = updateString.replace('{5}', ((coinCfg.syncStatus == 'good' ? fork_status_icon_ok : (coinCfg.syncStatus == 'warning' ? fork_status_icon_warn : fork_status_icon_error)).replace('{0}', coinCfg.syncStatusMsg)));
-   updateString = updateString.replace('{6}', coinCfg.coinPriceSource);
-   updateString = updateString.replace('{7}', coinCfg.coinPathName);
+   updateString = updateString.replace(/\{0\}/g, coinCfg.coinDisplayName);
+   updateString = updateString.replace(/\{1\}/g, coinCfg.coinPathName);
+   updateString = updateString.replace(/\{2\}/g, imgPath);
+   updateString = updateString.replace(/\{3\}/g, coinCfg.coinPrefix);
+   updateString = updateString.replace(/\{4\}/g, ((coinCfg.syncStatus == 'good' ? fork_status_icon_ok : (coinCfg.syncStatus == 'warning' ? fork_status_icon_warn : fork_status_icon_error)).replace('{0}', coinCfg.syncStatusMsg)));
+   updateString = updateString.replace(/\{5\}/g, coinCfg.coinPriceSource);
 
    if (!replaceExistingCard && $('#'+coinCfg.coinPathName+'-card').length == 0) {
       $('#wallet-cards').append(updateString);

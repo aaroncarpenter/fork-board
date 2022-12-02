@@ -7,6 +7,7 @@
       <link rel = "stylesheet" href = "./css/forkboard.css" />
       <script src="https://kit.fontawesome.com/80792d13b7.js" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="../bower_components/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
       <script src = "./lineChart.js" ></script>
       <style type = "text/css">
 
@@ -25,7 +26,19 @@
       <div id="close-button-div" class="card-header">
          <div class="d-flex flex-row justify-content-between">
             <div><small id="line-graph-title"></small></button></div>
-            <div><i class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i></div>
+            <div><i class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i>&nbsp;&nbsp;</div>
+         </div>
+      </div>
+      <div class="d-flex flex-row align-items-center">
+         <div class="d-flex align-items-end flex-row col-md-12">
+            <div id="days-dropdown" class="dropbtn dropdown" style="width: 100%; padding-right: 5px;">
+               <small id="days-dropdown-text"></small> 
+               <div id="days-dropdown-content" class="dropdown-content">
+                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(30)"><small>30</small></button>
+                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(60)"><small>60</small></button>
+                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(90)"><small>90</small></button>
+               </div>
+            </div>
          </div>
       </div>
       <div class="chart-container" style="position: relative; height: 600px; width:100%">

@@ -273,7 +273,7 @@ function createLineGraphWindow(graphCfg, clientCfg, exchangeRateObj) {
    }));
 
    lineGraph.once("show", function () {
-      logger.info(`Sending load-line-graph event: ${graphCfg.addressList.length} addresses`);
+      logger.info(`Sending load-line-graph event: ${graphCfg.dataDisplayName}`);
       lineGraph.webContents.send("load-line-graph", [graphCfg, clientCfg, exchangeRateObj, process.platform]);
    });
 
@@ -480,9 +480,10 @@ ipcMain.on('async-get-line-graph-data', function (event, arg) {
 
       logger.info(`Requesting graph data from ${url}`);
       axios.post(url, {
-         addressList:graphCfg.addressList,
+         addressList: graphCfg.addressList,
          numberOfDays: graphCfg.daysFilter,
-         aggregationLevel: graphCfg.aggregationLevel
+         aggregationLevel: graphCfg.aggregationLevel,
+         coinPrefix: graphCfg.coinPrefix
       })
       .then(function (result)
       {

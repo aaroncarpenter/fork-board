@@ -1,4 +1,4 @@
-<div id="{3}-card" class="walletCard" >
+<div id="{1}-card" class="walletCard" >
     <div class="card">
         <div class="card-header" onclick="loadWalletDetails('{1}')" title="Click here to open the wallet details." >
             <div class="d-flex flex-row justify-content-between">
@@ -10,14 +10,14 @@
                     <small class="text-muted">
                         <span id="walletCount"></span>
                         <span id="walletCountLabel"></span>&nbsp;
-                        <span id="forkStatusSymbol">{5}</span>
+                        <span id="forkStatusSymbol">{4}</span>
                     </small>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="d-flex justify-content-center col-md-12"><div class="spinner-border" role="status"></div></div>
-            <div class="card-balances" onclick="openGraphWindow('{7}');"  style="display: none;">
+            <div class="card-balances" onclick="openLineChart('{1}');" title="Click to view balance history" style="display: none;">
                 <div class="d-flex flex-row align-items-center">
                     <div class="col-md-5 flex-fill text-center" title="Wallet balance in coins.">
                         <div>
@@ -26,7 +26,7 @@
                             </h2>
                         </div>
                         <div>
-                            <small class="text-muted">{4}</small>
+                            <small class="text-muted">{3}</small>
                         </div>
                     </div>
                     <div class="col-md-7 flex-fill text-center" style="border-left: 1px solid lightgray">
@@ -42,7 +42,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-footer" onclick="loadWalletDetails('{1}')" title="Click here to open the wallet details.">
+        <div class="card-footer" onclick="openLineChart('{1}-price');" title="Click to view price history">
             <div class="d-flex flex-row justify-content-between">
                 <div class="col-md-4">
                     <small class="text-muted" title="The change in balance over the last 24 hours">Chg:&nbsp; 
@@ -51,7 +51,7 @@
                     </small>
                 </div>
                 <div class="d-flex col-md-8 justify-content-end">
-                    <small class="text-muted" title="Price per coin from {6}">
+                    <small class="text-muted" title="Price per coin from {5}">
                         <div class="coin-price"></div>
                     </small>
                 </div>

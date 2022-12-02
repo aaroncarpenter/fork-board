@@ -9,6 +9,11 @@ const DisplayTheme = {
    Dark: 'Dark',
    Light: 'Light'
 };
+const DaysField = {
+   30: '30',
+   60: '60',
+   90: '90'
+};
 // #endregion
 
 // #region Variable Definitions
@@ -58,7 +63,7 @@ function closeWindow() {
 // #region Graph Functions
 
 // ***********************
-// Name: 	loadLineGraph
+// Name: 	loadLineGraph  
 // Purpose: This function is handles clearing and re-adding the wallet cards.
 //    Args: N/A
 //  Return: N/A
@@ -120,7 +125,7 @@ ipcRenderer.on('load-line-graph', (event, arg) => {
 ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
    logger.info('Received async-get-line-graph-data-reply event');
 
-   $(document).attr("title", `${graphCfg.windowTitle} History`);
+   $(document).attr("title", `${graphCfg.windowTitle}`);
 
    let exchangeRate = utils.getUSDExchangeRate(clientCfg.appSettings.currency, exchangeRateObj);
    logger.info(`Exchange rate is ${exchangeRate}`);
@@ -131,13 +136,13 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
       logger.info(`Received ${graphData.length} rows`);
 
       let groupDateLbls = [];
-      let groupCoinCountVals = [];
-      let groupCoinValueVals = [];
+      let groupCountVals = [];
+      let groupValueVals = [];
 
       graphData.every(function (dataGrp) {
          groupDateLbls.push(new Date(dataGrp.date).toLocaleDateString());
-         groupCoinCountVals.push(dataGrp.balance);
-         groupCoinValueVals.push(dataGrp.balanceUSD * exchangeRate);
+         groupCountVals.push(dataGrp.balance);
+         groupValueVals.push(dataGrp.balanceUSD * exchangeRate);
          return true;
       });
      
@@ -145,10 +150,10 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
       let scales = {};
 
       groupDatasets.push({
-         label: `Balance (${clientCfg.appSettings.currency})`,
+         label: `${graphCfg.primaryYAxisLabel} (${clientCfg.appSettings.currency})`,
          backgroundColor: 'rgb(0, 128, 0)',
          borderColor: 'rgb(0, 128, 0)',
-         data: groupCoinValueVals,
+         data: groupValueVals,
          yAxisID: 'y',
          tension: 0.2
        });
@@ -159,17 +164,17 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
          position: 'left',
          title: {
             display: true,
-            text: `Balance (${clientCfg.appSettings.currency})`
+            text: `${graphCfg.primaryYAxisLabel} (${clientCfg.appSettings.currency})`
          }
       };
 
-      if (graphData[0].group.toUpperCase() != 'ACTUAL')
+      if (graphCfg.showCoinCountLine)
       {
          groupDatasets.push({
             label: `Coins`,
             backgroundColor: 'rgb(229, 232, 232)',
             borderColor: 'rgb(229, 232, 232)',
-            data: groupCoinCountVals,
+            data: groupCountVals,
             yAxisID: 'y1',
             borderDash: [5, 5],
             fill: false,
@@ -192,15 +197,13 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
          };
       }
 
-      
-
-       const data = {
+      const data = {
          labels: groupDateLbls,
          datasets: groupDatasets
-       };
+      };
 
-       let delayed;
-       const config = {
+      let delayed;
+      const config = {
          type: 'line',
          data: data,
          options: {
@@ -214,16 +217,36 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
             radius: 0,
             scales: scales
          }
-       };
+      };
    
-       const myChart = new Chart(
+      const myChart = new Chart(
          document.getElementById('forkboardChart'),
          config
-       );
+      );
    
    }
    else {
       logger.error('Reply args incorrect');
    }
 });
+
+// ***********************
+// Name: 	updateSortOrder
+// Purpose: This function changes the sort order.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function updateDays(days) {
+   logger.info(`Update Days filter to ${days}`);
+
+   if (days != clientConfigObj.appSettings.graphDaysFilter) {
+      clientConfigObj.appSettings.graphDaysFilter = days;
+
+      $('#days-dropdown-text').text(`Days: ${clientConfigObj.appSettings.graphDaysFilter}`)
+
+      graphCfg.daysFilter = clientConfigObj.appSettings.graphDaysFilter;
+
+      loadLineGraph();
+   }
+}
 // #endregion
