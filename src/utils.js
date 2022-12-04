@@ -87,13 +87,13 @@ class Utils {
       }
 
       if (balance < 100000) {
-         balanceStr = roundToPreferredDecimalPlaces(balance, decimalPlaces).toLocaleString();
+         balanceStr = this.roundToPreferredDecimalPlaces(balance, decimalPlaces).toLocaleString();
       } else if (balance < 1000000) {
-         balanceStr = roundToPreferredDecimalPlaces(balance / 1000, decimalPlaces).toLocaleString() + "K";
+         balanceStr = this.roundToPreferredDecimalPlaces(balance / 1000, decimalPlaces).toLocaleString() + "K";
       } else if (balance < 1000000000) {
-         balanceStr = roundToPreferredDecimalPlaces(balance / 1000000, decimalPlaces).toLocaleString() + "M";
+         balanceStr = this.roundToPreferredDecimalPlaces(balance / 1000000, decimalPlaces).toLocaleString() + "M";
       } else {
-         balanceStr = roundToPreferredDecimalPlaces(balance / 1000000000, decimalPlaces).toLocaleString() + "B";
+         balanceStr = this.roundToPreferredDecimalPlaces(balance / 1000000000, decimalPlaces).toLocaleString() + "B";
       }
 
       return balanceStr;
@@ -141,35 +141,7 @@ class Utils {
          balance = Math.round(balance);
       }
 
-      /*
-      */
-
-      if (currencyStr == "USD")
-         localeCode = "en-US";
-      else if (currencyStr == "RUB")
-         localeCode = "ru-RU";
-      else if (currencyStr == "CNY")
-         localeCode = "zh-CN";
-      else if (currencyStr == "TWD")
-         localeCode = "zh-TW";
-      else if (currencyStr == "JPY")
-         localeCode = "ja-JP";
-      else if (currencyStr == "KRW")
-         localeCode = "ko-KR";
-      else if (currencyStr == "PLN")
-         localeCode = "pl-PL";
-      else if (currencyStr == "AUD")
-         localeCode = "en-AU";
-      else if (currencyStr == "CZK")
-         localeCode = "cs-CZ";
-      else if (currencyStr == "INR")
-         localeCode = "en-IN";
-      else if (currencyStr == "KZT")
-         localeCode = "kk-KZ";
-      else if (currencyStr == "UAH")
-         localeCode = "uk-UA";
-      else
-         localeCode = navigator.languages[0];
+      localeCode = this.getLocaleFromCurrency(currencyStr);
       
       if (!extendedDigits) {
          balanceStr = balance.toLocaleString(localeCode, {style: 'currency', currency: currencyStr});
@@ -207,7 +179,44 @@ class Utils {
       return exchangeRate;
    }
 
-  applySort(key, order = 'asc') {
+   // ***********************
+   // Name: 	getLocaleFromCurrency
+   // Purpose: 
+   //    Args: currency - currency string
+   //  Return: locale code
+   // ************************
+   getLocaleFromCurrency(currencyStr) {
+      let localeCode = navigator.languages[0];
+
+      if (currencyStr == "USD")
+         localeCode = "en-US";
+      else if (currencyStr == "RUB")
+         localeCode = "ru-RU";
+      else if (currencyStr == "CNY")
+         localeCode = "zh-CN";
+      else if (currencyStr == "TWD")
+         localeCode = "zh-TW";
+      else if (currencyStr == "JPY")
+         localeCode = "ja-JP";
+      else if (currencyStr == "KRW")
+         localeCode = "ko-KR";
+      else if (currencyStr == "PLN")
+         localeCode = "pl-PL";
+      else if (currencyStr == "AUD")
+         localeCode = "en-AU";
+      else if (currencyStr == "CZK")
+         localeCode = "cs-CZ";
+      else if (currencyStr == "INR")
+         localeCode = "en-IN";
+      else if (currencyStr == "KZT")
+         localeCode = "kk-KZ";
+      else if (currencyStr == "UAH")
+         localeCode = "uk-UA";
+      
+      return localeCode;
+   }
+
+   applySort(key, order = 'asc') {
       return function innerSort(a, b) {
         if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
           // property doesn't exist on either object
@@ -228,18 +237,17 @@ class Utils {
         );
       };
   }
-}
 
+   // ***********************
+   // Name: 	roundToPreferredDecimalPlaces
+   // Purpose: 
+   //    Args: value - value to round
+   //          places - number of decimal places 
+   //  Return: Rounded value
+   // ************************
+   roundToPreferredDecimalPlaces(value, places) {
+      return Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
+   }
+}
 
 module.exports = Utils;
-
-// ***********************
-// Name: 	roundToPreferredDecimalPlaces
-// Purpose: 
-//    Args: value - value to round
-//          places - number of decimal places 
-//  Return: Rounded value
-// ************************
-function roundToPreferredDecimalPlaces(value, places) {
-   return Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
-}

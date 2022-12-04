@@ -251,7 +251,7 @@ function createLineGraphWindow(graphCfg, clientCfg, exchangeRateObj) {
    refreshMainCard = false;
    lineGraph = new BrowserWindow({
       width: 1000,
-      height: 650,
+      height: 675,
       modal: true,
       show: false,
       parent: win, // Make sure to add parent window here

@@ -2,7 +2,7 @@
 const {ipcRenderer, clipboard} = require('electron');
 const remote = require('electron').remote;
 const logger = require('electron-log');
-const { chart } = require('chart.js');
+const { chart, Chart } = require('chart.js');
 logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/lineChart.log');
 const Utils = require('./utils');
 const DisplayTheme = {
@@ -28,10 +28,15 @@ let clientCfg = {};
 let exchangeRateObj = {};
 let displayTheme;
 let showCloseButton = false;
+let graphDaysFilter = 30;
+
+let forkboardChartObj; 
 // #endregion
 
 $(function () {
    addEventListener('keyup', handleKeyPress, true);
+   $('#days-dropdown-text').text(`Filter: Last ${graphDaysFilter} Days`);
+   forkboardChartObj = new Chart(document.getElementById('forkboardChart'),{});
 });
 
 // #region Page Event Handlers
@@ -58,6 +63,7 @@ function handleKeyPress(event) {
 function closeWindow() {
    ipcRenderer.send('close-line-graph', []);
 }
+
 // #endregion
 
 // #region Graph Functions
@@ -82,9 +88,13 @@ function loadLineGraph() {
 function setDisplayTheme() {
    if (clientCfg.appSettings.displayTheme === DisplayTheme.Dark) {
       $('body').addClass('dark-mode');
+      $('div.dropdown-content').addClass('dark-mode');
+      $('div.card-header').addClass('dark-mode');
    }
    else {
       $('body').removeClass('dark-mode');
+      $('div.dropdown-content').removeClass('dark-mode');
+      $('div.card-header').removeClass('dark-mode');
    }
 }
 
@@ -97,7 +107,7 @@ function setDisplayTheme() {
 // ************************
 ipcRenderer.on('load-line-graph', (event, arg) => {
    logger.info('Received load-line-graph event');
-   
+
    if (arg.length == 4) {
       graphCfg = arg[0];
       clientCfg = arg[1];
@@ -111,7 +121,8 @@ ipcRenderer.on('load-line-graph', (event, arg) => {
       setDisplayTheme();
 
       if (processPlatform != 'darwin') {
-         $('#close-button-div').hide();
+         $('#darwin-window-title').hide();
+         $('#darwin-window-close').hide();
       }
    }
    else {
@@ -125,7 +136,13 @@ ipcRenderer.on('load-line-graph', (event, arg) => {
 ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
    logger.info('Received async-get-line-graph-data-reply event');
 
-   $(document).attr("title", `${graphCfg.windowTitle}`);
+   if (forkboardChartObj != undefined)
+   {
+      forkboardChartObj.destroy();
+   }
+
+   $(document).attr("title", graphCfg.windowTitle);
+   $('#darwin-window-title').text(graphCfg.windowTitle);
 
    let exchangeRate = utils.getUSDExchangeRate(clientCfg.appSettings.currency, exchangeRateObj);
    logger.info(`Exchange rate is ${exchangeRate}`);
@@ -142,12 +159,13 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
       graphData.every(function (dataGrp) {
          groupDateLbls.push(new Date(dataGrp.date).toLocaleDateString());
          groupCountVals.push(dataGrp.balance);
-         groupValueVals.push(dataGrp.balanceUSD * exchangeRate);
+         groupValueVals.push(utils.roundToPreferredDecimalPlaces(dataGrp.balanceUSD, 2) * exchangeRate);
          return true;
       });
      
       let groupDatasets = [];
       let scales = {};
+      let plugins = {};
 
       groupDatasets.push({
          label: `${graphCfg.primaryYAxisLabel} (${clientCfg.appSettings.currency})`,
@@ -165,7 +183,13 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
          title: {
             display: true,
             text: `${graphCfg.primaryYAxisLabel} (${clientCfg.appSettings.currency})`
-         }
+         },
+         ticks: {
+            // Include a dollar sign in the ticks
+            callback: function(value, index, ticks) {
+                return value.toLocaleString(utils.getLocaleFromCurrency(clientCfg.appSettings.currency), {style: 'currency', currency: clientCfg.appSettings.currency, minimumFractionDigits: 0, maximumFractionDigits: 4});
+            }
+        }
       };
 
       if (graphCfg.showCoinCountLine)
@@ -197,6 +221,26 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
          };
       }
 
+      
+      scales.yAxes = [{
+         ticks: {
+            min: 0,
+            callback: function(value, index, values) {
+               return value.toLocaleString(utils.getLocaleFromCurrency(clientCfg.appSettings.currency),{style:"currency", currency: clientCfg.appSettings.currency});
+            }
+         }
+      }];
+
+      scales.x = {
+         ticks: {
+           // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+           callback: function(val, index) {
+            // Hide every 2nd tick label
+            return index % (graphCfg.daysFilter == 30 ? 2 : graphCfg.daysFilter == 60 ? 4 : 6) === 0 ? new Date(this.getLabelForValue(val)).toLocaleDateString() : '';
+           }
+         }
+       }
+
       const data = {
          labels: groupDateLbls,
          datasets: groupDatasets
@@ -215,11 +259,12 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
                intersect: false
             },
             radius: 0,
-            scales: scales
+            scales: scales,
+            plugins: plugins
          }
       };
    
-      const myChart = new Chart(
+      forkboardChartObj = new Chart(
          document.getElementById('forkboardChart'),
          config
       );
@@ -239,12 +284,12 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
 function updateDays(days) {
    logger.info(`Update Days filter to ${days}`);
 
-   if (days != clientConfigObj.appSettings.graphDaysFilter) {
-      clientConfigObj.appSettings.graphDaysFilter = days;
+   if (days != graphDaysFilter) {
+      graphDaysFilter = days;
 
-      $('#days-dropdown-text').text(`Days: ${clientConfigObj.appSettings.graphDaysFilter}`)
+      $('#days-dropdown-text').text(`Filter: Last ${graphDaysFilter} Days`);
 
-      graphCfg.daysFilter = clientConfigObj.appSettings.graphDaysFilter;
+      graphCfg.daysFilter = graphDaysFilter;
 
       loadLineGraph();
    }
