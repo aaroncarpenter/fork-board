@@ -23,17 +23,9 @@
 
 
    <body>
-      <!--<div id="darwin-window-title"></div>
-         <div id="close-button-div" class="card-header">
-            <div class="d-flex flex-row justify-content-between">
-               <div id="darwin-window-title"><small id="line-chart-title"></small></button></div>
-               <div id="darwin-window-close"><i class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i>&nbsp;&nbsp;</div>
-            </div>
-         </div>
-      </div>-->
-      <div class="d-flex justify-content-between">
+      <div class="d-flex justify-content-between card-header">
          <div class="col-4" style="padding-left:5px;"><small id="darwin-window-title"></small></div>
-         <div class="d-flex col-4 justify-content-between">
+         <div class="d-flex col-6 justify-content-between">
             <div></div>
             <div id="days-dropdown" class="dropbtn dropdown" style="height: 20px;">
                <small id="days-dropdown-text"></small> 
@@ -43,12 +35,24 @@
                   <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(90)"><small>Last 90 days</small></button>
                </div> 
             </div>
+         </div>
+         <div class="d-flex col-2 justify-content-end" style="padding-right:10px; padding-top:5px;"><i id="darwin-window-close" class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i></div>
+      </div>
+      <div class="chart-container" style="position: relative; height: 600px; width:100%;">
+         <canvas id="forkboardChart"></canvas>
+       </div>
+       <div class="d-flex justify-content-between card-footer">
+         <div></div>
+            <div id="days-dropdown" class="dropbtn dropdown" style="height: 20px;">
+               <div id="days-dropdown-content" class="dropdown-content">
+                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(30)"><small>Last 30 days</small></button>
+                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(60)"><small>Last 60 days</small></button>
+                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(90)"><small>Last 90 days</small></button>
+               </div> 
+               <small id="days-dropdown-text"></small> 
+            </div>
             <div></div>
          </div>
-         <div class="d-flex col-4 justify-content-end" style="padding-right:10px; padding-top:5px;"><i id="darwin-window-close" class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i></div>
-      </div>
-      <div class="chart-container" style="position: relative; height: 600px; width:100%">
-         <canvas id="forkboardChart"></canvas>
        </div>
    </body>
 </html>
