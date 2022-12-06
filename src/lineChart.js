@@ -120,7 +120,7 @@ ipcRenderer.on('load-line-graph', (event, arg) => {
       //Setting theme
       setDisplayTheme();
 
-      if (processPlatform != 'darwin') {
+      if (processPlatform == 'darwin') {
          $('#darwin-window-title').hide();
          $('#darwin-window-close').hide();
       }
@@ -290,6 +290,31 @@ function updateDays(days) {
       $('#days-dropdown-text').text(`Filter: Last ${graphDaysFilter} Days`);
 
       graphCfg.daysFilter = graphDaysFilter;
+
+      if (days == 30) {
+         $('#days-filter-30').addClass('btn-primary');
+         $('#days-filter-30').removeClass('btn-secondary');
+         $('#days-filter-60').addClass('btn-secondary');
+         $('#days-filter-60').removeClass('btn-primary');
+         $('#days-filter-90').addClass('btn-secondary');
+         $('#days-filter-90').removeClass('btn-primary');
+      }
+      else if  (days == 60) {
+         $('#days-filter-60').addClass('btn-primary');
+         $('#days-filter-60').removeClass('btn-secondary');
+         $('#days-filter-30').addClass('btn-secondary');
+         $('#days-filter-30').removeClass('btn-primary');
+         $('#days-filter-90').addClass('btn-secondary');
+         $('#days-filter-90').removeClass('btn-primary');
+      }
+      else if  (days == 90) {
+         $('#days-filter-90').addClass('btn-primary');
+         $('#days-filter-90').removeClass('btn-secondary');
+         $('#days-filter-30').addClass('btn-secondary');
+         $('#days-filter-30').removeClass('btn-primary');
+         $('#days-filter-60').addClass('btn-secondary');
+         $('#days-filter-60').removeClass('btn-primary');
+      }
 
       loadLineGraph();
    }

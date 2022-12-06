@@ -24,19 +24,17 @@
 
    <body>
       <div class="d-flex justify-content-between card-header">
-         <div class="col-4" style="padding-left:5px;"><small id="darwin-window-title"></small></div>
-         <div class="d-flex col-6 justify-content-between">
+         <div class="col-4" style="padding-left:5px; padding-top:2px;"><small id="darwin-window-title"></small></div>
+         <div class="d-flex col-4 justify-content-center">
             <div></div>
-            <div id="days-dropdown" class="dropbtn dropdown" style="height: 20px;">
-               <small id="days-dropdown-text"></small> 
-               <div id="days-dropdown-content" class="dropdown-content">
-                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(30)"><small>Last 30 days</small></button>
-                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(60)"><small>Last 60 days</small></button>
-                  <button  type="button" class="btn" style="width: 100%; padding-top: 5px; padding-bottom: 5px;" onclick="updateDays(90)"><small>Last 90 days</small></button>
-               </div> 
+            <div class="btn-group btn-group-sm" role="group">
+               <button id="days-filter-30" type="button" class="btn btn-primary btn-small" style="width: 100%;" onclick="updateDays(30)"><small>Last 30 Days</small></button>
+               <button id="days-filter-60" type="button" class="btn btn-secondary btn-small" style="width: 100%;" onclick="updateDays(60)"><small>Last 60 Days</small></button>
+               <button id="days-filter-90" type="button" class="btn btn-secondary btn-small" style="width: 100%;" onclick="updateDays(90)"><small>Last 90 Days</small></button>
             </div>
+            <div></div>
          </div>
-         <div class="d-flex col-2 justify-content-end" style="padding-right:10px; padding-top:5px;"><i id="darwin-window-close" class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i></div>
+         <div class="d-flex col-4 justify-content-end" style="padding-right:10px; padding-top:8px;"><i id="darwin-window-close" class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i></div>
       </div>
       <div class="chart-container" style="position: relative; height: 600px; width:100%;">
          <canvas id="forkboardChart"></canvas>
