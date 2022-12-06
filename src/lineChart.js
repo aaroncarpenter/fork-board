@@ -120,7 +120,7 @@ ipcRenderer.on('load-line-graph', (event, arg) => {
       //Setting theme
       setDisplayTheme();
 
-      if (processPlatform == 'darwin') {
+      if (processPlatform != 'darwin') {
          $('#darwin-window-title').hide();
          $('#darwin-window-close').hide();
       }
