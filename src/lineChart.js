@@ -221,16 +221,6 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
          };
       }
 
-      
-      scales.yAxes = [{
-         ticks: {
-            min: 0,
-            callback: function(value, index, values) {
-               return value.toLocaleString(utils.getLocaleFromCurrency(clientCfg.appSettings.currency),{style:"currency", currency: clientCfg.appSettings.currency});
-            }
-         }
-      }];
-
       scales.x = {
          ticks: {
            // For a category axis, the val is the index so the lookup via getLabelForValue is needed
