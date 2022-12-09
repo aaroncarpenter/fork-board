@@ -326,7 +326,7 @@ ipcMain.on("show-user-settings", function (_event, arg) {
 });
 
 // ************************
-// Purpose: This function handles the open-user-settings event from the Renderer.  It opens the User Settings page.
+// Purpose: This function handles the open-line-graph event from the Renderer.  It opens the User Settings page.
 // ************************
 ipcMain.on("open-line-graph", function (_event, arg) {
    logger.info('Received open-line-graph Event');
@@ -491,7 +491,7 @@ ipcMain.on('async-get-line-graph-data', function (event, arg) {
          event.sender.send('async-get-line-graph-data-reply', [result.data]);
       })
       .catch(function (error) {
-         logger.error(`FAILED - Graph Data for ${launcherid}`);
+         logger.error(`FAILED - Graph Data for ${launcherId} - ${error}`);
       });
    }
 });

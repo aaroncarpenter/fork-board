@@ -258,6 +258,8 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
          document.getElementById('forkboardChart'),
          config
       );
+
+      document.getElementById('forkboardChart').focus();
    
    }
    else {
