@@ -184,12 +184,12 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
             display: true,
             text: `${graphCfg.primaryYAxisLabel} (${clientCfg.appSettings.currency})`
          },
-         ticks: {
+         /*ticks: {
             // Include a dollar sign in the ticks
             callback: function(value, index, ticks) {
                 return value.toLocaleString(utils.getLocaleFromCurrency(clientCfg.appSettings.currency), {style: 'currency', currency: clientCfg.appSettings.currency, minimumFractionDigits: 0, maximumFractionDigits: 4});
             }
-        }
+        }*/
       };
 
       if (graphCfg.showCoinCountLine)
