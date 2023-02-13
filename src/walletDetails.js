@@ -2,7 +2,7 @@
 const {ipcRenderer, clipboard} = require('electron');
 const remote = require('electron').remote;
 const logger = require('electron-log');
-logger.transports.file.resolvePath = () => path.join(__dirname, '../logs/walletDetails.log');
+logger.transports.file.resolvePath = () => path.join(__dirname, '../../logs/walletDetails.log');
 const Utils = require('./utils');
 const DisplayTheme = {
    Dark: 'Dark',
@@ -17,14 +17,15 @@ let $ = require('jquery');
 let fs = require('fs');
 let path = require('path');
 
-let walletFile = path.resolve(__dirname, '../assets/config/wallets.json');
-let templateFile = path.resolve(__dirname, '../assets/templates/card-template-wallet-detail.html');
+let walletFile = path.resolve(__dirname, '../../assets/config/wallets.json');
+let templateFile = path.resolve(__dirname, '../../assets/templates/card-template-wallet-detail.html');
 let cardTemplate = fs.readFileSync(templateFile, 'utf8');
 let walletObj = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
 
 let coinCfg = {};
 let clientCfg = {};
 let exchangeRates = {};
+let walletDetailsObj = [];
 let displayTheme;
 let showCloseButton = false;
 // #endregion
@@ -278,6 +279,98 @@ function storeWalletSettings() {
    fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
 }
 
+// ***********************
+// Name: 	deleteAllWallets
+// Purpose: This function handles deleting all wallets for a particular coin.  It functions similarly to the inidividual wallet delete function.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function deleteAllWallets() {
+   if (confirm(`Are you sure you want to delete ${walletDetailsObj.length} wallet(s)?`))
+   {
+      walletDetailsObj.every(function (wdo) {
+         let newWalletObj = [];
+
+         // Push wallet values to the new array for all wallets except the one to delete
+         walletObj.every(function (w) {
+            if (w.wallet != wdo.wallet) {
+               newWalletObj.push({ 'wallet': w.wallet });
+            }
+            return true;
+         });
+      
+         walletObj = newWalletObj;
+
+         // Remove the card from the display
+         $(`#${wdo.wallet}-card`).remove();
+ 
+         return true;
+      });
+      
+      // Write the new wallet file
+      fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
+
+      // This flag tells the main dashboard there was a change and forces a refresh.
+      ipcRenderer.send('async-set-dashboard-maincard-refresh-flag', []);
+
+      // Auto-close the window after removing all wallets.
+      closeWindow();
+   }
+}
+
+// ***********************
+// Name: 	deleteZeroBalanceWallets
+// Purpose: This function handles deleting all zero balance wallets for a particular coin.  It functions similarly to the inidividual wallet delete function.
+//    Args: N/A
+//  Return: N/A
+// ************************
+function deleteZeroBalanceWallets() {
+   let zeroBalanceWalletCount = 0;
+
+   // Iterate through the wallet details list to get the number of wallets with zero balances.
+   walletDetailsObj.every(function (wdo) {
+      if (wdo.balance == 0)
+      {
+         zeroBalanceWalletCount = zeroBalanceWalletCount + 1;
+      }
+
+      return true;
+   });
+
+   if (confirm(`Are you sure you want to delete ${zeroBalanceWalletCount} wallet(s)?`))
+   {
+      walletDetailsObj.every(function (wdo) {
+         if (wdo.balance == 0)
+         { 
+            let newWalletObj = [];
+
+            // Push wallet values to the new array for all wallets except the one to delete
+            walletObj.every(function (w) {
+               if (w.wallet != wdo.wallet) {
+                  newWalletObj.push({ 'wallet': w.wallet });
+               }
+               return true;
+            });
+         
+            walletObj = newWalletObj;
+
+            // Remove the card from the display
+            $(`#${wdo.wallet}-card`).remove();
+         }
+         return true;
+      });
+      
+      // Write the new wallet file
+      fs.writeFileSync(walletFile, JSON.stringify(walletObj, null, '\t'));
+
+      // This flag tells the main dashboard there was a change and forces a refresh.
+      ipcRenderer.send('async-set-dashboard-maincard-refresh-flag', []);
+
+      // Auto-close the window after removing all wallets.
+      closeWindow();
+   }
+}
+
 // #endregion
 
 // #region Electron Event Handlers
@@ -338,6 +431,8 @@ ipcRenderer.on('async-get-wallet-balance-reply', (event, arg) => {
          else {
             $('#'+wallet+'-card .card-body .balance-currency').text('-');
          }
+
+         walletDetailsObj.push({ 'wallet': wallet, 'balance': balance });
       }
    }
    else {

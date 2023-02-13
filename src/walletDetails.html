@@ -6,6 +6,7 @@
       <link rel = "stylesheet" href = "../bower_components/bootstrap/dist/css/bootstrap.min.css" />
       <link rel = "stylesheet" href = "./css/forkboard.css" />
       <script src="https://kit.fontawesome.com/80792d13b7.js" crossorigin="anonymous"></script>
+      <script src = "./walletDetails.js" ></script>
       <style type = "text/css">
          #wallet-list {
             overflow-y: auto;
@@ -43,8 +44,6 @@
             font-variant: small-caps;
          }
       </style>
-
-   
    </head>
    
    <body>
@@ -54,11 +53,14 @@
             <div style="padding-right:10px; padding-top:5px;"><i class="fas fa-times" onclick="closeWindow();" aria-label="Close" title="Close this window"></i>&nbsp;&nbsp;</div>
          </div>
       </div>
-      <div class = "container">
+      <div class="container-fluid">
          <h2 id="coinDisplayName"></h2>
          <p></p>
-         <div id="wallet-cards" class="row" style="vertical-align:bottom"></div>
-      <script src = "./walletDetails.js" ></script>
+         <div id="wallet-cards" class="d-flex row justify-content-center" style="vertical-align:bottom"></div>
       </div>
+      <div style="margin-left: 5px; margin-right: 5px; margin-bottom: 5px;" class="d-flex flex-row justify-content-between">
+         <button id="delete-all-wallets" type="button" class="btn btn-primary btn-small" style="width: 100%;" onclick="deleteAllWallets()"><small><nobr>Delete All Wallets</nobr></small></button>
+         &nbsp;
+         <button id="delete-zero-balance-wallets" type="button" class="btn btn-primary btn-small" style="width: 100%;" onclick="deleteZeroBalanceWallets()"><small><nobr>Delete Zero Balance Wallets</nobr></small></button>
    </body>
 </html>
