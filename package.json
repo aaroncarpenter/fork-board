@@ -9,13 +9,13 @@
   "scripts": {
     "start": "electron .",
     "package-win": "electron-packager . ForkBoard --overwrite --win32 --x64 --icon=assets/icons/fork-board-gray.ico --prune=true --out=./out_win --ignore=^/assets/config --ignore=^/logs",
-    "installer-win": "electron-installer-windows --src ./out_win/ForkBoard-win32-x64 --dest ./out_win/installers --icon=assets/icons/fork-board-gray.ico",
-    "package-mac-arm64": "electron-packager . ForkBoard --overwrite --darwin --arm64 --icon=assets/icons/fork-board-gray.icns --prune=true --out=./out_arm64 --ignore=^/assets/config --ignore=^/logs",
-    "installer-mac-arm64": "electron-installer-dmg out_arm64/ForkBoard-darwin-arm64/ForkBoard.app out_arm64/installers/ForkBoard-arm64",
-    "package-mac-x64": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-board-gray.icns --prune=true --out=./out_x64 --ignore=^/assets/config --ignore=^/logs",
-    "installer-mac-x64": "electron-installer-dmg out_x64/ForkBoard-darwin-x64/ForkBoard.app out_x64/installers/ForkBoard-x64",
+    "installer-win": "electron-installer-windows --src ./out_win/ForkBoard-win32-x64 --dest ./out_win/inst --icon=assets/icons/fork-board-gray.ico",
+    "package-mac-arm64": "electron-packager . ForkBoard --darwin --arm64 --out=./out_mac_arm64/ --icon=assets/icons/fork-board-gray.icns --overwrite=true --prune=true --ignore=^/assets/config --ignore=^/logs",
+    "installer-mac-arm64": "electron-installer-dmg out_mac_arm64/ForkBoard-darwin-x64/ForkBoard.app out_mac_arm64/inst",
+    "package-mac-x64": "electron-packager . ForkBoard --darwin --x64 --out=./out_mac_x64/ --icon=assets/icons/fork-board-gray.icns --overwrite=true --prune=true --ignore=^/assets/config --ignore=^/logs",
+    "installer-mac-x64": "electron-installer-dmg out_mac_x64/ForkBoard-darwin-x64/ForkBoard.app out_mac_x64/inst",
     "package-deb": "electron-packager . ForkBoard --overwrite --linux --x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./out_deb --ignore=^/assets/config --ignore=^/logs",
-    "installer-deb": "electron-installer-debian --src ./out_deb/ForkBoard-linux-x64 --dest ./out_deb/installers/ --arch amd64 --icon=assets/icons/fork-board-gray.png  --overwrite=true"
+    "installer-deb": "electron-installer-debian --src ./out_deb/ForkBoard-linux-x64 --dest ./out_deb/inst --arch amd64 --icon=assets/icons/fork-board-gray.png  --overwrite=true"
   },
   "dependencies": {
     "axios": "^0.24.0",

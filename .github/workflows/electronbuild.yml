@@ -49,9 +49,9 @@ jobs:
     - name: Package ForkBoard for Mac (arm64)
       run: yarn installer-mac-arm64
     - name: see dist directory
-      run: ls ./out_mac_arm64
+      run: ls ./out_arm64
     - name: see installers directory
-      run: ls ./out_mac_arm64/installers
+      run: ls ./out_arm64/inst
   build_on_mac_x64:
     runs-on: macos-latest
     steps:
@@ -74,7 +74,7 @@ jobs:
     - name: see dist directory
       run: ls ./out_mac_x64
     - name: see installers directory
-      run: ls ./out_mac_x64/installers
+      run: ls ./out_mac_x64/inst
   build_on_ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -97,4 +97,4 @@ jobs:
     - name: see out directory
       run: ls ./out_deb
     - name: see installers directory
-      run: ls ./out_deb/installers
+      run: ls ./out_deb/inst
