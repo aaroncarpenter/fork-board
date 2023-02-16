@@ -32,8 +32,8 @@ jobs:
     - name: see Install Electron Prompt
       run:  npm i electron-prompt@1.7.0
     - name: Build ForkBoard
-      run: electron-packager . ForkBoard --darwin --arm64 --out dist/ --icon=assets/icons/fork-board-gray.icns --overwrite=true
+      run: npm run package-mac-arm64
     - name: Package ForkBoard
-      run: electron-packager . ForkBoard --darwin --arm64 --out dist/ --icon=assets/icons/fork-board-gray.icns --overwrite=true
+      run: npm run installer-mac-arm64
     - name: see directory
       run: ls ./dist
