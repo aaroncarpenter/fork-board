@@ -39,5 +39,7 @@ jobs:
       run: yarn package-win
     - name: Package ForkBoard
       run: yarn installer-win
-    - name: see directory
+    - name: see out directory
       run: ls ./out
+    - name: see installers directory
+      run: ls ./out/installers
