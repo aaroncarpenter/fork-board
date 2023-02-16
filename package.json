@@ -14,7 +14,7 @@
     "installer-mac-arm64": "electron-installer-dmg dist/ForkBoard-darwin-arm64/ForkBoard.app dist/out/ForkBoard-arm64",
     "package-mac-x64": "electron-packager . ForkBoard --overwrite --darwin --x64 --icon=assets/icons/fork-board-gray.icns --prune=true --out=./out --ignore=^/assets/config --ignore=^/logs",
     "installer-mac-x64": "electron-installer-dmg dist/ForkBoard-darwin-x64/ForkBoard.app dist/out/ForkBoard-x64",
-    "package-linux": "electron-packager . ForkBoard --overwrite --linux --x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./out --ignore=^/assets/config --ignore=^/logs",
+    "package-deb": "electron-packager . ForkBoard --overwrite --linux --x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./out --ignore=^/assets/config --ignore=^/logs",
     "installer-deb": "electron-installer-debian --src ./out/ForkBoard-linux-x64 --dest ./out/installers/ --arch amd64 --icon=assets/icons/fork-board-gray.png  --overwrite=true"
   },
   "dependencies": {

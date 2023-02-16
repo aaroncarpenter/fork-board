@@ -17,20 +17,6 @@ jobs:
         node-version: 16.15.1
     - name: see directory
       run: ls
-#    - name: Install Electron
-#      run: npm install --global electron@15.3.3
-#    - name: Install Electron Packager
-#      run: npm install --global electron-packager
-#    - name: Install Electron Installer DMG
-#      run: npm install --global electron-installer-dmg
-#    - name: Install ElectronLog
-#      run: npm install --global electron-log
-#    - name: Install Chart.JS
-#      run: npm install --global chart.js@3.9.1
-#    - name: Install Axios
-#      run: npm install --global axios@0.24.0
-#    - name: see Install Electron Prompt
-#      run: npm install --global electron-prompt@1.7.0
     - name: see NPM Reinstall
       run: yarn install
     - name: Install Electron Installer Windows
@@ -39,6 +25,75 @@ jobs:
       run: yarn package-win
     - name: Package ForkBoard
       run: yarn installer-win
+    - name: see out directory
+      run: ls ./out
+    - name: see installers directory
+      run: ls ./out/installers
+  build_on_mac_arm64:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        ref: master
+    - uses: actions/setup-node@master
+      with:
+        node-version: 16.15.1
+    - name: see directory
+      run: ls
+    - name: see NPM Reinstall
+      run: yarn install
+    - name: Install Electron Installer Mac
+      run: yarn add electron-installer-dmg@^4.0.0
+    - name: Build ForkBoard for Mac (arm64)
+      run: yarn package-mac-arm64
+    - name: Package ForkBoard for Mac (arm64)
+      run: yarn installer-mac-arm64
+    - name: see dist directory
+      run: ls ./dist
+    - name: see installers directory
+      run: ls ./dist/installers
+  build_on_mac_x64:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        ref: master
+    - uses: actions/setup-node@master
+      with:
+        node-version: 16.15.1
+    - name: see directory
+      run: ls
+    - name: see NPM Reinstall
+      run: yarn install
+    - name: Install Electron Installer Mac
+      run: yarn add electron-installer-dmg@^4.0.0
+    - name: Build ForkBoard for Mac (x64)
+      run: yarn package-mac-x64
+    - name: Package ForkBoard for Mac (x64)
+      run: yarn installer-mac-x64
+    - name: see dist directory
+      run: ls ./dist
+    - name: see installers directory
+      run: ls ./dist/installers
+  build_on_ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        ref: master
+    - uses: actions/setup-node@master
+      with:
+        node-version: 16.15.1
+    - name: see directory
+      run: ls
+    - name: see NPM Reinstall
+      run: yarn install
+    - name: Install Electron Installer Debian
+      run: yarn add electron-installer-debian@^3.1.0
+    - name: Build ForkBoard for Ubuntu
+      run: yarn package-deb
+    - name: Package ForkBoard for Ubuntu
+      run: yarn installer-deb
     - name: see out directory
       run: ls ./out
     - name: see installers directory
