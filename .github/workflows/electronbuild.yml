@@ -17,26 +17,23 @@ jobs:
         node-version: 16.15.1
     - name: see directory
       run: ls
-    - name: Install dependencies
-      run: yarn install
-    - name: Install dependencies
-      run: yarn install
-    - name: check env
-      env:
-        ELECTRON: true
-        APP_VERSION_NUMBER: 1.1.1
-      run: set
-    - name: Build on Windows
-      env:
-        ELECTRON: true
-        APP_VERSION_NUMBER: 1.1.1
-      run: yarn build
-    - name: Build Electron
-      env:
-        ELECTRON: true
-        APP_VERSION_NUMBER: 1.1.1
-      run: yarn electron:buildWin
+    - name: Install Electron
+      run: npm i electron@15.3.3
+    - name: Install Electron Packager
+      run: npm i electron-packager
+    - name: Install Electron Installer DMG
+      run: npm i electron-installer-dmg
+    - name: Install ElectronLog
+      run: npm i electron-log
+    - name: Install Chart.JS
+      run: npm i chart.js@3.9.1
+    - name: Install Axios
+      run: npm i axios@0.24.0
+    - name: see Install Electron Prompt
+      run:  npm i electron-prompt@1.7.0
+    - name: Build ForkBoard
+      run: electron-packager . ForkBoard --darwin --arm64 --out dist/ --icon=assets/icons/fork-board-gray.icns --overwrite=true
+    - name: Package ForkBoard
+      run: electron-packager . ForkBoard --darwin --arm64 --out dist/ --icon=assets/icons/fork-board-gray.icns --overwrite=true
     - name: see directory
-      run: ls
-    - name: see directory
-      run: ls ./electron_dist/squirrel-windows
+      run: ls ./dist
