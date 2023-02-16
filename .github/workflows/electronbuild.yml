@@ -9,10 +9,10 @@ jobs:
   build_on_mac:
     runs-on: macOS-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@github-build-test
       with:
-        ref: master
-    - uses: actions/setup-node@master
+        ref: github-action-test
+    - uses: actions/setup-node@github-build-test
       with:
         node-version: 16.15.1
     - name: see directory
