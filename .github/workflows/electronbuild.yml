@@ -1,0 +1,30 @@
+# name of your github action
+name: Electron Build
+# this will help you specify where to run 
+on:
+  # enable manual execution
+  workflow_dispatch:
+# this is where the magic happens, each job happens in parallel btw
+jobs:
+  build_on_mac:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        ref: master
+    - uses: actions/setup-node@master
+      with:
+        node-version: 16.15.1
+    - name: see directory
+      run: ls
+build_on_win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        ref: feature/github-actions        
+    - uses: actions/setup-node@master
+      with:
+        node-version: 16.15.1
+    - name: see directory
+      run: ls
