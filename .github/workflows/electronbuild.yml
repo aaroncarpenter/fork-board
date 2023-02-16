@@ -11,20 +11,29 @@ jobs:
     steps:
     - uses: actions/checkout@master
       with:
-        ref: master
+        ref: github-action-test
     - uses: actions/setup-node@master
       with:
         node-version: 16.15.1
     - name: see directory
       run: ls
-  build_on_win:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@master
-      with:
-        ref: feature/github-actions        
-    - uses: actions/setup-node@master
-      with:
-        node-version: 16.15.1
+    - name: Install Electron
+      run: npm install --global electron@15.3.3
+    - name: Install Electron Packager
+      run: npm install --global electron-packager
+    - name: Install Electron Installer DMG
+      run: npm install --global electron-installer-dmg
+    - name: Install ElectronLog
+      run: npm install --global electron-log
+    - name: Install Chart.JS
+      run: npm install --global chart.js@3.9.1
+    - name: Install Axios
+      run: npm install --global axios@0.24.0
+    - name: see Install Electron Prompt
+      run: npm install --global electron-prompt@1.7.0
+    - name: Build ForkBoard
+      run: npm run package-mac-arm64
+    - name: Package ForkBoard
+      run: npm run installer-mac-arm64
     - name: see directory
-      run: ls
+      run: ls ./dist
