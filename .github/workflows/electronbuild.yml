@@ -17,3 +17,26 @@ jobs:
         node-version: 16.15.1
     - name: see directory
       run: ls
+    - name: Install dependencies
+      run: yarn install
+    - name: Install dependencies
+      run: yarn install
+    - name: check env
+      env:
+        ELECTRON: true
+        APP_VERSION_NUMBER: 1.1.1
+      run: set
+    - name: Build on Windows
+      env:
+        ELECTRON: true
+        APP_VERSION_NUMBER: 1.1.1
+      run: yarn build
+    - name: Build Electron
+      env:
+        ELECTRON: true
+        APP_VERSION_NUMBER: 1.1.1
+      run: yarn electron:buildWin
+    - name: see directory
+      run: ls
+    - name: see directory
+      run: ls ./electron_dist/squirrel-windows
