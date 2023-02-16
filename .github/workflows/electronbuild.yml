@@ -1,5 +1,5 @@
 # name of your github action
-name: Electron Build
+name: ForkBoard Build
 # this will help you specify where to run 
 on:
   # enable manual execution
