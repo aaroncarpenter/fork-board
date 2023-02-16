@@ -26,9 +26,9 @@ jobs:
     - name: Package ForkBoard
       run: yarn installer-win
     - name: see out directory
-      run: ls ./out
+      run: ls ./out_win
     - name: see installers directory
-      run: ls ./out/installers
+      run: ls ./out_win/installers
   build_on_mac_arm64:
     runs-on: macos-latest
     steps:
@@ -49,9 +49,9 @@ jobs:
     - name: Package ForkBoard for Mac (arm64)
       run: yarn installer-mac-arm64
     - name: see dist directory
-      run: ls ./dist
+      run: ls ./out_mac_arm64
     - name: see installers directory
-      run: ls ./dist/installers
+      run: ls ./out_mac_arm64/installers
   build_on_mac_x64:
     runs-on: macos-latest
     steps:
@@ -72,9 +72,9 @@ jobs:
     - name: Package ForkBoard for Mac (x64)
       run: yarn installer-mac-x64
     - name: see dist directory
-      run: ls ./dist
+      run: ls ./out_mac_x64
     - name: see installers directory
-      run: ls ./dist/installers
+      run: ls ./out_mac_x64/installers
   build_on_ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -95,6 +95,6 @@ jobs:
     - name: Package ForkBoard for Ubuntu
       run: yarn installer-deb
     - name: see out directory
-      run: ls ./out
+      run: ls ./out_deb
     - name: see installers directory
-      run: ls ./out/installers
+      run: ls ./out_deb/installers
