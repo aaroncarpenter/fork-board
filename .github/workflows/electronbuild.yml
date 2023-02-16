@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
       with:
-        ref: github-action-test
+        ref: master
     - uses: actions/setup-node@master
       with:
         node-version: 16.15.1
