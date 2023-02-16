@@ -18,19 +18,19 @@ jobs:
     - name: see directory
       run: ls
     - name: Install Electron
-      run: npm i electron@15.3.3
+      run: npm install --global electron@15.3.3
     - name: Install Electron Packager
-      run: npm i electron-packager
+      run: npm install --global electron-packager
     - name: Install Electron Installer DMG
-      run: npm i electron-installer-dmg
+      run: npm install --global electron-installer-dmg
     - name: Install ElectronLog
-      run: npm i electron-log
+      run: npm install --global electron-log
     - name: Install Chart.JS
-      run: npm i chart.js@3.9.1
+      run: npm install --global chart.js@3.9.1
     - name: Install Axios
-      run: npm i axios@0.24.0
+      run: npm install --global axios@0.24.0
     - name: see Install Electron Prompt
-      run:  npm i electron-prompt@1.7.0
+      run: npm install --global electron-prompt@1.7.0
     - name: Build ForkBoard
       run: npm run package-mac-arm64
     - name: Package ForkBoard
