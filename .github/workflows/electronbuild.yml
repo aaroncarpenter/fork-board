@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 # this is where the magic happens, each job happens in parallel btw
 jobs:
-  build_on_mac:
-    runs-on: macOS-latest
+  build_on_win:
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@master
       with:
@@ -17,25 +17,25 @@ jobs:
         node-version: 16.15.1
     - name: see directory
       run: ls
-    - name: Install Electron
-      run: npm install --global electron@15.3.3
-    - name: Install Electron Packager
-      run: npm install --global electron-packager
-    - name: Install Electron Installer DMG
-      run: npm install --global electron-installer-dmg
-    - name: Install ElectronLog
-      run: npm install --global electron-log
-    - name: Install Chart.JS
-      run: npm install --global chart.js@3.9.1
-    - name: Install Axios
-      run: npm install --global axios@0.24.0
-    - name: see Install Electron Prompt
-      run: npm install --global electron-prompt@1.7.0
+#    - name: Install Electron
+#      run: npm install --global electron@15.3.3
+#    - name: Install Electron Packager
+#      run: npm install --global electron-packager
+#    - name: Install Electron Installer DMG
+#      run: npm install --global electron-installer-dmg
+#    - name: Install ElectronLog
+#      run: npm install --global electron-log
+#    - name: Install Chart.JS
+#      run: npm install --global chart.js@3.9.1
+#    - name: Install Axios
+#      run: npm install --global axios@0.24.0
+#    - name: see Install Electron Prompt
+#      run: npm install --global electron-prompt@1.7.0
     - name: see NPM Reinstall
-      run: npm install --global npm-reinstall
+      run: yarn install
     - name: Build ForkBoard
-      run: npm run package-mac-arm64
+      run: yarn package-win
     - name: Package ForkBoard
-      run: npm run installer-mac-arm64
+      run: yarn installer-win
     - name: see directory
-      run: ls ./dist
+      run: ls ./out
