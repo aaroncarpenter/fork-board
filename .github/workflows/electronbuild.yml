@@ -31,6 +31,8 @@ jobs:
       run: npm install --global axios@0.24.0
     - name: see Install Electron Prompt
       run: npm install --global electron-prompt@1.7.0
+    - name: see NPM Reinstall
+      run: npm install --global npm-reinstall
     - name: Build ForkBoard
       run: npm run package-mac-arm64
     - name: Package ForkBoard
