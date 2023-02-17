@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 env:
   FBVERSION: 1.1.1
+  RELEASETAG: v1.1.1
 # this is where the magic happens, each job happens in parallel btw
 jobs:
   build_on_win:
@@ -26,7 +27,7 @@ jobs:
     - name: Package ForkBoard
       run: yarn installer-win
     - name: rename output articfact
-      run: mv ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-setup.exe ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-x64.exe
+      run: mv ./out/win/ForkBoard-${{ env:FBVERSION }}-x64/ForkBoard-${{ env:FBVERSION }}-setup.exe ./out/win/ForkBoard-${{ env:FBVERSION }}-x64/ForkBoard-${{ env:FBVERSION }}-x64.exe
 #    - name: Upload Installer
 #      uses: actions/upload-artifact@v3
 #      with:
@@ -37,9 +38,9 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ github.token }}
-        file: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
-        asset_name: ForkBoard-1.1.1-x64.exe
-        tag: v1.1.1-build
+        file: ./out/win/ForkBoard-${{ env:FBVERSION }}-x64/ForkBoard-${{ env:FBVERSION }}-x64.exe
+        asset_name: ForkBoard-${{ env:FBVERSION }}-x64.exe
+        tag: ${{ env:RELEASEVERSION }}
         overwrite: true
   build_on_mac_arm64:
     runs-on: macos-latest
