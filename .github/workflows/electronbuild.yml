@@ -4,6 +4,8 @@ name: ForkBoard Build
 on:
   # enable manual execution
   workflow_dispatch:
+env:
+  FBVERSION: 1.1.1
 # this is where the magic happens, each job happens in parallel btw
 jobs:
   build_on_win:
@@ -25,12 +27,18 @@ jobs:
       run: yarn package-win
     - name: Package ForkBoard
       run: yarn installer-win
-    - name: see out directory
+    - name: see out/win directory
       run: ls ./out/win
-    artifacts:
-      paths:
-        - ./out/win/*
-
+    - name: rename output articfact
+      run: mv ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-setup.exe ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-x64.exe
+    - name: see out/win directory
+      run: ls ./out/win/ForkBoard-$env:FBVERSION-x64/
+    - name: Upload Installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-x64-installer
+        path: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
+        retention-days: 10
   build_on_mac_arm64:
     runs-on: macos-latest
     steps:
@@ -52,7 +60,16 @@ jobs:
       run: yarn installer-mac-arm64
     - name: see dist directory
       run: ls ./out/arm64
-
+    - name: rename output articfact
+      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FBVERSION-arm64.dmg
+    - name: see out/arm64 directory
+      run: ls ./out/arm64/
+    - name: Upload Installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-arm64-installer
+        path: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
+        retention-days: 10
   build_on_mac_x64:
     runs-on: macos-latest
     steps:
@@ -74,7 +91,16 @@ jobs:
       run: yarn installer-mac-x64
     - name: see dist directory
       run: ls ./out/x64
-
+    - name: rename output articfact
+      run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FBVERSION-x64.dmg
+    - name: see out/x64 directory
+      run: ls ./out/x64/
+    - name: Upload Installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-x64-installer
+        path: ./out/x64/ForkBoard-1.1.1-x64.dmg
+        retention-days: 10
   build_on_ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -95,5 +121,15 @@ jobs:
     - name: Package ForkBoard for Ubuntu
       run: yarn installer-deb
     - name: see out directory
-      run: ls ./out/deb
+      run: ls ./out/deb/ForkBoard-$FBVERSION-x64/
+    - name: rename output articfact
+      run: mv ./out/deb/ForkBoard-$FBVERSION-x64/forkboard_1.1.1_amd64.deb ./out/deb/ForkBoard-$FBVERSION-x64/ForkBoard-$FBVERSION-x64.deb
+    - name: see out/deb directory
+      run: ls ./out/deb/ForkBoard-$FBVERSION-x64/
+    - name: Upload Installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-deb-installer
+        path: ./out/deb/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.deb
+        retention-days: 10
   
