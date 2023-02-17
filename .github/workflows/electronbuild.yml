@@ -123,7 +123,7 @@ jobs:
     - name: see out directory
       run: ls ./out/deb/ForkBoard-$FBVERSION-x64/
     - name: rename output articfact
-      run: mv ./out/deb/ForkBoard-$FBVERSION-x64/forkboard_$FBVERSION_x64.deb ./out/deb/ForkBoard-$FBVERSION-x64/ForkBoard-$FBVERSION-x64.deb
+      run: mv ./out/deb/ForkBoard-$FBVERSION-x64/forkboard_1.1.1_amd64.deb ./out/deb/ForkBoard-$FBVERSION-x64/ForkBoard-$FBVERSION-x64.deb
     - name: see out/deb directory
       run: ls ./out/deb/ForkBoard-$FBVERSION-x64/
     - name: Upload Installer
