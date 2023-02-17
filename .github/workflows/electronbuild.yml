@@ -27,8 +27,7 @@ jobs:
       run: yarn installer-win
     - name: see out directory
       run: ls ./out/win
-#    - name: see installers directory
-#      run: ls ./out_win/installers
+
   build_on_mac_arm64:
     runs-on: macos-latest
     steps:
@@ -50,8 +49,7 @@ jobs:
       run: yarn installer-mac-arm64
     - name: see dist directory
       run: ls ./out/arm64
-#    - name: see installers directory
-#      run: ls ./out_mac_arm64/inst
+
   build_on_mac_x64:
     runs-on: macos-latest
     steps:
@@ -73,8 +71,7 @@ jobs:
       run: yarn installer-mac-x64
     - name: see dist directory
       run: ls ./out/x64
-#    - name: see installers directory
-#      run: ls ./out_mac_x64/inst
+
   build_on_ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -96,5 +93,7 @@ jobs:
       run: yarn installer-deb
     - name: see out directory
       run: ls ./out/deb
-#    - name: see installers directory
-#      run: ls ./out_deb/inst
+  
+artifacts:
+    paths:
+      - ./out/*
