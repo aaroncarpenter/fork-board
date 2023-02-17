@@ -40,12 +40,12 @@ jobs:
 #        asset_path: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
 #        asset_name: ForkBoard-1.1.1-x64.exe
 #        asset_content_type: application/octet-stream
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ github.token }}
         file: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
         asset_name: ForkBoard-1.1.1-x64.exe
         tag: v1.1.1-build
         overwrite: true
-  build_on_mac_arm64:
+  build_on_mac:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@master
