@@ -66,10 +66,10 @@ jobs:
       run: yarn package-mac-x64
     - name: Package ForkBoard for Mac (x64)
       run: yarn installer-mac-x64
-    - name: rename output articfact
+    - name: rename output articfact (arm64)
+      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FBVERSION-arm64.dmg
+    - name: rename output articfact (x64)
       run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FBVERSION-x64.dmg
-    - name: rename output articfact
-      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FBVERSION-arm64.dmg 
     - name: Upload Installer (arm64)
       uses: actions/upload-artifact@v3
       with:
