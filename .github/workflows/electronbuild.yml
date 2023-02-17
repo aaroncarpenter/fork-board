@@ -17,8 +17,6 @@ jobs:
     - uses: actions/setup-node@master
       with:
         node-version: 16.15.1
-#    - name: see directory
-#      run: ls
     - name: see NPM Reinstall
       run: yarn install
     - name: Install Electron Installer Windows
@@ -56,8 +54,6 @@ jobs:
     - uses: actions/setup-node@master
       with:
         node-version: 16.15.1
-#    - name: see directory
-#      run: ls
     - name: see NPM Reinstall
       run: yarn install
     - name: Install Electron Installer Mac
@@ -74,7 +70,6 @@ jobs:
       run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FBVERSION-x64.dmg
     - name: rename output articfact
       run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FBVERSION-arm64.dmg 
-
     - name: Upload Installer (arm64)
       uses: actions/upload-artifact@v3
       with:
@@ -114,8 +109,6 @@ jobs:
     - uses: actions/setup-node@master
       with:
         node-version: 16.15.1
-#    - name: see directory
-#      run: ls
     - name: see NPM Reinstall
       run: yarn install
     - name: Install Electron Installer Debian
@@ -124,12 +117,8 @@ jobs:
       run: yarn package-deb
     - name: Package ForkBoard for Ubuntu
       run: yarn installer-deb
-#    - name: see out directory
-#      run: ls ./out/deb/ForkBoard-$FBVERSION-x64/
     - name: rename output articfact
       run: mv ./out/deb/ForkBoard-$FBVERSION-x64/forkboard_1.1.1_amd64.deb ./out/deb/ForkBoard-$FBVERSION-x64/ForkBoard-$FBVERSION-x64.deb
-#    - name: see out/deb directory
-#      run: ls ./out/deb/ForkBoard-$FBVERSION-x64/
     - name: Upload Installer
       uses: actions/upload-artifact@v3
       with:
