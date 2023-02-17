@@ -30,9 +30,9 @@ jobs:
     - name: see out/win directory
       run: ls ./out/win
     - name: rename output articfact
-      run: mv ./out/win/ForkBoard-$env:VERSION-x64/ForkBoard-$env:VERSION-setup.exe ./out/win/ForkBoard-$env:VERSION-x64/ForkBoard-$env:VERSION-x64.exe
+      run: mv ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-setup.exe ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-x64.exe
     - name: see out/win directory
-      run: ls ./out/win/ForkBoard-$env:VERSION-x64/
+      run: ls ./out/win/ForkBoard-$env:FBVERSION-x64/
     - name: Upload Installer
       uses: actions/upload-artifact@v3
       with:
