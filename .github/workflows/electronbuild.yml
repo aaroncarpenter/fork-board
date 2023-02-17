@@ -5,8 +5,8 @@ on:
   # enable manual execution
   workflow_dispatch:
 env:
-  FBVERSION: 1.1.1-build
-  RELEASETAG: v1.1.1-build
+  FBVERSION: 1.1.1
+  RELEASETAG: v1.1.1
 # this is where the magic happens, each job happens in parallel btw
 jobs:
   build_on_win:
@@ -38,9 +38,9 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ github.token }}
-        file: ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-x64.exe
-        asset_name: ForkBoard-$env:FBVERSION-x64.exe
-        tag: ${{ env.RELEASEVERSION }}
+        file: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
+        asset_name: ForkBoard-1.1.1-x64.exe
+        tag: v1.1.1
         overwrite: true
   build_on_mac_arm64:
     runs-on: macos-latest
@@ -73,7 +73,7 @@ jobs:
         repo_token: ${{ github.token }}
         file: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
         asset_name: ForkBoard-1.1.1-arm64.dmg
-        tag: v1.1.1-build
+        tag: v1.1.1
         overwrite: true
   build_on_mac_x64:
     runs-on: macos-latest
@@ -106,7 +106,7 @@ jobs:
         repo_token: ${{ github.token }}
         file: ./out/x64/ForkBoard-1.1.1-x64.dmg
         asset_name: ForkBoard-1.1.1-x64.dmg
-        tag: v1.1.1-build
+        tag: v1.1.1
         overwrite: true
   build_on_ubuntu:
     runs-on: ubuntu-latest
@@ -139,6 +139,6 @@ jobs:
         repo_token: ${{ github.token }}
         file: ./out/deb/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.deb
         asset_name: ForkBoard-1.1.1-x64.deb
-        tag: v1.1.1-build
+        tag: v1.1.1
         overwrite: true
   
