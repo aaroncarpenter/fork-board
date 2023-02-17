@@ -34,10 +34,10 @@ jobs:
     - name: see out/win directory
       run: ls ./out/win/ForkBoard-$env:FB_VERSION-x64/
     - name: Upload Installer
-        uses: actions/upload-artifact@v3
-        with:
-          name: windows-x64-installer
-          path: ./out/win/ForkBoard-$env:FB_VERSION-x64/ForkBoard-$env:FB_VERSION-x64.exe
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-x64-installer
+        path: ./out/win/ForkBoard-$env:FB_VERSION-x64/ForkBoard-$env:FB_VERSION-x64.exe
   build_on_mac_arm64:
     runs-on: macos-latest
     steps:
