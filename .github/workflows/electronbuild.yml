@@ -36,17 +36,13 @@ jobs:
     - name: Upload release binary
       uses: svenstaro/upload-release-action@v2
       with:
-#        upload_url: https://uploads.github.com/repos/aaroncarpenter/fork-board/releases/92878061/assets{?name,label}
-#        asset_path: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
-#        asset_name: ForkBoard-1.1.1-x64.exe
-#        asset_content_type: application/octet-stream
         repo_token: ${{ github.token }}
         file: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
         asset_name: ForkBoard-1.1.1-x64.exe
         tag: v1.1.1-build
         overwrite: true
   build_on_mac_arm64:
-    runs-on: macos-latest
+    runs-on: [macos-latest, ARM64]
     steps:
     - uses: actions/checkout@master
       with:
@@ -71,16 +67,15 @@ jobs:
         path: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
         retention-days: 10
     - name: Upload release binary (arm64)
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+      uses: svenstaro/upload-release-action@v2
       with:
-        upload_url: https://uploads.github.com/repos/aaroncarpenter/fork-board/releases/92878061/assets{?name,label}
-        asset_path: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
+        repo_token: ${{ github.token }}
+        file: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
         asset_name: ForkBoard-1.1.1-arm64.dmg
-        asset_content_type: application/octet-stream
+        tag: v1.1.1-build
+        overwrite: true
   build_on_mac_x64:
-    runs-on: macos-latest
+    runs-on: [macos-latest, x64]
     steps:
     - uses: actions/checkout@master
       with:
@@ -105,14 +100,13 @@ jobs:
         path: ./out/x64/ForkBoard-1.1.1-x64.dmg
         retention-days: 10
     - name: Upload release binary (x64)
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+      uses: svenstaro/upload-release-action@v2
       with:
-        upload_url: https://uploads.github.com/repos/aaroncarpenter/fork-board/releases/92878061/assets{?name,label}
-        asset_path: ./out/x64/ForkBoard-1.1.1-x64.dmg
+        repo_token: ${{ github.token }}
+        file: ./out/x64/ForkBoard-1.1.1-x64.dmg
         asset_name: ForkBoard-1.1.1-x64.dmg
-        asset_content_type: application/octet-stream
+        tag: v1.1.1-build
+        overwrite: true
   build_on_ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -139,12 +133,11 @@ jobs:
         path: ./out/deb/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.deb
         retention-days: 10
     - name: Upload release binary (arm64)
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+      uses: svenstaro/upload-release-action@v2
       with:
-        upload_url: https://uploads.github.com/repos/aaroncarpenter/fork-board/releases/92878061/assets{?name,label}
-        asset_path: ./out/deb/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.deb
+        repo_token: ${{ github.token }}
+        file: ./out/deb/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.deb
         asset_name: ForkBoard-1.1.1-x64.deb
-        asset_content_type: application/octet-stream
+        tag: v1.1.1-build
+        overwrite: true
   
