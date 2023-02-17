@@ -61,7 +61,7 @@ jobs:
     - name: see dist directory
       run: ls ./out/arm64
     - name: rename output articfact
-      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FBVERSION-arm64.dmg
+      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FBVERSION-arm64.dmg 
     - name: see out/arm64 directory
       run: ls ./out/arm64/
     - name: Upload Installer
