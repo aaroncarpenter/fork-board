@@ -59,7 +59,15 @@ jobs:
       run: yarn installer-mac-arm64
     - name: see dist directory
       run: ls ./out/arm64
-
+    - name: rename output articfact
+      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FB_VERSION-arm64.dmg
+    - name: see out/win directory
+      run: ls ./out/arm64/
+    - name: Upload Installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-arm64-installer
+        path: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
   build_on_mac_x64:
     runs-on: macos-latest
     steps:
@@ -81,7 +89,15 @@ jobs:
       run: yarn installer-mac-x64
     - name: see dist directory
       run: ls ./out/x64
-
+    - name: rename output articfact
+      run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FB_VERSION-x64.dmg
+    - name: see out/win directory
+      run: ls ./out/x64/
+    - name: Upload Installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-x64-installer
+        path: ./out/x64/ForkBoard-1.1.1-x64.dmg
   build_on_ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -103,4 +119,13 @@ jobs:
       run: yarn installer-deb
     - name: see out directory
       run: ls ./out/deb
+    - name: rename output articfact
+      run: mv ./out/deb/ForkBoard-$env:FB_VERSION-x64/forkboard_$FB_VERSION_x64.deb ./out/deb/ForkBoard-$env:FB_VERSION-x64/ForkBoard-$FB_VERSION-x64.deb
+    - name: see out/deb directory
+      run: ls ./out/deb/ForkBoard-$FB_VERSION-x64/
+    - name: Upload Installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-deb-installer
+        path: ./out/deb/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.deb
   
