@@ -5,7 +5,7 @@ on:
   # enable manual execution
   workflow_dispatch:
 env:
-  FB_VERSION: 1.1.1
+  FBVERSION: 1.1.1
 # this is where the magic happens, each job happens in parallel btw
 jobs:
   build_on_win:
@@ -30,9 +30,9 @@ jobs:
     - name: see out/win directory
       run: ls ./out/win
     - name: rename output articfact
-      run: mv ./out/win/ForkBoard-$env:FB_VERSION-x64/ForkBoard-$env:FB_VERSION-setup.exe ./out/win/ForkBoard-$env:FB_VERSION-x64/ForkBoard-$env:FB_VERSION-x64.exe
+      run: mv ./out/win/ForkBoard-$env:VERSION-x64/ForkBoard-$env:VERSION-setup.exe ./out/win/ForkBoard-$env:VERSION-x64/ForkBoard-$env:VERSION-x64.exe
     - name: see out/win directory
-      run: ls ./out/win/ForkBoard-$env:FB_VERSION-x64/
+      run: ls ./out/win/ForkBoard-$env:VERSION-x64/
     - name: Upload Installer
       uses: actions/upload-artifact@v3
       with:
@@ -61,7 +61,7 @@ jobs:
     - name: see dist directory
       run: ls ./out/arm64
     - name: rename output articfact
-      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FB_VERSION-arm64.dmg
+      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$VERSION-arm64.dmg
     - name: see out/arm64 directory
       run: ls ./out/arm64/
     - name: Upload Installer
@@ -92,7 +92,7 @@ jobs:
     - name: see dist directory
       run: ls ./out/x64
     - name: rename output articfact
-      run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FB_VERSION-x64.dmg
+      run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$VERSION-x64.dmg
     - name: see out/x64 directory
       run: ls ./out/x64/
     - name: Upload Installer
@@ -121,11 +121,11 @@ jobs:
     - name: Package ForkBoard for Ubuntu
       run: yarn installer-deb
     - name: see out directory
-      run: ls ./out/deb
+      run: ls ./out/deb/ForkBoard-$VERSION-x64/
     - name: rename output articfact
-      run: mv ./out/deb/ForkBoard-$FB_VERSION-x64/forkboard_$FB_VERSION_x64.deb ./out/deb/ForkBoard-$FB_VERSION-x64/ForkBoard-$FB_VERSION-x64.deb
+      run: mv ./out/deb/ForkBoard-$VERSION-x64/forkboard_$VERSION_x64.deb ./out/deb/ForkBoard-$VERSION-x64/ForkBoard-$VERSION-x64.deb
     - name: see out/deb directory
-      run: ls ./out/deb/ForkBoard-$FB_VERSION-x64/
+      run: ls ./out/deb/ForkBoard-$VERSION-x64/
     - name: Upload Installer
       uses: actions/upload-artifact@v3
       with:
