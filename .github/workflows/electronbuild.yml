@@ -62,7 +62,7 @@ jobs:
       run: ls ./out/arm64
     - name: rename output articfact
       run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FB_VERSION-arm64.dmg
-    - name: see out/win directory
+    - name: see out/arm64 directory
       run: ls ./out/arm64/
     - name: Upload Installer
       uses: actions/upload-artifact@v3
@@ -93,7 +93,7 @@ jobs:
       run: ls ./out/x64
     - name: rename output articfact
       run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FB_VERSION-x64.dmg
-    - name: see out/win directory
+    - name: see out/x64 directory
       run: ls ./out/x64/
     - name: Upload Installer
       uses: actions/upload-artifact@v3
@@ -123,7 +123,7 @@ jobs:
     - name: see out directory
       run: ls ./out/deb
     - name: rename output articfact
-      run: mv ./out/deb/ForkBoard-$env:FB_VERSION-x64/forkboard_$FB_VERSION_x64.deb ./out/deb/ForkBoard-$env:FB_VERSION-x64/ForkBoard-$FB_VERSION-x64.deb
+      run: mv ./out/deb/ForkBoard-$FB_VERSION-x64/forkboard_$FB_VERSION_x64.deb ./out/deb/ForkBoard-$FB_VERSION-x64/ForkBoard-$FB_VERSION-x64.deb
     - name: see out/deb directory
       run: ls ./out/deb/ForkBoard-$FB_VERSION-x64/
     - name: Upload Installer
