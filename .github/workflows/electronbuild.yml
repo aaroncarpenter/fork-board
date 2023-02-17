@@ -27,6 +27,9 @@ jobs:
       run: yarn installer-win
     - name: see out directory
       run: ls ./out/win
+    artifacts:
+      paths:
+        - ./out/win/*
 
   build_on_mac_arm64:
     runs-on: macos-latest
@@ -94,6 +97,3 @@ jobs:
     - name: see out directory
       run: ls ./out/deb
   
-artifacts:
-    paths:
-      - ./out/*
