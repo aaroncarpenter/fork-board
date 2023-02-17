@@ -4,6 +4,8 @@ name: ForkBoard Build
 on:
   # enable manual execution
   workflow_dispatch:
+env:
+  FB_VERSION: 1.1.1
 # this is where the magic happens, each job happens in parallel btw
 jobs:
   build_on_win:
@@ -25,12 +27,12 @@ jobs:
       run: yarn package-win
     - name: Package ForkBoard
       run: yarn installer-win
-    - name: see out directory
+    - name: see out/win directory
       run: ls ./out/win
-    artifacts:
-      paths:
-        - ./out/win/*
-
+    - name: rename output articfact
+      run: mv ./out/win/ForkBoard-$FB_VERSION-x64/ForkBoard-$FB_VERSION-setup.exe ./out/win/ForkBoard-$FB_VERSION-x64/ForkBoard-$FB_VERSION-x64.exe
+    - name: see out/win directory
+      run: ls ./out/win/ForkBoard-$FB_VERSION-x64/
   build_on_mac_arm64:
     runs-on: macos-latest
     steps:
