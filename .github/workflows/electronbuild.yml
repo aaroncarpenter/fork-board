@@ -40,14 +40,14 @@ jobs:
         path: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
         retention-days: 10
     - name: Upload release binary
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: https://uploads.github.com/repos/aaroncarpenter/fork-board/releases/92878061/assets{?name,label}
-          asset_path: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
-          asset_name: ForkBoard-1.1.1-x64.exe
-          asset_content_type: application/octet-stream
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: https://uploads.github.com/repos/aaroncarpenter/fork-board/releases/92878061/assets{?name,label}
+        asset_path: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
+        asset_name: ForkBoard-1.1.1-x64.exe
+        asset_content_type: application/octet-stream
   build_on_mac_arm64:
     runs-on: macos-latest
     steps:
