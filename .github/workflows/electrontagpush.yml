@@ -2,8 +2,9 @@
 name: ForkBoard Build
 # this will help you specify where to run 
 on:
-  # enable manual execution
-  workflow_dispatch:
+  push:
+    tags:
+      - '*'
 env:
   FBVERSION: 1.1.1-build
   RELEASETAG: v1.1.1-build
@@ -40,7 +41,7 @@ jobs:
         repo_token: ${{ github.token }}
         file: ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-x64.exe
         asset_name: ForkBoard-$env:FBVERSION-x64.exe
-        tag: ${{ env.RELEASEVERSION }}
+        tag: ${{ github.ref }}
         overwrite: true
   build_on_mac_arm64:
     runs-on: macos-latest
