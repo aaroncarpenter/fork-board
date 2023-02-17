@@ -45,7 +45,7 @@ jobs:
         asset_name: ForkBoard-1.1.1-x64.exe
         tag: v1.1.1-build
         overwrite: true
-  build_on_mac:
+  build_on_mac_arm64:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@master
@@ -62,25 +62,13 @@ jobs:
       run: yarn package-mac-arm64
     - name: Package ForkBoard for Mac (arm64)
       run: yarn installer-mac-arm64
-    - name: Build ForkBoard for Mac (x64)
-      run: yarn package-mac-x64
-    - name: Package ForkBoard for Mac (x64)
-      run: yarn installer-mac-x64
-    - name: rename output articfact (arm64)
+    - name: rename output artifact (arm64)
       run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FBVERSION-arm64.dmg
-    - name: rename output articfact (x64)
-      run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FBVERSION-x64.dmg
     - name: Upload Installer (arm64)
       uses: actions/upload-artifact@v3
       with:
         name: mac-arm64-installer
         path: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
-        retention-days: 10
-      - name: Upload Installer (x64)
-      uses: actions/upload-artifact@v3
-      with:
-        name: mac-x64-installer
-        path: ./out/x64/ForkBoard-1.1.1-x64.dmg
         retention-days: 10
     - name: Upload release binary (arm64)
       uses: actions/upload-release-asset@v1.0.2
@@ -91,6 +79,31 @@ jobs:
         asset_path: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
         asset_name: ForkBoard-1.1.1-arm64.dmg
         asset_content_type: application/octet-stream
+  build_on_mac_x64:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        ref: master
+    - uses: actions/setup-node@master
+      with:
+        node-version: 16.15.1
+    - name: see NPM Reinstall
+      run: yarn install
+    - name: Install Electron Installer Mac
+      run: yarn add electron-installer-dmg@^4.0.0
+    - name: Build ForkBoard for Mac (x64)
+      run: yarn package-mac-x64
+    - name: Package ForkBoard for Mac (x64)
+      run: yarn installer-mac-x64
+    - name: rename output artifact (x64)
+      run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FBVERSION-x64.dmg
+    - name: Upload Installer (x64)
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-x64-installer
+        path: ./out/x64/ForkBoard-1.1.1-x64.dmg
+        retention-days: 10
     - name: Upload release binary (x64)
       uses: actions/upload-release-asset@v1.0.2
       env:
