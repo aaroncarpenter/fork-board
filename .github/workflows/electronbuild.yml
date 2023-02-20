@@ -37,7 +37,7 @@ jobs:
         tag: v1.1.1
         overwrite: true
   build_on_mac_arm64:
-    runs-on: macos-latest
+    runs-on: [self-hosted, macOS, ARM64]
     steps:
     - uses: actions/checkout@master
       with:
