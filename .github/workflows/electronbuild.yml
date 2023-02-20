@@ -27,18 +27,12 @@ jobs:
     - name: Package ForkBoard
       run: yarn installer-win
     - name: rename output articfact
-      run: mv ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-setup.exe ./out/win/ForkBoard-$env:FBVERSION-x64/ForkBoard-$env:FBVERSION-x64.exe
-#    - name: Upload Installer
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: windows-x64-installer
-#        path: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
-#        retention-days: 10
+      run: mv ./dist/ForkBoard-$env:FBVERSION-setup.exe ./dist/ForkBoard-$env:FBVERSION-x64.exe
     - name: Upload release binary
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ github.token }}
-        file: ./out/win/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.exe
+        file: ./dist/ForkBoard-1.1.1-x64.exe
         asset_name: ForkBoard-1.1.1-x64.exe
         tag: v1.1.1
         overwrite: true
@@ -60,18 +54,12 @@ jobs:
     - name: Package ForkBoard for Mac (arm64)
       run: yarn installer-mac-arm64
     - name: rename output artifact (arm64)
-      run: mv ./out/arm64/ForkBoard-arm64.dmg ./out/arm64/ForkBoard-$FBVERSION-arm64.dmg
-#    - name: Upload Installer (arm64)
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: mac-arm64-installer
-#        path: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
-#        retention-days: 10
+      run: mv ./dist/ForkBoard.dmg ./dist/ForkBoard-$FBVERSION-arm64.dmg
     - name: Upload release binary (arm64)
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ github.token }}
-        file: ./out/arm64/ForkBoard-1.1.1-arm64.dmg
+        file: ./dist/ForkBoard-1.1.1-arm64.dmg
         asset_name: ForkBoard-1.1.1-arm64.dmg
         tag: v1.1.1
         overwrite: true
@@ -93,18 +81,12 @@ jobs:
     - name: Package ForkBoard for Mac (x64)
       run: yarn installer-mac-x64
     - name: rename output artifact (x64)
-      run: mv ./out/x64/ForkBoard-x64.dmg ./out/x64/ForkBoard-$FBVERSION-x64.dmg
-#    - name: Upload Installer (x64)
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: mac-x64-installer
-#        path: ./out/x64/ForkBoard-1.1.1-x64.dmg
-#        retention-days: 10
+      run: mv ./dist/ForkBoard.dmg ./dist/ForkBoard-$FBVERSION-x64.dmg
     - name: Upload release binary (x64)
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ github.token }}
-        file: ./out/x64/ForkBoard-1.1.1-x64.dmg
+        file: ./dist/ForkBoard-1.1.1-x64.dmg
         asset_name: ForkBoard-1.1.1-x64.dmg
         tag: v1.1.1
         overwrite: true
@@ -127,12 +109,6 @@ jobs:
       run: yarn installer-deb
     - name: rename output articfact
       run: mv ./out/deb/ForkBoard-$FBVERSION-x64/forkboard_1.1.1_amd64.deb ./out/deb/ForkBoard-$FBVERSION-x64/ForkBoard-$FBVERSION-x64.deb
-#    - name: Upload Installer
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: mac-deb-installer
-#        path: ./out/deb/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.deb
-#        retention-days: 10
     - name: Upload release binary (arm64)
       uses: svenstaro/upload-release-action@v2
       with:
