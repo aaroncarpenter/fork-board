@@ -11,7 +11,7 @@
     "package-win": "electron-packager . ForkBoard --overwrite --win32 --x64 --icon=assets/icons/fork-board-gray.ico --prune=true --out=./dist --ignore=^/assets/config --ignore=^/logs",
     "installer-win": "electron-installer-windows --src ./dist/ForkBoard-win32-x64 --dest ./dist --icon=assets/icons/fork-board-gray.ico",
     "package-mac-arm64": "electron-packager . ForkBoard --darwin --arm64 --out=./dist --icon=assets/icons/fork-board-gray.icns --overwrite=true --prune=true --ignore=^/assets/config --ignore=^/logs",
-    "installer-mac-arm64": "electron-installer-dmg dist/ForkBoard-darwin-x64/ForkBoard.app dist/ForkBoard",
+    "installer-mac-arm64": "electron-installer-dmg dist/ForkBoard-darwin-arm64/ForkBoard.app dist/ForkBoard",
     "package-mac-x64": "electron-packager . ForkBoard --darwin --x64 --out=./dist --icon=assets/icons/fork-board-gray.icns --overwrite=true --prune=true --ignore=^/assets/config --ignore=^/logs",
     "installer-mac-x64": "electron-installer-dmg dist/ForkBoard-darwin-x64/ForkBoard.app dist/ForkBoard",
     "package-deb": "electron-packager . ForkBoard --overwrite --linux --x64 --icon=assets/icons/fork-board-gray.png --prune=true --out=./dist --ignore=^/assets/config --ignore=^/logs",
