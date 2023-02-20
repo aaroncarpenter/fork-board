@@ -108,12 +108,12 @@ jobs:
     - name: Package ForkBoard for Ubuntu
       run: yarn installer-deb
     - name: rename output articfact
-      run: mv ./out/deb/ForkBoard-$FBVERSION-x64/forkboard_1.1.1_amd64.deb ./out/deb/ForkBoard-$FBVERSION-x64/ForkBoard-$FBVERSION-x64.deb
+      run: mv ./dist/forkboard_1.1.1_amd64.deb ./dist/ForkBoard-$FBVERSION-x64.deb
     - name: Upload release binary (arm64)
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ github.token }}
-        file: ./out/deb/ForkBoard-1.1.1-x64/ForkBoard-1.1.1-x64.deb
+        file: ./dist/ForkBoard-1.1.1-x64.deb
         asset_name: ForkBoard-1.1.1-x64.deb
         tag: v1.1.1
         overwrite: true
