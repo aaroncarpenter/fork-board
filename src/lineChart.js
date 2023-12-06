@@ -159,7 +159,7 @@ ipcRenderer.on('async-get-line-graph-data-reply', (event, arg) => {
       graphData.every(function (dataGrp) {
          groupDateLbls.push(new Date(dataGrp.date).toLocaleDateString());
          groupCountVals.push(dataGrp.balance);
-         groupValueVals.push(utils.roundToPreferredDecimalPlaces(dataGrp.balanceUSD, 2) * exchangeRate);
+         groupValueVals.push(utils.roundToPreferredDecimalPlaces(dataGrp.balanceUSD, 4) * exchangeRate);
          return true;
       });
      
